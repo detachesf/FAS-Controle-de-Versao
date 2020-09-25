@@ -1,6 +1,6 @@
 # -*- coding: cp860 -*-
 
-import pickle
+import pickle  # serve para armazenar objetos e vari veis em arquivos
 import tkinter
 from tkinter.messagebox import showerror
 from tkinter import ttk
@@ -58,8 +58,8 @@ class Janela:
         self.PlanilhaArquivoLPEditado = ''
         self.caminhoArquivoLPEditado = ''
         self.pathchecar = getcwd
-        self.versao = '2.0.10'
-        self.data = '28/11/2018'
+        self.versao = '2.0.11'
+        self.data = '24/09/2020'
 
         # Tamanhos de frame
         frmlargura = 330
@@ -167,7 +167,7 @@ class Janela:
                                        # height=2,
                                        command=self.arquivoClickButton)
         self.botaoArquivo.grid(row=1, column=3, pady=20, padx=5)
-        #createToolTip(self.botaoArquivo, '–ltimo arquivo gerado de nova LP ou de checagem.')
+        # createToolTip(self.botaoArquivo, '–ltimo arquivo gerado de nova LP ou de checagem.')
 
         # FRAME Listbox ------------------------------------------------------------------------------------
         self.frm12 = ttk.LabelFrame(self.frmD, text=u" Relat¢rio Gera‡„o  ", height=4.7 * frmaltura,

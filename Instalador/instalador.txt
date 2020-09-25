@@ -9,12 +9,12 @@ bibliotecas (pasta \lib_bib)
    File Gerar_LP_Beta3.pyc
    File Checar_LP_Beta3.pyc
    File LP_Config.xls
-   File "Padrão Planilha Supervisão_rev1L(Minuta).xls"
+   File "Padrao Planilha Supervisao_rev1P.xlsm"
 
    File .\lp_lib\LP_Beta3.pyc
    File .\lp_lib\__init__.pyc
    File .\lp_lib\gerarPlanilhaLP.pyc
 
-   File python-2.7.2.msi
+   File python-3.4.4.msi
    File xlrd-0.7.1.win32.msi
    File xlwt-0.7.1.win32.exe

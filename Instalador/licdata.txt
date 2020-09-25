@@ -1,6 +1,6 @@
 ###     FAS - Ferramenta de Automatização para Supervisório   	  ###
 ###                          Mantido pelo DETA			 ###
-###                     Versão do programa: 2.0.10			 ###
+###                     Versão do programa: 2.0.11			 ###
 
 
 Programa gerado e mantido pelo DETA (DEPARTAMENTO DE ENGENRARIA

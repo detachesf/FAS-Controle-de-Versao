@@ -33,7 +33,7 @@ def gerar(LP_Padrao,relatorio,LP_Config):
         arq_conf = open_workbook(LP_Config) #Abrir arquivo de configura‡„o
     except:
         showerror('Erro','Arquivo de parametriza‡„o n„o encontrado')
-
+        print(LP_Config)
     try:
         sheet = arq_conf.sheet_by_index(0)           #Abrir planilha "Configura‡”es" do arquivo LP_config.xls
         Codigo_SE = sheet.cell(4,1).value.upper()    #Ler defini‡„o do c¢digo da SE
@@ -55,7 +55,7 @@ def gerar(LP_Padrao,relatorio,LP_Config):
     planilha_LP = arq_LP.worksheets()[0]
 
     linha = 6
-    for dado in saida[0]: #Passa por todas as linhas do array de sa¡da gravando pontos no Excel
+    for dado in saida[0]: # Passa por todas as linhas do array de sa¡da gravando pontos no Excel
         tag = dado[0]
         ocr = dado[1].value
         descr = dado[2]

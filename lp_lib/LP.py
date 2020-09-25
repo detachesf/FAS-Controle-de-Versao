@@ -14,8 +14,8 @@ except:
               'Arquivo "func.pyc" deve estar no diret¢rio "lp_lib"')
 
 dados = '''
-Vers„o do programa: 2.0.6
-Atualiza‡„o do programa: 05/02/2015
+Vers„o do programa: 2.0.11
+Atualiza‡„o do programa: 24/09/2020
 M¢dulo n£clea da funcionalidade de gerar planilha
 '''
 
@@ -317,9 +317,9 @@ def gerarlp(lp_padrao, LP_Config):
         index_linha += 1
 
     index_linha = 96
-    while sheet.cell(index_linha, 3).value:  # Linha 97 do LP_Config.xls, Carregar dado do Compensador S¡ncrono
+    while sheet.cell(index_linha, 0).value:  # Linha 97 do LP_Config.xls, Carregar dado do Compensador S¡ncrono
         # 0 - C¢digo operacional Ex. 04K1
-        conf_CS_array.append({'COD': sheet.cell(index_linha, ).value.upper(),
+        conf_CS_array.append({'COD': sheet.cell(index_linha, 0).value.upper(),
                               # 1 - Nome Painel UA Ex. 4UA7
                               'PNL': sheet.cell(index_linha, 1).value.upper(),
                               # A que a parametriza‡„o se refere
@@ -483,10 +483,10 @@ def gerarlp(lp_padrao, LP_Config):
                             for parametros_LT in conf_LT_array:
                                 ###Condi‡”es para processar o ponto###
 
-                                # N„o conste obserna‡„o #RELIGMONO ou conste #RELIGMONO e "Relig." definido como 'MONO/TRI'
+                                # N„o conste observa‡„o #RELIGMONO ou conste #RELIGMONO e "Relig." definido como 'MONO/TRI'
                                 cd1 = ('#RELIGMONO' not in observacao.upper()) or (
                                     '#RELIGMONO'.upper() in observacao and parametros_LT['79'] == 'MONO/TRI')
-                                # N„o conste obserna‡„o #DISJEMEIO ou conste #DISJEMEIO e "ARRANJO" definido como 'DISJ E MEIO'
+                                # N„o conste observa‡„o #DISJEMEIO ou conste #DISJEMEIO e "ARRANJO" definido como 'DISJ E MEIO'
                                 cd2 = ('#DISJEMEIO' not in observacao.upper()) or (
                                     '#DISJEMEIO' in observacao.upper() and parametros_LT['ARR'] == 'DISJ E MEIO')
                                 # N„o conste na descri‡„o #87 ou conste #87 e "Tem 87L" definido como 'Sim'
@@ -523,8 +523,10 @@ def gerarlp(lp_padrao, LP_Config):
                                 # N„o conste na observacao #85PNL ou conste #85PNL e "PAINEL TELEPROT." definido como 'Sim'
                                 cd13 = ('#85PNL' not in observacao.upper()) or (
                                     '#85PNL' in tratar and parametros_LT['85PNL'] == 'Sim')
+                                # N„o conste na observa‡„o #ACESSANTE
+                                cd14 = ('#ACESSANTE' not in observacao.upper()) # Modificar quando acrescentar a fun‡„o de painel de interface na LP_CONFIG
 
-                                if cd1 * cd2 * cd3 * cd4 * cd5 * cd6 * cd7 * cd8 * cd9 * cd10 * cd11 * cd12 * cd13:
+                                if cd1 * cd2 * cd3 * cd4 * cd5 * cd6 * cd7 * cd8 * cd9 * cd10 * cd11 * cd12 * cd13 * cd14:
 
                                     tratar_1 = tratar.replace('0YYY', parametros_LT['COD'])
                                     descricao_0 = descricao.replace('0YYY', parametros_LT['COD'])
@@ -567,6 +569,12 @@ def gerarlp(lp_padrao, LP_Config):
                                         for n_canal in range(1, 3):
                                             texto_canal = tratar_1[tratar_1.find('FPTn'):-1] + str(n_canal)
                                             tratar_2 = tratar_1.replace('FPTn', texto_canal)
+                                            gravar_ponto(tratar_2, descricao_1)
+                                            k_lt += 1
+                                    elif 'FPDn' in tratar_1:
+                                        for n_canal in range(1, 3):
+                                            texto_canal = tratar_1[tratar_1.find('FPDn'):-1] + str(n_canal)
+                                            tratar_2 = tratar_1.replace('FPDn', texto_canal)
                                             gravar_ponto(tratar_2, descricao_1)
                                             k_lt += 1
                                     else:
@@ -615,9 +623,12 @@ def gerarlp(lp_padrao, LP_Config):
                                 cd12 = ('F9' not in tratar) or ('F9' in tratar and parametros_Trafo['F9'] == 'Sim')
 
                                 if (cd1 + cd2) * cd3 * cd4 * cd5 * cd6 * cd7 * cd8 * cd9 * cd10 * cd11 * cd12:
-
-                                    tratar_1 = tratar.replace('0XTY', parametros_Trafo['COD'])
-                                    descricao_1 = descricao.replace('0XTY', parametros_Trafo['COD'])
+                                    if '0XTY' in tratar:
+                                        tratar_1 = tratar.replace('0XTY', parametros_Trafo['COD'])
+                                        descricao_1 = descricao.replace('0XTY', parametros_Trafo['COD'])
+                                    elif '0YYY' in tratar:
+                                        tratar_1 = tratar.replace('0YYY', parametros_Trafo['COD'])
+                                        descricao_1 = descricao.replace('0YYY', parametros_Trafo['COD'])
 
                                     if '{PNL}' in tratar_1:  # Substituir {PNL} pelo nome do painel
                                         for npnl in [parametros_Trafo['PNLH'], parametros_Trafo['PNLX']]:
@@ -637,6 +648,12 @@ def gerarlp(lp_padrao, LP_Config):
                                                     tratar_3 = tratar_2.replace('FPCn', texto_canal)
                                                     gravar_ponto(tratar_3, descricao_1)
                                                     k_trafo += 1
+                                            elif 'FPDn' in tratar_2:
+                                                for n_canal in range(1, 3):
+                                                    texto_canal = tratar_2[tratar_2.find('FPDn'):-1] + str(n_canal)
+                                                    tratar_3 = tratar_2.replace('FPDn', texto_canal)
+                                                    gravar_ponto(tratar_3, descricao_1)
+                                                    k_trafo += 1
                                             else:
                                                 gravar_ponto(tratar_2, descricao_1)
                                             k_trafo += 1
@@ -644,6 +661,12 @@ def gerarlp(lp_padrao, LP_Config):
                                         for n_canal in range(1, 3):
                                             texto_canal = tratar_1[tratar_1.find('FPCn'):-1] + str(n_canal)
                                             tratar_2 = tratar_1.replace('FPCn', texto_canal)
+                                            gravar_ponto(tratar_2, descricao_1)
+                                            k_trafo += 1
+                                    elif 'FPDn' in tratar_1:
+                                        for n_canal in range(1, 3):
+                                            texto_canal = tratar_1[tratar_1.find('FPDn'):-1] + str(n_canal)
+                                            tratar_2 = tratar_1.replace('FPDn', texto_canal)
                                             gravar_ponto(tratar_2, descricao_1)
                                             k_trafo += 1
                                     else:
@@ -656,23 +679,36 @@ def gerarlp(lp_padrao, LP_Config):
                                     for parametros_BT in conf_BT_array:
                                         cd1 = ('F9' not in tratar) or (
                                             'F9' in tratar and int(parametros_BT['COD'][1]) >= 3)
-
-                                        if cd1:
+                                        if '0YDY' in tratar:
                                             tratar_1 = tratar.replace('0YDY', parametros_BT['COD'])
-                                            tratar_2 = tratar_1.replace('1YDY', parametros_BT['COD'])
                                             descricao_1 = descricao.replace('0YDY', parametros_BT['COD'])
-                                            descricao_2 = descricao_1.replace('1YDY', parametros_BT['COD'])
-                                            tratar_3 = tratar_2.replace('{PNL}', parametros_BT['PNL'])
-
-                                            if 'FCOn' in tratar_3:
+                                        elif '1YDY' in tratar:
+                                            tratar_1 = tratar.replace('1YDY', parametros_BT['COD'])
+                                            descricao_1 = descricao.replace('1YDY', parametros_BT['COD'])
+                                        tratar_2 = tratar_1.replace('{PNL}', parametros_BT['PNL'])
+                                        if cd1:
+                                            if 'FCOn' in tratar_2:
                                                 for n_canal in range(1, 3):
-                                                    texto_canal = tratar_3[tratar_3.find('FCOn'):-1] + str(n_canal)
-                                                    tratar_4 = tratar_3.replace('FCOn', texto_canal)
-                                                    gravar_ponto(tratar_4, descricao_2)
+                                                    texto_canal = tratar_2[tratar_2.find('FCOn'):-1] + str(n_canal)
+                                                    tratar_3 = tratar_2.replace('FCOn', texto_canal)
+                                                    gravar_ponto(tratar_3, descricao_1)
+                                                    k_bt += 1
+                                            elif 'FPDn' in tratar_2:
+                                                for n_canal in range(1, 3):
+                                                    texto_canal = tratar_2[tratar_2.find('FPDn'):-1] + str(n_canal)
+                                                    tratar_3 = tratar_2.replace('FPDn', texto_canal)
+                                                    gravar_ponto(tratar_3, descricao_1)
+                                                    k_bt += 1
+                                            elif 'FPCn' in tratar_2:
+                                                for n_canal in range(1, 3):
+                                                    texto_canal = tratar_2[tratar_2.find('FPCn'):-1] + str(n_canal)
+                                                    tratar_3 = tratar_2.replace('FPCn', texto_canal)
+                                                    gravar_ponto(tratar_3, descricao_1)
                                                     k_bt += 1
                                             else:
-                                                gravar_ponto(tratar_3, descricao_2)
+                                                gravar_ponto(tratar_2, descricao_1)
                                                 k_bt += 1
+
                                 ###Condi‡”es para processar o ponto de Prote‡„o e Anal¢gicos###
                                 # Tenha o tag '0XB' no ID SAGE
                                 cd1 = (tratar[4:7] == '0XB')
@@ -720,14 +756,15 @@ def gerarlp(lp_padrao, LP_Config):
                                                             tratar_2 = tratar_1.replace('FPCn', texto_canal)
                                                             gravar_ponto(tratar_2, descricao_1)
                                                             k_barra += 1
+                                                    elif 'FPDn' in tratar_1:
+                                                        for n_canal in range(1, 3):
+                                                            texto_canal = tratar_1[tratar_1.find('FPDn'):-1] + str(
+                                                                n_canal)
+                                                            tratar_2 = tratar_1.replace('FPDn', texto_canal)
+                                                            gravar_ponto(tratar_2, descricao_1)
+                                                            k_barra += 1
                                                     else:
                                                         gravar_ponto(tratar_1, descricao)
-                                                        k_barra += 1
-                                                elif 'FPCn' in tratar:
-                                                    for n_canal in range(1, 3):
-                                                        texto_canal = tratar_1[tratar_1.find('FPCn'):-1] + str(n_canal)
-                                                        tratar_2 = tratar_1.replace('FPCn', texto_canal)
-                                                        gravar_ponto(tratar_2, descricao_1)
                                                         k_barra += 1
                                                 else:
                                                     for i in barras:
@@ -735,8 +772,21 @@ def gerarlp(lp_padrao, LP_Config):
                                                             i)  # c¢digo da Barra
                                                         tratar_1 = tratar.replace('0XBY', cod)
                                                         descricao_1 = descricao.replace('0XBY', cod)
-                                                        gravar_ponto(tratar_1, descricao_1)
-                                                        k_barra += 1
+                                                        if 'FPCn' in tratar_1:
+                                                            for n_canal in range(1, 3):
+                                                                texto_canal = tratar_1[tratar_1.find('FPCn'):-1] + str(n_canal)
+                                                                tratar_2 = tratar_1.replace('FPCn', texto_canal)
+                                                                gravar_ponto(tratar_2, descricao_1)
+                                                                k_barra += 1
+                                                        elif 'FPDn' in tratar_1:
+                                                            for n_canal in range(1, 3):
+                                                                texto_canal = tratar_1[tratar_1.find('FPDn'):-1] + str(n_canal)
+                                                                tratar_2 = tratar_1.replace('FPDn', texto_canal)
+                                                                gravar_ponto(tratar_2, descricao_1)
+                                                                k_barra += 1
+                                                        else:
+                                                            gravar_ponto(tratar_1, descricao_1)
+                                                            k_barra += 1
 
                             ###Condi‡”es para processar o ponto de Prote‡„o de Barras em painel pr¢prio###
                             # Tenha o tag '0XB' no ID SAGE ou seja ponto referente a Bay Unit de Prote‡„o de Barras
@@ -758,17 +808,21 @@ def gerarlp(lp_padrao, LP_Config):
                                             vaos_bu = parametros_87B['VAOS'].split(
                                                 '/')  # Gerar array com v„o que ter„o Bay Unit da prote‡„o de barras
                                             for vao in vaos_bu:  # Gerar pontos referente a IED F9 (Bay Unit de 87B) para cada v„o
+                                                tratar_1 = tratar.replace('1YDY', vao)
                                                 if 'FPCn' in tratar_1:
                                                     for n_canal in range(1, 3):
                                                         texto_canal = tratar_1[tratar_1.find('FPCn'):-1] + str(n_canal)
                                                         tratar_2 = tratar_1.replace('FPCn', texto_canal)
-                                                        gravar_ponto(tratar_2, descricao_1)
+                                                        gravar_ponto(tratar_2, descricao)
                                                         k_barra += 1
-
+                                                elif 'FPDn' in tratar_1:
+                                                    for n_canal in range(1, 3):
+                                                        texto_canal = tratar_1[tratar_1.find('FPDn'):-1] + str(n_canal)
+                                                        tratar_2 = tratar_1.replace('FPDn', texto_canal)
+                                                        gravar_ponto(tratar_2, descricao)
+                                                        k_barra += 1
                                                 else:
-                                                    tratar_1 = tratar.replace('0YDY', vao)
-                                                    tratar_2 = tratar_1.replace('1YDY', vao)
-                                                    gravar_ponto(tratar_2, descricao)
+                                                    gravar_ponto(tratar_1, descricao)
                                                     k_barra += 1
 
                                     elif '{PNL}' in tratar:  # Ponto Agrupado de Barra1 e Barra 2 com informa‡„o do Painel
@@ -787,8 +841,21 @@ def gerarlp(lp_padrao, LP_Config):
                                         if parametros_87B['ARR'] != 'DISJ E MEIO':
                                             cod = '0' + str(parametros_87B['PNL'][0])
                                             tratar_1 = tratar.replace('0X', cod)
-                                            gravar_ponto(tratar_1, descricao)
-                                            k_barra += 1
+                                            if 'FPCn' in tratar_1:
+                                                for n_canal in range(1, 3):
+                                                    texto_canal = tratar_1[tratar_1.find('FPCn'):-1] + str(n_canal)
+                                                    tratar_2 = tratar_1.replace('FPCn', texto_canal)
+                                                    gravar_ponto(tratar_2, descricao)
+                                                    k_barra += 1
+                                            elif 'FPDn' in tratar_1:
+                                                for n_canal in range(1, 3):
+                                                    texto_canal = tratar_1[tratar_1.find('FPDn'):-1] + str(n_canal)
+                                                    tratar_2 = tratar_1.replace('FPDn', texto_canal)
+                                                    gravar_ponto(tratar_2, descricao)
+                                                    k_barra += 1
+                                            else:
+                                                gravar_ponto(tratar_1, descricao)
+                                                k_barra += 1
                                     else:
                                         if parametros_87B['ARR'] == 'DISJ E MEIO':  # Se for disjuntor e meio
                                             for i in [1, 2]:
@@ -798,15 +865,41 @@ def gerarlp(lp_padrao, LP_Config):
                                                 tratar_1 = tratar.replace('0XBY', cod)
                                                 tratar_2 = tratar_1.replace('F8', 'F8.%s' % i)
                                                 descricao_1 = descricao.replace('0XBY', cod)
-                                                gravar_ponto(tratar_2, descricao_1)
-                                                k_barra += 1
+                                                if 'FPCn' in tratar_2:
+                                                    for n_canal in range(1, 3):
+                                                        texto_canal = tratar_2[tratar_2.find('FPCn'):-1] + str(n_canal)
+                                                        tratar_3 = tratar_2.replace('FPCn', texto_canal)
+                                                        gravar_ponto(tratar_3, descricao_1)
+                                                        k_barra += 1
+                                                elif 'FPDn' in tratar_2:
+                                                    for n_canal in range(1, 3):
+                                                        texto_canal = tratar_2[tratar_2.find('FPDn'):-1] + str(n_canal)
+                                                        tratar_3 = tratar_2.replace('FPDn', texto_canal)
+                                                        gravar_ponto(tratar_3, descricao_1)
+                                                        k_barra += 1
+                                                else:
+                                                    gravar_ponto(tratar_2, descricao_1)
+                                                    k_barra += 1
                                         else:  # Se n„o for disjuntor e meio
                                             for i in barras:
                                                 cod = '0' + str(parametros_87B['PNL'][0]) + 'B' + str(i)
                                                 tratar_1 = tratar.replace('0XBY', cod)
                                                 descricao_1 = descricao.replace('0XBY', cod)
-                                                gravar_ponto(tratar_1, descricao_1)
-                                                k_barra += 1
+                                                if 'FPCn' in tratar_1:
+                                                    for n_canal in range(1, 3):
+                                                        texto_canal = tratar_1[tratar_1.find('FPCn'):-1] + str(n_canal)
+                                                        tratar_2 = tratar_1.replace('FPCn', texto_canal)
+                                                        gravar_ponto(tratar_2, descricao_1)
+                                                        k_barra += 1
+                                                elif 'FPDn' in tratar_1:
+                                                    for n_canal in range(1, 3):
+                                                        texto_canal = tratar_1[tratar_1.find('FPDn'):-1] + str(n_canal)
+                                                        tratar_2 = tratar_1.replace('FPDn', texto_canal)
+                                                        gravar_ponto(tratar_2, descricao_1)
+                                                        k_barra += 1
+                                                else:
+                                                    gravar_ponto(tratar_1, descricao_1)
+                                                    k_barra += 1
 
                         elif sheet.name == 'Reator':
                             for parametros_Reator in conf_Reator_array:
@@ -827,16 +920,22 @@ def gerarlp(lp_padrao, LP_Config):
                                     tratar_1 = tratar.replace('0XEY', parametros_Reator['COD'])
                                     descricao_1 = descricao.replace('0XEY', parametros_Reator['COD'])
 
-                                    if 'FPCn' not in tratar_1:
-                                        tratar_2 = tratar_1.replace('{PNL}', parametros_Reator['PNL'])
-                                        gravar_ponto(tratar_2, descricao_1)
-                                        k_reator += 1
-                                    else:
+                                    if 'FPCn' in tratar_1:
                                         for n_canal in range(1, 3):
                                             texto_canal = tratar_1[tratar_1.find('FPCn'):-1] + str(n_canal)
                                             tratar_2 = tratar_1.replace('FPCn', texto_canal)
                                             gravar_ponto(tratar_2, descricao_1)
                                             k_reator += 1
+                                    elif 'FPDn' in tratar_1:
+                                        for n_canal in range(1, 3):
+                                            texto_canal = tratar_1[tratar_1.find('FPDn'):-1] + str(n_canal)
+                                            tratar_2 = tratar_1.replace('FPDn', texto_canal)
+                                            gravar_ponto(tratar_2, descricao_1)
+                                            k_reator += 1
+                                    else:
+                                        tratar_2 = tratar_1.replace('{PNL}', parametros_Reator['PNL'])
+                                        gravar_ponto(tratar_2, descricao_1)
+                                        k_reator += 1
 
                         elif sheet.name == 'T_Terra':
                             for parametros_TT in conf_TT_array:
@@ -1048,58 +1147,105 @@ def gerarlp(lp_padrao, LP_Config):
                                 if cd1 * cd2 * cd3:
                                     tratar_1 = tratar.replace('0XHY', parametros_Bcap['COD'])
                                     descricao_1 = descricao.replace('0XHY', parametros_Bcap['COD'])
-                                    if 'FPCn' not in tratar_1:
+                                    '''if 'FPCn' not in tratar_1:
                                         tratar_2 = tratar_1.replace('{PNL}', parametros_Bcap['PNL'])
                                         gravar_ponto(tratar_2, descricao_1)
                                         k_bcap += 1
-                                    else:
+                                    else:'''
+                                    if 'FPCn' in tratar_1:
                                         for n_canal in range(1, 3):
                                             texto_canal = tratar_1[tratar_1.find('FPCn'):-1] + str(n_canal)
                                             tratar_2 = tratar_1.replace('FPCn', texto_canal)
                                             gravar_ponto(tratar_2, descricao_1)
                                             k_bcap += 1
+                                    elif 'FPDn' in tratar_1:
+                                        for n_canal in range(1, 3):
+                                            texto_canal = tratar_1[tratar_1.find('FPDn'):-1] + str(n_canal)
+                                            tratar_2 = tratar_1.replace('FPDn', texto_canal)
+                                            gravar_ponto(tratar_2, descricao_1)
+                                            k_bcap += 1
+                                    else:
+                                        tratar_2 = tratar_1.replace('{PNL}', parametros_Bcap['PNL'])
+                                        gravar_ponto(tratar_2, descricao_1)
+                                        k_bcap += 1
 
                         elif sheet.name == 'BCS':
                             for parametros_BCS in conf_BCS_array:
                                 tratar_1 = tratar.replace('0XHY', parametros_BCS['COD'])
-                                if 'FPCn' not in tratar_1:
+                                '''if 'FPCn' not in tratar_1:
                                     tratar_2 = tratar_1.replace('{PNL}', parametros_BCS['PNL'])
                                     gravar_ponto(tratar_2, descricao)
                                     k_bcs += 1
-                                else:
+                                else:'''
+                                if 'FPCn' in tratar_1:
                                     for n_canal in range(1, 3):
                                         texto_canal = tratar_1[tratar_1.find('FPCn'):-1] + str(n_canal)
                                         tratar_2 = tratar_1.replace('FPCn', texto_canal)
                                         gravar_ponto(tratar_2, descricao)
                                         k_bcs += 1
+                                elif 'FPDn' in tratar_1:
+                                    for n_canal in range(1, 3):
+                                        texto_canal = tratar_1[tratar_1.find('FPDn'):-1] + str(n_canal)
+                                        tratar_2 = tratar_1.replace('FPDn', texto_canal)
+                                        gravar_ponto(tratar_2, descricao)
+                                        k_bcs += 1
+                                else:
+                                    tratar_2 = tratar_1.replace('{PNL}', parametros_BCS['PNL'])
+                                    gravar_ponto(tratar_2, descricao)
+                                    k_bcs += 1
 
                         elif sheet.name == 'ECE':
                             for parametros_ECE in conf_ECE_array:
                                 tratar_1 = tratar.replace('0XBY', parametros_ECE['COD'])
-                                if 'FPCn' not in tratar_1:
+                                '''if 'FPCn' not in tratar_1:
                                     tratar_2 = tratar_1.replace('{PNL}', parametros_ECE['PNL'])
                                     gravar_ponto(tratar_2, descricao)
                                     k_ece += 1
-                                else:
+                                else:'''
+                                if 'FPCn' in tratar_1:
                                     for n_canal in range(1, 3):
                                         texto_canal = tratar_1[tratar_1.find('FPCn'):-1] + str(n_canal)
                                         tratar_2 = tratar_1.replace('FPCn', texto_canal)
                                         gravar_ponto(tratar_2, descricao)
                                         k_ece += 1
+                                elif 'FPDn' in tratar_1:
+                                    for n_canal in range(1, 3):
+                                        texto_canal = tratar_1[tratar_1.find('FPDn'):-1] + str(n_canal)
+                                        tratar_2 = tratar_1.replace('FPDn', texto_canal)
+                                        gravar_ponto(tratar_2, descricao)
+                                        k_ece += 1
+                                else:
+                                    tratar_2 = tratar_1.replace('{PNL}', parametros_ECE['PNL'])
+                                    gravar_ponto(tratar_2, descricao)
+                                    k_ece += 1
 
                         elif sheet.name == 'CS':
                             for parametros_CS in conf_CS_array:
                                 tratar_1 = tratar.replace('0XKY', parametros_CS['COD'])
-                                if 'FPCn' not in tratar_1:
+                                '''if 'FPCn' not in tratar_1:
                                     tratar_2 = tratar_2.replace('{PNL}', parametros_CS['PNL'])
                                     gravar_ponto(tratar_2, descricao)
                                     k_cs += 1
-                                else:
+                                else:'''
+                                if 'FPCn' in tratar_1:
                                     for n_canal in range(1, 3):
                                         texto_canal = tratar_1[tratar_1.find('FPCn'):-1] + str(n_canal)
                                         tratar_2 = tratar_1.replace('FPCn', texto_canal)
                                         gravar_ponto(tratar_2, descricao)
                                         k_cs += 1
+                                elif 'FPDn' in tratar_1:
+                                    for n_canal in range(1, 3):
+                                        texto_canal = tratar_1[tratar_1.find('FPDn'):-1] + str(n_canal)
+                                        tratar_2 = tratar_1.replace('FPDn', texto_canal)
+                                        gravar_ponto(tratar_2, descricao)
+                                        k_cs += 1
+                                elif '{PNL}' in tratar_1:
+                                    tratar_2 = tratar_1.replace('{PNL}', parametros_CS['PNL'])
+                                    gravar_ponto(tratar_2, descricao)
+                                    k_cs += 1
+                                else:
+                                    gravar_ponto(tratar_1, descricao)
+                                    k_cs += 1
 
                         elif sheet.name == 'Prep. Reen.':
                             if tratar.split(':')[1] == 'mmmmnnn':  # Sitema de Regula‡„o de Tens„o
