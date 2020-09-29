@@ -37,7 +37,7 @@ def gerarPlanilha(nome_arquivo):
     planilha.set_row(2, options={'hidden': True})
     planilha.set_row(5, 115)    
     planilha.freeze_panes(6,0)
-
+    planilha
     
     # Campo ITEM ------------------------------------------------------------------
     formato1 = arquivo.add_format({

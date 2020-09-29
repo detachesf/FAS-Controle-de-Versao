@@ -111,15 +111,25 @@ def gerarlp(lp_padrao, LP_Config):
                               'POR_SW': sheet.cell(index_linha, 4).value,
                               # 5 - Firewall (Sim/N„o)
                               'FW': sheet.cell(index_linha, 5).value,
+                              # 6 - N£mero de portas do Firewall
+                              'POR_FW': sheet.cell(index_linha, 6).value,
+                              # 7 - RedBox (Sim/N„o)
+                              'RB': sheet.cell(index_linha, 7).value,
+                              # 8 - N£mero Inicial de RedBox
+                              'DE_RB': sheet.cell(index_linha, 8).value,
+                              # 9 - N£mero Final de RedBox
+                              'ATE_RB': sheet.cell(index_linha, 9).value,
+                              # 10 - N£mero de portas do RedBox
+                              'POR_RB': sheet.cell(index_linha, 10).value,
                               # A que a parametriza‡„o se refere
                               'TIPO': 'SD'})
         index_linha += 1
         evento_dic['SD'] = True  # Define que planilha SD da LP padr„o ser  lida
 
     index_linha = 9  # Linha 10 do LP_Config.xls, in¡cio de lista de Painel SAGE e Bastidores de Rede
-    if sheet.cell(index_linha, 7).value:  # Carregar dados RDP
-        conf_RDP = {'DE_RDP': sheet.cell(index_linha, 7).value,
-                    'ATE_RDP': sheet.cell(index_linha, 8).value or sheet.cell(index_linha, 7).value,
+    if sheet.cell(index_linha, 12).value:  # Carregar dados RDP
+        conf_RDP = {'DE_RDP': sheet.cell(index_linha, 12).value,
+                    'ATE_RDP': sheet.cell(index_linha, 13).value or sheet.cell(index_linha, 12).value,
                     # Se n„o foi definido valor, atribuir valor do campo 1
                     'TIPO': 'RDP'}
         evento_dic['SD'] = True  # Define que planilha SD da LP padr„o ser  lida
@@ -450,21 +460,38 @@ def gerarlp(lp_padrao, LP_Config):
                                             disp_array.append([sw])
                                         if parametros_SD['FW'] == 'Sim':
                                             disp_array.append(['FW'])
-
+                                        if parametros_SD['RB'] == 'Sim':
+                                            for nrb in range(int(parametros_SD['DE_RB']),int(parametros_SD['ATE_RB']) + 1):
+                                                rb = 'RB' + str(nrb)
+                                                disp_array.append([rb])
                                         if tratar[-4:] == 'FDSD':  # Falha Dispositivo
                                             for disp in disp_array:
                                                 tratar_1 = tratar.replace('{DISP}', disp[0])
                                                 gravar_ponto(tratar_1, descricao)
                                                 k_sd += 1
                                         if tratar[-4:] == 'FCpp':  # Falha porta de Comunica‡„o
-                                            if ['FW'] in disp_array: disp_array.remove(['FW'])
                                             for disp in disp_array:
-                                                tratar_1 = tratar.replace('{DISP}', disp[0])
-                                                for porta in range(1, int(parametros_SD['POR_SW']) + 1):
-                                                    tag = 'FC{:02}'.format(porta)
-                                                    tratar_2 = tratar_1.replace('FCpp', tag)
-                                                    gravar_ponto(tratar_2, descricao)
-                                                    k_sd += 1
+                                                if 'FW' in disp[0]:
+                                                    tratar_1 = tratar.replace('{DISP}', disp[0])
+                                                    for porta in range(1, int(parametros_SD['POR_FW']) + 1):
+                                                        tag = 'FC{:02}'.format(porta)
+                                                        tratar_2 = tratar_1.replace('FCpp', tag)
+                                                        gravar_ponto(tratar_2, descricao)
+                                                        k_sd += 1
+                                                elif 'RB' in disp[0]:
+                                                    tratar_1 = tratar.replace('{DISP}', disp[0])
+                                                    for porta in range(1, int(parametros_SD['POR_RB']) + 1):
+                                                        tag = 'FC{:02}'.format(porta)
+                                                        tratar_2 = tratar_1.replace('FCpp', tag)
+                                                        gravar_ponto(tratar_2, descricao)
+                                                        k_sd += 1
+                                                elif 'SW' in disp[0]:
+                                                    tratar_1 = tratar.replace('{DISP}', disp[0])
+                                                    for porta in range(1, int(parametros_SD['POR_SW']) + 1):
+                                                        tag = 'FC{:02}'.format(porta)
+                                                        tratar_2 = tratar_1.replace('FCpp', tag)
+                                                        gravar_ponto(tratar_2, descricao)
+                                                        k_sd += 1
                                     elif 'SELE' in descricao.upper():  # pontos de sele‡„o de comando
                                         if parametros_SD['SB'] == 'SAGE':
                                             gravar_ponto(tratar, descricao)

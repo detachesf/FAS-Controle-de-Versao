@@ -1,0 +1,8 @@
+Link tutorial: https://www.youtube.com/watch?v=LOQT9bb0dG0&list=PLYZJPXr5by43GT9P_EFODHf9zi8HMXs5P&index=1
+
+Comandos no gitbash para atualizar :
+
+git status -> verificar se há alteração nos arquivos
+git add -A -> adicionar todos os arquivos alterados e mudanças
+git commit -m "(melhoria)" -> comando para informar a melhoria feita ou versão nova.
+git push -> faz o upload no github.
