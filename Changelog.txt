@@ -1,0 +1,318 @@
+# Changelog
+
+Todas as mudanças serão documentadas neste arquivo.
+
+###### Mantido pelo DETA.
+
+## [2.0.12](https://github.com/detachesf/FAS-Controle-de-Versao/tree/1d9e30fe3d207ac460a0b86b1a8d629a9e08c90f)- 16-10-2020
+
+### Adicionado
+
+- LP CONFIG:
+  - Campo ACESSO-SEGREGADO para Lista de Pontos de Acessantes Segregados.
+
+### Modificado
+
+- Inclusão na função de checagem, a verificação do preenchimento das colunas N3 (U até AT).
+- Retirado o limite de portas dos Switches na LP CONFIG, no campo de PAINEL SAGE E BASTIDOR DE REDE.
+
+### Corrigido
+
+- O FAS Não estava verificando os endereços N3  duplicados, agora o programa identifica qual das duas colunas estão os endereços (N3 Teleassistência ou N3).
+- O FAS estava gerando os IDs com UC1 para o lado de baixa tensão dos transformadores nos seguintes pontos:
+  - Bloqueio por sincronismo (25) (BSIN) 
+  - Falha Sincronismo para Fechamento (25) (FSPF)
+
+
+
+## [2.0.11](https://github.com/detachesf/FAS-Controle-de-Versao/tree/1d9e30fe3d207ac460a0b86b1a8d629a9e08c90f) - 29-09-2020
+
+### Adicionado
+
+- LP CONFIG:
+  - Opções 138/69 e 138/69/13,8 na coluna de relação do Transformador.
+  - Colunas Em Painel SAGE e Bastidor de Rede:
+    - RedBox (Sim/Não).
+    - RedBox-De e RedBox-Até (semelhante ao Switch).
+    - Nº de portas do Firewall.
+    - Nº de portas do RedBox.
+
+### Corrigido
+
+- Ponto FPDn não substituindo o "n" pelos números das portas. 
+- Ponto PATU sendo gerado para não acessante (LT).
+- O FAS não estava substituindo o 0YYY pelo código operacional do Trafo em:
+  - IEDs F1 e F2 nos pontos FCSI e ILOC.
+  - IEDs F1, F2, F9, UC1 e UC2 no ponto FPCn.
+
+## [2.0.10](https://github.com/detachesf/FAS-Controle-de-Versao/tree/0357e995823c711821327c23d3b3b0d29b336efc) - 28-11-2018
+### Adicionado
+- TooTips nos campos da LP CONFIG para ajuda no preenchimento.
+
+### Modificado
+- Pop-up de processamento.
+
+### Corrigido
+
+- Geração de pontos PASS para seccionadoras (FTCO e FCAM).
+- Geração de pontos FPCn e FPTn.
+
+## 2.0.9 - 18-04-2016
+
+### Modificado
+
+- Instalador do FAS com Python 3.4.4 (mesma versão intalada caso solicitado ao suporte TI da Chesf).
+- Durante checagem de LP utilizando atquivo de configuração como base o campo comando é checado se há preenchimento diferente de vazio, "CS", "CD" ou "SP.
+
+### Corrigido
+
+- Na geração de LP baseado em Base de Dados SAGE, a impossibilidade de achar a variável "ORDEM" em um registro de uma tabela pdf.dat não gera mais erro inerperado.
+
+## 2.0.8 - 10-12-2015
+
+### Modificado
+
+- Se existir pontos de ID fora do padrão será alertado que não será possível fazer sugestão ao invés de não executar a checagem.
+
+- Na geração de Lista de Pontos baseado em base de dados SAGE será lido arquivos por meio de "include" para as tabelas pds, pdd, pdf, pas, pad, paf, pts, ptd, ptf, cgs, cgf e tac.
+
+## 2.0.7 - 25-08-2015
+
+### Modificado
+
+- Modernização de botões com nova biblioteca gráfica.
+
+### Corrigido
+
+- Se houvesse ponto de comando com descrição ou outro campo preenchido errado o FAS comparava com o ponto de supervisão e não o ponto de comando da LP padrão.
+
+## 2.0.6 - 27-07-2015
+
+### Adicionado
+
+- Mensagem de "Processando" nos momento de geração, comparação e checagem da lista de pontos.
+
+### Corrigido
+
+- Pontos PBSS do  disjuntor para PASS estavam sendo gerados igual ao convencional (sem ser PASS.
+- Pontos PBSP do  disjuntor para PASS estavam sendo gerados sem substituir o texto ":Z" do ID do Ponto.
+- Pontos da LP padrão com ID constando mais de quatro campos sepadados por ":" e que necessitavem ser gerados mais de um ponto resultante (exemplo: "[F1/F2]" no terceiro campo) desconsideravam a partir do quinto campo do ID.
+- Os pontos referentes a FTCO e FCAM com descrição errada em caso de sistema PASS.
+- LP_Config não estava aceitando entrada de valor para número de painéis para proteção de barras.
+- Checar se o arquivo LP_Config é ao menos da versão 2.0.0, compatível com as novas versões do programa.
+
+## 2.0.5- 23-12-2014
+
+### Adicionado
+
+- Ajuste das colunas das Planilhas Problema e Pontos_faltantes do arquivo Relatório, além da PADRÃO do arquivo LP_gerada.
+
+### Modificado
+
+- Funcionalidade de ID Sugerido.
+
+### Corrigido
+
+- Na funcionalidade de Checagem da lista de pontos, os pontos de comando e status de equipamento (mesmo ID) eram confundidos.
+
+## 2.0.4 - 02-12-2014
+
+### Adicionado
+
+- No arquivo Relatório (resultado da checagem), exite uma nova Planilha (Resumo) com as informações resumo da checagem que aparecem na tela do FAS.
+- No nome do arquivo de relatório gerado na checagem agora consta o código da subestação. 
+- Na geração da Lita de pontos é salvo um arquivo "log_GER_[código da SE].txt" com resumo de pontos gerados.
+- No nome do  arquivo de relatório gerado agora consta a sigla da subestação checada.
+
+### Modificado
+
+- Ajuste na geração de planilha e na checagem, renomeando coluna "ANUNCIADOR" para "TELA".
+
+### Corrigido
+
+- O ponto FLDI (Falha Disjuntor) para F3 estava sendo gerado para vão de LT.
+
+## 2.0.3 - 01-12-2014
+
+### Corrigido
+
+- As seccionadoras do lado de baixa do transformador quando o transformador tinha o mesmo arranjo de barras na Alta e na Baixa.
+
+## 2.0.2 
+
+### Adicionado
+
+- LP CONFIG:
+  - Coluna "PAINEL TELEPROT." para filtrar pontos referentes a painel de teleproteção para LTs.
+  - Coluna "Bay Unit (F9)" para filtrar pontos referentes a Bay Unit (F9) de proteção diferencial de barras.
+
+### Corrigido
+
+- Erro na lógica de geração de pontos com #TRIFASICO.
+- Erro no tratamento de #PASS na geração dos pontos:
+  - "FTCO" e "FCAM"
+  -  Para LT.
+  -  Para Disjuntor.
+
+## 2.0.1 
+### Modificado
+- Planilha Cepel para LP Excel:
+  - O valor de ID não pode estar vazio ou começar com ";" para o ponto ser considerado.
+  - O programa verifica se a última coluna da tabela que está com título vazio (chameio de coluna x/y) tem valor preenchido: se não tiver valor preenchido, ele processa todos os pontos desconsiderando a última coluna vazia (não existe definição de x/y na planilha, como é o caso da CEPEL pura).
+  - Caso exista a coluna x/y, só serão processados os pontos que tiverem um "x" ou "X.
+- Base SAGE para LP Excel:
+  - Não é mais exigido a existência dos arquivos ptd.dat, pts.dat e ptf.dat. Caso não  existam, a planilha é gerada e dado um aviso que não foram gravados pontos totalizadores.
+
+### Corrigido
+
+- Fechamento do programa na geração de pontos do SD sem definir RDP.
+
+## 2.0.0 - 27-10-2014 
+
+### Adicionado
+
+- Disponibilizada  funcionalidade "Planilha Cepel para LP Excel".
+- Inserido  coluna "RDP" para informar se vão trabalha com RDP com Stand Alone  nas tabelas de configuração de LT, Trafo, Banco Capacitor Shunt e  Reator. 
+- Criada  tabela de Configuração para RDP Central, no caso de haver central de RDP.
+
+### Modificado
+
+- Troca de  padrão de nome de IEDs de proteção de barras de F1/F2 para F8 (BPT e BD4 e  BD5) ou F8.1 e F8.2 (disjuntor e meio).
+- Na  planilha Disjuntor o ponto "FSPI" (Falha Seleção Proteção  Intrínseca) só é gerado para disjuntores de alta e baixa do transformador.
+- Adequação  a pontos referentes ao PASS. Para LT, Trafo, Vão de Transferência/Disjuntor  Central, Reator e Trafo Terra foram criadas as colunas Câmara PASS e Conjunto  de Secc que devem ser preenchidas apenas quando se trata de um bay utilizando  módulo isolado a SF6.
+- Em caso  de pontos para disjuntor 1XD2 (segundo disjuntor de transferência) para Barra  Dupla os nomes das barras serão considerados 0XB3 e 0XB4 nos IDs e descrição  do ponto.
+- Troca do  xlwt por XlsxWriter. Com isso, todos os arquivos gerados pelo FAS terão a  extensão xlsx .
+- Não se  necessita mais instalação separada do Python e módulos, ao se mandar instalar  o Python os módulos xlrd e XlsxWriter já estarão na instalação de forma  transparente para o usuário.
+- FAS  passa a ser desenvolvido em Python 3.4.2.
+
+### Corrigido
+
+- Não  estavam sendo gerados pontos referentes a disjuntor de by-pass e chaves  seccionadoras para vão de Banco Capacitor Série. Agora são gerados os pontos  do disjuntor e das chaves 6, 8, 9, 7A e 7B.
+- Estavam  sendo gerados pontos de chave 43 para disjuntores ligados como barra simple  (caso de reatores manobráveis).
+
+## 1.1.0 - 25-09-2014 
+
+### Adicionado
+
+- Na tela  de selecionar diretório da funcionalidade "Base SAGE para LP Excel"  consta orientação para que seja selecionado o diretório onde se encontram os  arquivos .dat.
+- Na  instalação é criado um atalho na área de trabalho.
+- Na  implementação de mensagem de erro inesperado na geração de LP é colocado em  tela de console o texto do erro ocorrido.
+- Implementação  para trabalhar com transformador de "230/6.9kV".
+
+### Modificado
+
+- No  relatório de checagem a coluna "POSSÍVEL ID" foi substituída por  "OBSERVAÇÕES". Agora os IDs sugeridos vêm precedidos do texto  "ID SUGERIDO -> " e esta coluna também é usada para mostrar o  conteúdo correto dos itens em vermelho da linha. As colunas que têm  preenchimento com X não são tratadas nesta coluna de observação.
+- Agora a  pasta padrão de instalação identifica a versão do FAS, possibilitando  coexistir mais de uma versão de FAS no  computador.
+- A aba  "Considerações Técnicas" do arquivo "LP_Config.xls" foi  retirada. Na instalação do FAS é criado o arquivo "Considerações  Técnicas N1 e N2.pptx" na pasta da instalação do FAS em substituição a  aba retirada.
+- No  dicionário de parametrização de cada vão foi adicionado o tipo de vão (não é  verificada qualquer mudança para usuário).
+- Instalador  com Python 2.7.7, xlrd 0.9.2 e xlwt 0.7.3.
+- Utilização  de dicionário no lugar de array para carregar configurações, facilitando  manutenção e modificação na planilha LP_Config (não é verificada qualquer  mudança para usuário).
+- Gravação  de ponto por meio de função, facilitando manutenção do programa (não é  verificada qualquer mudança para usuário).
+- Geração  Planilha ONS: melhoria nas mensagens de erro (exceções com textos mais  claros).
+
+### Corrigido
+
+- A  checagem de pontos não estava funcionando quando existia ID fora do padrão  esperado (BUG na implementação de ID Provável). Agora estes pontos são  listados no relatório de checagem.
+
+## 1.0.3 - 03-06-2014 
+
+### Adicionado
+
+- Mensagem de erro inesperado na geração de LP (erros não mapeados que não  davam mensagem alguma, apenas não gerava).
+
+### Modificado
+
+- Geração  Planilha ONS: Possibilidade de associação manual de um ponto a um item do  Procedimento de Redes 2.7 através de uso de colchetes para separar os itens.  Ex: [x.x.x.x.(x)] [y.y.y.y(y)]
+- Só eram  considerados pontos referentes a terciário de transformador os que continham  o texto "Terciário" da descrição do ponto. Agora também é checado  se existe "13.8" (qualquer dos 2 textos valida o ponto como ponto  de terciário).
+- O  programa procura a linha do excel que a lista de pontos a ser checada inicia,  não necessitando mais que o título esteja na linha 5 e que a lista de pontos  inicia na linha 7.
+
+### Corrigido
+
+- Pontos  de analógicos de barra no arranjo barra principal e transferência eram gerado  como 0XB1 e não 0XBP.
+- Geração  Planilha ONS:
+  - Geração da "Sequencia de Eventos Disjuntor" para BC  estava indexando itens trocados.
+  - Geração da lista para item 7.3.1.2.a (Sinalização de Estado)  estava ocultando parte dos pontos.
+  - Varredura das colunas realizada de forma independente da ordem  em que aparecem.
+  - Constatação da coluna ITEM da ONS sem preenchimento levantava  exceção com mensagem que não refletia o erro encontrado. 
+
+- Na  descrição de Banco Capacitor Shunt não estavam sendo substituidos os textos  0XHY por código do equipamento (02H1, por exemplo).
+
+## 1.0.2 - 30-09-2013 
+
+### Modificado
+
+- Substituição  de TAG 0YDY, possibilitando rodar usando LP padrão na versão 1L.
+- Em  linhas de 69kV com código 02F2 no ID SAGE seriam gerados IED FE com pontos de  funções 21 (distância), 68 (bloqueio  por oscilação de potência) e 78 (trip por oscilação de potência).
+- Na  sugestão de ID foram implementadas as seguintes checagens:     
+  - Só serão sugeridos IDs que não já existam na lista que está sendo  validada .   
+  - Caso se trate de ID de comando (possibilidade de 2 ID iguais) o programa  faz a sugestão.     
+
+### Corrigido
+
+- BUG na  funcionalidade de comparação de LPs surgido na versão 1.0.0.
+- Em  linhas de 69kV com código 02F2 no ID SAGE o código era substituído por 02UC1.  Resolvido.
+- 
+
+## 1.0.1 - 30-08-2013 
+
+### Modificado
+
+- Implementação  de na Checagem de coluna com "POSSÍVEL ID" e pintando de cor  amarela o ID SADE na planilha Pontos_Faltantes que foi sugerida.
+- Ao  selecionar um arquivo de configuração na tela Principal e clicar para seleção  de um arquivo a ser checado o programa aponta para o mesmo diretório do  arquivo já selecionado.
+- Ao  selecionar um arquivo na tela "Comparar Arquivos" e clicar para  seleção de um segundo arquivo o programa aponta para o mesmo diretório do  arquivo já selecionado.
+
+### Corrigido
+
+- BUG na  funcionalidade de Checagem surgido na versão 1.0.0.
+
+## 1.0.0 - 30-08-2013 
+
+### Adicionado
+
+- Ao gerar  um arquivo (LP, relatório, etc) pergunta ao usuário se deseja abrir o arquivo  gerado.
+- Implementação  de geração planilha ONS.
+- Importação  de base de dados SAGE para Lista de Pontos padrão Chesf.
+
+### Modificado
+
+- Possibilidade  de seleção de arranjo BS (Barra Simples).
+- Tratar  pontos de BARRAS quer conste 1YDY ou 0YDY na LP Padrão.
+
+### Corrigido
+
+- Resolvido  duplicidade de pontos para LT de 69 quando ponto definido para F1/F2/UC1  (antes gerava F1/UC1/UC1 agora apenas F1/UC1).
+- Resolvido  pontos de não substituição de nome de barramento para proteção de barramento  (59R) de 69kV em Transformador de Aterramento.
+- Correção  de geração de pontos de proteção de Barramento para arranjo disjuntor e meio.
+
+## BETA 12 - 07-05-2013
+
+### Adicionado
+
+- Botão "Selecionar" para o arquivo LP_Config e retirada do menu  "Arquivo" a opção "Definir arquivo de Parametrização...".
+- Implementação  do arranjo Barra Dupla a 3 Chaves:
+  - Geração de pontos de chaves seccionadoras 1, 2, 5, 7A e 7B.
+  - Inibição de pontos referentes a transferência de proteção (ID SAGE com  ":43:").
+- Foi  implementado preenchimento de campo de N3 e ONS na LP gerada.
+- Botão "Abrir Arquivo" que abre o LP gerado ou o relatório de  checagem.
+- Geração  de pontos de Sistema de Paralelismo.
+- Geração  de pontos de Preparação para Reenergização.
+- Geração  de pontos de CS.
+- Geração  de pontos de ECE.
+
+### Modificado
+
+- Não há  mais restrição para preenchimento dos campos "PAINEL" na planilha  "LP_Config.xls".
+- Inserção  de mais 2 linha de Vão de transferência, totalizando 5 linhas configuração e  adaptação para que a mesma tabela funcione para disjuntor central em arranjo  dijuntor e meio.
+- Para os  Ids SAGE que contém "FCOn" ou "PFCn" são gerados dois  pontos: "FCO1" e "FCO2", "PFC1" e  "PFC2" respectivamente.
+- Na  geração dos pontos de disjuntor:    
+  - Os pontos na LP padrão com observação "Para arranjos disjuntor e  meio." só são gerados caso o arranjo seja definido como "DISJ E  MEIO".     
+  - Inibição de pontos referentes a transferência de proteção (ID SAGE com  ":43:") para caso de arranjo disjuntor e meio.
+- Na  checagem de LP não são mais considerados os espaços a esquerda e a direita no  campo "Descrição".
+- Passa a  aceitar campos preenchidos com número na checagem de LP. A discrepância é  mostrada no relatório.
+- Ajuste  de colunas de LP gerada.
+- As  planilhas geradas com "_ 1", "_2", etc. Também incluem a  sigla da SE.
+
+### Corrigido
+
+- Quando o  arranjo da alta e da baixa eram iguais (exemplo: BPT na alta e BPT na baixa)  a geração de pontos de disjuntores da baixa não eram gerados e a alta eram  duplicados. Problema corrigido.
+

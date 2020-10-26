@@ -1,0 +1,7 @@
+-----Pontos Gerados-----
+
+LT____________________________207 pontos
+Disjuntor_____________________ 47 pontos
+Secc__________________________ 60 pontos
+
+Total: 314

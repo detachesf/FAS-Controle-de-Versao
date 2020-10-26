@@ -11,8 +11,8 @@ except:
     showerror('Erro', 'M¢dulo xlrd n„o instalado')
 
 dados= '''            
-Vers„o do programa: 2.0.10
-Atualiza‡„o do programa: 18/07/2016
+Vers„o do programa: 2.0.12
+Atualiza‡„o do programa: 16/10/2020
 Fun‡”es adicionais: painelLT69, linhaInicialETitulos
 '''
 
@@ -54,27 +54,103 @@ def linhaInicialETitulos(arquivo, nomeAba):
     """   
     
     arq_conf = open_workbook(arquivo)  
-    sheet = arq_conf.sheet_by_name(nomeAba) 
-    
+    sheet = arq_conf.sheet_by_name(nomeAba)
+    titulossuperiores = {}
+    TitulosPrinc = ['CHESF - N‹VEL 2', 'CHESF - TELEASSIST‰NCIA N3', 'CHESF - N‹VEL 3', 'ONS', 'LIMITES OPERACIONAIS']
     titulos = {}
     for li in range(1, 10):                                         #Varrer as linhas de 2 a 10
-        for i in range(sheet.ncols):                                #Varrer as colunas da linha
-            texto_coluna = sheet.cell_value(li,i).upper().strip()   #Pegar texto da c‚lula
-            if texto_coluna == '':                                  #Gravar £ltima posi‡„o com valor vazio
-                titulos[texto_coluna] = i
-            elif texto_coluna not in titulos:                       #Iserir chave se n„o existir no dicion rio
-                titulos[texto_coluna] = i
-        if 'ID (SAGE)' in titulos: break                     #Se foi passado pela linha com chave "ID (SAGE)" parar de varrer linhas 
-    
-    li += 1                                                         #Seleciona linha ap¢s o t¡tulo
-    if 'ID (SAGE)' in titulos:                               #Verifica se foi encontrado chave "ID (SAGE)"
+        for i in range(sheet.ncols):
+            texto = sheet.cell_value(li, i).upper().strip().replace("  "," ")
+            if texto in TitulosPrinc:
+                titulossuperiores[texto] = (li, i)
+        if 'CHESF - N‹VEL 2' in titulossuperiores: break                  #Se foi passado pela linha com chave "ID (SAGE)" parar de varrer linhas
+
+    for tit in TitulosPrinc:
+        if tit not in titulossuperiores:
+            showerror('Erro','T¡tulo {} n„o identificado no arquivo a ser checado, verifique se ele est  escrito desta mesma forma.'.format(tit))
+
+    subtitulosn2 = {}
+    subtitulosn3Tele = {}
+    subtitulosn3 = {}
+    subtitulosONS = {}
+    subtitulosLO = {}
+
+    for coluna in range(titulossuperiores['CHESF - N‹VEL 2'][1], titulossuperiores['CHESF - TELEASSIST‰NCIA N3'][1]):
+        for i in range(1,3):
+            if sheet.cell_value(titulossuperiores['CHESF - N‹VEL 2'][0] + i, coluna).upper().strip() != '':
+                subtitulosn2[sheet.cell_value(titulossuperiores['CHESF - N‹VEL 2'][0] + i, coluna).upper().strip()] = coluna
+                if coluna == titulossuperiores['CHESF - N‹VEL 2'][1]:
+                    li += 1
+                break
+    for coluna in range(titulossuperiores['CHESF - TELEASSIST‰NCIA N3'][1], titulossuperiores['CHESF - N‹VEL 3'][1]):
+        for i in range(1, 3):
+            if sheet.cell_value(titulossuperiores['CHESF - TELEASSIST‰NCIA N3'][0] + i, coluna).upper().strip() != '':
+                subtitulosn3Tele[sheet.cell_value(titulossuperiores['CHESF - TELEASSIST‰NCIA N3'][0] + i, coluna).upper().strip()] = coluna
+                if titulossuperiores['CHESF - TELEASSIST‰NCIA N3'][0] + i > li:
+                    li = titulossuperiores['CHESF - TELEASSIST‰NCIA N3'][0] + i
+                break
+
+    for coluna in range(titulossuperiores['CHESF - N‹VEL 3'][1], titulossuperiores['ONS'][1]):
+        for i in range(1, 3):
+            if sheet.cell_value(titulossuperiores['CHESF - N‹VEL 3'][0] + i, coluna).upper().strip() != '':
+                subtitulosn3[sheet.cell_value(titulossuperiores['CHESF - N‹VEL 3'][0] + i, coluna).upper().strip()] = coluna
+                if titulossuperiores['CHESF - N‹VEL 3'][0] + i > li:
+                    li = titulossuperiores['CHESF - N‹VEL 3'][0] + i
+                break
+
+    for coluna in range(titulossuperiores['ONS'][1], titulossuperiores['LIMITES OPERACIONAIS'][1]):
+        if sheet.cell_value(titulossuperiores['ONS'][0] + 2, coluna).upper().strip() != '':
+            subtitulosONS[sheet.cell_value(titulossuperiores['ONS'][0] + 2, coluna).upper().strip()] = coluna
+            if titulossuperiores['ONS'][0] + 2 > li:
+                li = titulossuperiores['ONS'][0] + 2
+
+    for coluna in range(titulossuperiores['LIMITES OPERACIONAIS'][1], titulossuperiores['LIMITES OPERACIONAIS'][1] + 8):
+        for i in range(1, 3):
+            if sheet.cell_value(titulossuperiores['LIMITES OPERACIONAIS'][0] + i, coluna).upper().strip() != '':
+                subtitulosLO[sheet.cell_value(titulossuperiores['LIMITES OPERACIONAIS'][0] + i, coluna).upper().strip()] = coluna
+                if titulossuperiores['LIMITES OPERACIONAIS'][0] + i > li:
+                    li = titulossuperiores['LIMITES OPERACIONAIS'][0] + i
+                break
+    #Nesse bloco s„o adicionados aos t¡tulos principais os campos com suas respectivas colunas
+    titulos['CHESF - N‹VEL 2'] = subtitulosn2
+    titulos['CHESF - TELEASSIST‰NCIA N3'] = subtitulosn3Tele
+    titulos['CHESF - N‹VEL 3'] = subtitulosn3
+    titulos['ONS'] = subtitulosONS
+    titulos['LIMITES OPERACIONAIS'] = subtitulosLO
+
+    #Campos padr„o de cada t¡tulo, nesse bloco ‚ feito o tratamento de erro, caso o arquivo a ser checado venha com os t¡tulos preenchidos erroneamente
+    camposN2 = ['ID (SAGE)','OCR (SAGE)','DESCRI€ŽO','TIPO','COMANDO','MEDI€ŽO','LISTA DE ALARMES','SOE']
+    camposN3Tele = ['OCR (SAGE)','COMANDO','MEDI€ŽO','LISTA DE ALARME','SOE','OBSERVA€ŽO','AGRUPAMENTO','ENDERE€O']
+    camposN3 = ['OCR (SAGE)','COMANDO','MEDI€ŽO','LISTA DE ALARME','SOE','OBSERVA€ŽO','AGRUPAMENTO','ENDERE€O']
+    camposONS = ['ITEM','DESCRI€ŽO']
+    camposLimop = ['LIU','LIE','LIA','LSA','LSE','LSU','BNDMO','OBSERVA€™ES']
+    if 'TELA' not in titulos['CHESF - N‹VEL 2'] and 'ANUNCIADOR' not in titulos['CHESF - N‹VEL 2']:
+        showerror('Erro','Campo TELA ou ANUNCIADOR n„o identificado abaixo do cabe‡alho CHESF - N‹VEL 2 do arquivo a ser checado, verifique se ele est  escrito desta mesma forma.')
+    for campo in camposN2:
+        if campo not in titulos['CHESF - N‹VEL 2']:
+            showerror('Erro','Campo {} n„o identificado abaixo do cabe‡alho CHESF - N‹VEL 2 do arquivo a ser checado, verifique se ele est  escrito desta mesma forma.'.format(campo))
+    for campo in camposN3Tele:
+        if campo not in titulos['CHESF - TELEASSIST‰NCIA N3']:
+            showerror('Erro', 'Campo {} n„o identificado abaixo do cabe‡alho CHESF - TELEASSIST‰NCIA N3 do arquivo a ser checado, verifique se ele est  escrito desta mesma forma.'.format(campo))
+    for campo in camposN3:
+        if campo not in titulos['CHESF - N‹VEL 3']:
+            showerror('Erro','Campo {} n„o identificado abaixo do cabe‡alho CHESF - N‹VEL 3 do arquivo a ser checado, verifique se ele est  escrito desta mesma forma.'.format(campo))
+    for campo in camposONS:
+        if campo not in titulos['ONS']:
+            showerror('Erro','Campo {} n„o identificado abaixo do cabe‡alho ONS do arquivo a ser checado, verifique se ele est  escrito desta mesma forma.'.format(campo))
+    for campo in camposLimop:
+        if campo not in titulos['LIMITES OPERACIONAIS']:
+            showerror('Erro','Campo {} n„o identificado abaixo do cabe‡alho LIMITES OPERACIONAIS do arquivo a ser checado, verifique se ele est  escrito desta mesma forma.'.format(campo))
+
+    li += 1  # Seleciona linha ap¢s o t¡tulo
+    if 'ID (SAGE)' in titulos['CHESF - N‹VEL 2']:                               #Verifica se foi encontrado chave "ID (SAGE)"
         while True:
-            if sheet.cell_value(li,titulos['ID (SAGE)']):              #Verifica se a c‚lula est  preenchida com algum valor
+            if sheet.cell_value(li, titulos['CHESF - N‹VEL 2']['ID (SAGE)']):              #Verifica se a c‚lula est  preenchida com algum valor
                 break                                                   #Parar de procurar linha preenchida
             else:
                 li += 1                                                 #Selecionar linha seguinte
     else:
-        li = -1            
+        li = -1
     return [li,titulos]
 
 def processing(function, args):

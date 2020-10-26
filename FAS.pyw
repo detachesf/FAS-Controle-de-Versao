@@ -58,8 +58,8 @@ class Janela:
         self.PlanilhaArquivoLPEditado = ''
         self.caminhoArquivoLPEditado = ''
         self.pathchecar = getcwd
-        self.versao = '2.0.11'
-        self.data = '24/09/2020'
+        self.versao = '2.0.12'
+        self.data = '16/10/2020'
 
         # Tamanhos de frame
         frmlargura = 330
@@ -234,8 +234,8 @@ class Janela:
             sheet = arq_conf.sheet_by_index(0)  # Abrir planilha "Configura‡”es" do arquivo LP_config.xls
             vers = re.findall('\d+\.\d+\.\d+', str(sheet.cell(110, 0)))[0].split('.')  # Ler defini‡„o do c¢digo da SE
             vers = list(map(int, vers))  # Transformar array de string em array de inteiro
-            if vers < [2, 0, 11]:
-                showerror('Erro', 'Deve ser usado arquivo LP_Config.xls com vers„o igual ou maior a 2.0.11')
+            if vers < [2, 0, 12]:
+                showerror('Erro', 'Deve ser usado arquivo LP_Config.xls com vers„o igual ou maior a 2.0.12')
             else:
                 try:
                     processing(gerar, {'LP_Padrao': self.caminhoArquivoLP_Padrao, 'relatorio': self.Lb,

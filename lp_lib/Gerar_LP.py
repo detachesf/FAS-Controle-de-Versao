@@ -120,7 +120,8 @@ def gerar(LP_Padrao,relatorio,LP_Config):
                      [12,'ECE'],
                      [13, 'CS'],
                      [14, 'Prep. Reen.'],
-                     [15, 'Sistema Regulacao']):
+                     [15, 'Sistema Regulacao'],
+                     [16, 'Painel de Interface']):
 
         if saida[1][k]>0: 
             relatorio.insert(END,evento.ljust(30,'_')+str(saida[1][k]).rjust(3)+' pontos')

@@ -131,7 +131,7 @@ def gerarPlanilha(nome_arquivo):
     'bg_color': '#7DF9FF',
     'border' : 1,
     })
-    for i in ('ID (SAGE)','OCR (SAGE)','DESCRI€ŽO','TIPO','COMANDO','MEDI€ŽO','TELA','LISTA DE ALARMES','SOE','OBSERVA€™ES','AGRUPAMENTO'):
+    for i in ('ID (SAGE)','OCR (SAGE)','DESCRI€ŽO','TIPO','COMANDO','MEDI€ŽO','TELA','LISTA DE ALARMES','SOE','OBSERVA€ŽO','AGRUPAMENTO'):
         planilha.merge_range(4,col,5,col,i, formato7)
         col+=1
     
@@ -185,7 +185,7 @@ def gerarPlanilha(nome_arquivo):
     'bg_color': 'FFFF99',
     'border' : 1,
     })
-    for i in ('OCR (SAGE)','COMANDO','MEDI€ŽO','LISTA DE ALARME','SOE','OBSERVA€O','ENDERE€O','AGRUPAMENTO'):
+    for i in ('OCR (SAGE)','COMANDO','MEDI€ŽO','LISTA DE ALARME','SOE','OBSERVA€ŽO','ENDERE€O','AGRUPAMENTO'):
         planilha.merge_range(4,col,5,col,i, formato11)
         col+=1
     # Campo ONS ------------------------------------------------------------------

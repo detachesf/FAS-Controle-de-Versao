@@ -14,8 +14,8 @@ except:
               'Arquivo "func.pyc" deve estar no diret¢rio "lp_lib"')
 
 dados = '''
-Vers„o do programa: 2.0.11
-Atualiza‡„o do programa: 24/09/2020
+Vers„o do programa: 2.0.12
+Atualiza‡„o do programa: 16/10/2020
 M¢dulo n£clea da funcionalidade de gerar planilha
 '''
 
@@ -27,7 +27,8 @@ def gerarlp(lp_padrao, LP_Config):
                   'B_CAP': False, 'Disjuntor': False, 'Secc': False,
                   'ECE': False, 'CS': False, 'CE': False, 'BCS': False,
                   'Reator': False, 'Prep. Reen.': False, 'SAs': False,
-                  'BARRA': False, 'SD': False}
+                  'BARRA': False, 'SD': False, 'SEP': False, 'P_Eolico': False,
+                  'P_Solar': False, 'P. Interface': False}
 
     # Dicion rio para c¢digo de Sistema de Regula‡„o
     tensao_dic = {'230kV': '230', '138kV': '138',
@@ -49,6 +50,8 @@ def gerarlp(lp_padrao, LP_Config):
     conf_CS_array = []  # Configura‡„o de Compensador S¡ncrono
     conf_PR_array = []  # Configura‡„o de Compensador S¡ncrono
     conf_SR_array = []  # Configura‡„o de Sistema Regula‡„o
+    conf_PInterface_array = [] #Configura‡„o do Acesso Segregado (P.interface)
+
     #    conf_CE_array = []          #Configura‡„o de Compensador Est tico
 
     saida_array = []  # Array que ser  gravado em LP_gerada
@@ -70,7 +73,7 @@ def gerarlp(lp_padrao, LP_Config):
     k_sas = 0  # |
     k_barra = 0  # |
     k_sd = 0  # |
-
+    k_Pint = 0 # |
     # ---------- Fun‡”es ----------#
     # Pega texto "A , B", coloca em  maipusculo, transforma em Array por v¡rgula e retira espa‡os de cada elemento
     def tratar_str_secc(s):
@@ -164,7 +167,6 @@ def gerarlp(lp_padrao, LP_Config):
         evento_dic['LT'] = True  # Define que planilha LT da LP padr„o ser  lida
         evento_dic['Disjuntor'] = True  # Define que planilha Disjuntor da LP padr„o ser  lida
         evento_dic['Secc'] = True  # Define que planilha Secc da LP padr„o ser  lida
-
     index_linha = 37  # Linha 38 do LP_Config.xls, in¡cio de lista de Trafos
     while sheet.cell(index_linha, 0).value:  # Carregar dados do Trafo enquanto existir c¢digo da Trafo na linha Excel
         # 0 - C¢digodigo operacional Trafo Ex. 04T1
@@ -223,7 +225,7 @@ def gerarlp(lp_padrao, LP_Config):
     index_linha = 57  # Linha 58 do LP_Config.xls, in¡cio de lista de Reator
     while sheet.cell(index_linha,
                      0).value:  # Carregar dados Reator na linha enquanto existir c¢digo da Reator na linha Excel
-        # 0 - C¢digo operacional Reator Ex. 04E1
+                                    # 0 - C¢digo operacional Reator Ex. 04E1
         conf_Reator_array.append({'COD': sheet.cell(index_linha, 0).value.upper(),
                                   # 1 - Nome do painel Ex. 4UA4A
                                   'PNL': sheet.cell(index_linha, 1).value.upper(),
@@ -244,6 +246,44 @@ def gerarlp(lp_padrao, LP_Config):
         evento_dic['Reator'] = True  # Define que planilha Reator da LP padr„o ser  lida
         evento_dic['Disjuntor'] = True  # Define que planilha Disjuntor da LP padr„o ser  lida
         evento_dic['Secc'] = True  # Define que planilha Secc da LP padr„o ser  lida
+        index_linha += 1
+    index_linha = 57 #Linha 58 do LP_Config.xls, in¡cio da lista de V„o Segregado
+    while sheet.cell(index_linha,
+                     10).value: #Carregar dados Painel de Interface enquanto existir C¢digo do v„o na linha Excel
+                                    # 0 - Codigo Operacional do v„o
+        conf_PInterface_array.append({'COD': sheet.cell(index_linha, 10).value.upper(),
+                                    # 1 - Nome do Painel do ACESSANTE Ex: 4UA13
+                                      'PNL': sheet.cell(index_linha, 11).value.upper(),
+                                    # 2 - Se vai ser em um Painel j  existente
+                                      'PNLEXIST': sheet.cell(index_linha, 12).value,
+                                    # 3 - N£mero da UC em um painel existente
+                                     'N£mero_UC_CHESF': sheet.cell(index_linha, 13).value,
+                                    # 4 - N£mero da UC em um painel existente
+                                     'N£mero_UC_ACESSANTE': sheet.cell(index_linha, 14).value,
+                                    # 5 - Arranjo do v„o
+                                      'ARR': sheet.cell(index_linha, 15).value,
+                                    # 6 - Se tem Terminal Server
+                                      'TS': sheet.cell(index_linha, 16).value,
+                                    # 7 - N£mero do primeiro Terminal Server
+                                      'TS-DE': sheet.cell(index_linha, 17).value,
+                                    # 8 - N£mero do £ltimo Terminal Server
+                                      'TS-ATE': sheet.cell(index_linha, 18).value,
+                                    # 9 - Se Tem Redbox
+                                      'RB': sheet.cell(index_linha, 19).value,
+                                    # 10 - N£mero do primeiro Redbox
+                                      'RB-DE': sheet.cell(index_linha, 20).value,
+                                    # 11 - N£mero do £ltimo RedBox
+                                      'RB-ATE': sheet.cell(index_linha, 21).value,
+                                    #12 - Se Tem Multimedidor
+                                      'MM': sheet.cell(index_linha, 22).value,
+                                    #13 - N£mero do primeiro Multimedidor
+                                      'MM-DE': sheet.cell(index_linha, 23).value,
+                                    #14 - N£mero do £ltimo Multimedidor
+                                      'MM-ATE': sheet.cell(index_linha, 24).value,
+                                    #15 - Sigla da LT Remota ao v„o segregado
+                                      'LTREMOTA': sheet.cell(index_linha, 25).value
+                                      })
+        evento_dic['P. Interface'] = True
         index_linha += 1
 
     index_linha = 69  # Linha 70 do LP_Config.xls, in¡cio de lista de Trafo Terra
@@ -401,9 +441,9 @@ def gerarlp(lp_padrao, LP_Config):
         showerror('Erro', aviso)
 
     if book.nsheets < 4: showerror('Erro', u'O programa n„o reconheceu a LP Padr„o como v lida')
-    for plan_index in range(3, 18):  # Ler Planilhas com index 3 a 17 (quarta a d‚cima oitava planilha), uma a uma
+    for plan_index in range(3, 22):  # Ler Planilhas com index 3 a 22 (quarta a vig‚sima primeira), uma a uma
         sheet = book.sheet_by_index(plan_index)  # Abrir planilhas
-        if sheet.name not in evento_dic: showerror('Erro', u'O programa n„o reconheceu a LP Padr„o como v lida')
+        if sheet.name not in evento_dic: showerror('Erro', u'O programa n„o reconheceu a LP Padr„o como v lida {}')
         if evento_dic[sheet.name]:  # Verificar se no arquivo de configura‡„o foi solicitado ler planilha
             # Gerar dicion rio titulo_dic (dicion rio de t¡tulos das colunas)
             for li in range(1, 10):  # Varrer as linhas de 2 a 10
@@ -550,10 +590,8 @@ def gerarlp(lp_padrao, LP_Config):
                                 # N„o conste na observacao #85PNL ou conste #85PNL e "PAINEL TELEPROT." definido como 'Sim'
                                 cd13 = ('#85PNL' not in observacao.upper()) or (
                                     '#85PNL' in tratar and parametros_LT['85PNL'] == 'Sim')
-                                # N„o conste na observa‡„o #ACESSANTE
-                                cd14 = ('#ACESSANTE' not in observacao.upper()) # Modificar quando acrescentar a fun‡„o de painel de interface na LP_CONFIG
-
-                                if cd1 * cd2 * cd3 * cd4 * cd5 * cd6 * cd7 * cd8 * cd9 * cd10 * cd11 * cd12 * cd13 * cd14:
+                                cd14 = ('#ACESSANTE' not in observacao.upper())
+                                if cd1 * cd2 * cd3 * cd4 * cd5 * cd6 * cd7 * cd8 * cd9 * cd10 * cd11 * cd12 * cd13* cd14 :
 
                                     tratar_1 = tratar.replace('0YYY', parametros_LT['COD'])
                                     descricao_0 = descricao.replace('0YYY', parametros_LT['COD'])
@@ -604,9 +642,193 @@ def gerarlp(lp_padrao, LP_Config):
                                             tratar_2 = tratar_1.replace('FPDn', texto_canal)
                                             gravar_ponto(tratar_2, descricao_1)
                                             k_lt += 1
+                                    elif tratar_1[-4:] == 'FDSD':  # Falha Dispositivo
+                                        disp_array = []  # Lista de dispositivos para P.Interface
+                                        if parametros_LT['TS'] == 'Sim':
+                                            for nts in range(int(parametros_LT['DE_TS']), int(parametros_LT['ATE_TS']) + 1):
+                                                ts = 'TS' + str(nts)
+                                                disp_array.append([ts])
+                                        if parametros_LT['RB'] == 'Sim':
+                                            for nrb in range(int(parametros_LT['DE_RB']),int(parametros_LT['ATE_RB']) + 1):
+                                                rb = 'RB' + str(nrb)
+                                                disp_array.append([rb])
+                                        if tratar[-4:] == 'FDSD' and disp_array != '':  # Falha Dispositivo
+                                            for disp in disp_array:
+                                                tratar_1 = tratar.replace('{DISP}', disp[0])
+                                                gravar_ponto(tratar_1, descricao)
+                                                k_lt += 1
                                     else:
                                         gravar_ponto(tratar_1, descricao_1)
                                         k_lt += 1
+
+                        elif sheet.name == 'P. Interface':
+                            for parametros_PINT in conf_PInterface_array:
+
+                                cd1 = ('#ACESSANTE' in observacao.upper() or ('#ACESSANTE' in observacao.upper() and '#ACESSADA' in observacao.upper()) or '#CHESF' in observacao.upper())
+                                #                               # N„o conste na observa‡„o #ACESSADA ou conste #ACESSADA e o P.Interface definido como ACESSADA
+                                # N„o conste na obesrva‡„o #PAINEL ou conste #PAINEL e o PAINELINT definido como Sim
+                                cd2 = ('#PAINEL' not in observacao.upper()) or (
+                                            '#PAINEL' in observacao.upper() and parametros_PINT['PNLEXIST'] == 'N„o')
+                                if cd1 * cd2:
+
+                                    tratar_1 = tratar.replace('YYY', parametros_PINT['COD'][-3:])
+                                    descricao_0 = descricao.replace('YYY',parametros_PINT['COD'][-3:])
+                                    descricao_1 = descricao_0.replace('XXX', parametros_PINT['LTREMOTA'])
+
+                                    if '{PNL}' in tratar_1:  # Substituir {PNL} pelo nome do painel
+                                        if '#CHESF' in observacao.upper():
+                                            painel = parametros_PINT['PNL'][0] + 'UA12-' + parametros_PINT['PNL'][6]
+                                            tratar_2 = tratar_1.replace('{PNL}', painel)
+                                            if 'UC1' in tratar_1:
+                                                if parametros_PINT['N£mero_UC_CHESF'] != "" and parametros_PINT['PNLEXIST'] =='Sim':
+                                                    if int(parametros_PINT['N£mero_UC_CHESF']) != 1:
+                                                        tratar_3 = tratar_2.replace('UC1','UC'+ '{:.0f}'.format(parametros_PINT['N£mero_UC_CHESF']))
+                                                        if 'FPCn' in tratar_3:
+                                                            for n_canal in range(1, 3):
+                                                                texto_canal = tratar_3[tratar_3.find('FPCn'):-1] + str(n_canal)
+                                                                tratar_4 = tratar_3.replace('FPCn', texto_canal)
+                                                                gravar_ponto(tratar_4, descricao_1)
+                                                                k_Pint += 1
+                                                        else:
+                                                            gravar_ponto(tratar_3, descricao_1)
+                                                            k_Pint += 1
+                                                else:
+                                                    if 'FPCn' in tratar_2:
+                                                        for n_canal in range(1, 3):
+                                                            texto_canal = tratar_2[tratar_2.find('FPCn'):-1] + str(
+                                                                n_canal)
+                                                            tratar_3 = tratar_2.replace('FPCn', texto_canal)
+                                                            gravar_ponto(tratar_3, descricao_1)
+                                                            k_Pint += 1
+                                                    else:
+                                                        gravar_ponto(tratar_2, descricao_1)
+                                                        k_Pint += 1
+                                            else:
+                                                gravar_ponto(tratar_2, descricao_1)
+                                                k_Pint += 1
+                                        else:
+                                            tratar_2 = tratar_1.replace('{PNL}', parametros_PINT['PNL'])
+                                            if 'UC1' in tratar_1:
+                                                if parametros_PINT['N£mero_UC_ACESSANTE'] != '':
+                                                    tratar_3 = tratar_2.replace('UC1', 'UC' + '{:.0f}'.format(
+                                                    parametros_PINT['N£mero_UC_ACESSANTE']))
+                                                    if int(parametros_PINT['N£mero_UC_ACESSANTE']) != 1:
+                                                        gravar_ponto(tratar_3, descricao_1)
+                                                        k_Pint += 1
+                                                else:
+                                                    gravar_ponto(tratar_2, descricao_1)
+                                                    k_Pint += 1
+                                            else:
+                                                gravar_ponto(tratar_2, descricao_1)
+                                                k_Pint += 1
+                                    elif '-Z' in tratar_1:
+                                        arranjo = parametros_PINT['ARR']
+                                        for nsecc in [1, 2, 4, 5, 6, 7, 8, 9]:
+                                            if nsecc == 1 and (arranjo[0:2] == 'BD' or arranjo == 'BT'):
+                                                tag_secc ='-' + '1'
+                                                tratar_2 = tratar_1.replace('-Z', tag_secc)
+                                                descricao_1 = descricao_0.replace('-Z', tag_secc)
+                                                gravar_ponto(tratar_2, descricao_1)
+                                                k_Pint += 1
+                                            elif nsecc == 2 and (arranjo[0:2] == 'BD' or arranjo == 'BT'):
+                                                tag_secc = '-' + '2'
+                                                tratar_2 = tratar_1.replace('-Z', tag_secc)
+                                                descricao_1 = descricao_0.replace('-Z', tag_secc)
+                                                gravar_ponto(tratar_2, descricao_1)
+                                                k_Pint += 1
+                                            elif nsecc == 4 and (
+                                                                arranjo == 'BPT' or arranjo == 'BD5' or arranjo == 'DISJ E MEIO'):
+                                                tag_secc = '-' + '4'
+                                                tratar_2 = tratar_1.replace('-Z', tag_secc)
+                                                descricao_1 = descricao_0.replace('-Z', tag_secc)
+                                                gravar_ponto(tratar_2, descricao_1)
+                                                k_Pint += 1
+                                            elif nsecc == 5 and (arranjo == 'BPT' or arranjo[
+                                                                                     0:2] == 'BD' or arranjo == 'DISJ E MEIO'):
+                                                tag_secc = '-' + '5'
+                                                tratar_2 = tratar_1.replace('-Z', tag_secc)
+                                                descricao_1 = descricao_0.replace('-Z', tag_secc)
+                                                gravar_ponto(tratar_2, descricao_1)
+                                                k_Pint += 1
+                                            elif nsecc == 6 and (
+                                                                    arranjo == 'BPT' or arranjo == 'BD4' or arranjo == 'BD5' or arranjo == 'BCS'):
+                                                tag_secc = '-' + '6'
+                                                tratar_2 = tratar_1.replace('-Z', tag_secc)
+                                                descricao_1 = descricao_0.replace('-Z', tag_secc)
+                                                gravar_ponto(tratar_2, descricao_1)
+                                                k_Pint += 1
+                                            elif nsecc == 7 and parametros_PINT['COD'][2] != 'T' and (
+                                                                    arranjo == 'BPT' or arranjo[
+                                                                                        0:2] == 'BD' or arranjo == 'DISJ E MEIO' or arranjo == 'BCS'):
+                                                if arranjo[0:3] != 'BD3' and arranjo != 'BCS':
+                                                    tag_secc = '-' + '7'
+                                                    tratar_2 = tratar_1.replace('-Z', tag_secc)
+                                                    descricao_1 = descricao_0.replace('-Z', tag_secc)
+                                                    gravar_ponto(tratar_2, descricao_1)
+                                                    k_Pint += 1
+                                                else:
+                                                    for secbd3 in ['A', 'B']:
+                                                        tag_secc = '-' + '7' + secbd3
+                                                        tratar_2 = tratar_1.replace('-Z', tag_secc)
+                                                        descricao_1 = descricao_0.replace('-Z', tag_secc)
+                                                        gravar_ponto(tratar_2, descricao_1)
+                                                        k_Pint += 1
+                                            elif nsecc == 8 and (
+                                                                    arranjo == 'DISJ E MEIO' or arranjo == 'BS' or arranjo == 'TT' or arranjo == 'BCS'):
+                                                tag_secc = '-' + '8'
+                                                tratar_2 = tratar_1.replace('-Z', tag_secc)
+                                                descricao_1 = descricao_0.replace('-Z', tag_secc)
+                                                gravar_ponto(tratar_2, descricao_1)
+                                                k_Pint += 1
+                                            elif nsecc == 9 and (arranjo == 'TT' or arranjo == 'BCS'):
+                                                tag_secc ='-' + '9'
+                                                tratar_2 = tratar_1.replace('-Z', tag_secc)
+                                                descricao_1 = descricao_0.replace('-Z', tag_secc)
+                                                gravar_ponto(tratar_2, descricao_1)
+                                                k_Pint += 1
+                                    elif tratar_1[
+                                        5] == '2' and ':F2' in tratar_1:  # Caso de linha de 69kV com ID contendo F2 e ponto a ser tratato que j  n„o contenha UC1
+                                        cd1 = ('FPCn' not in tratar_1)
+                                        cd2 = ('FGOE' not in tratar_1)
+                                        cd3 = ('FGPS' not in tratar_1)
+                                        cd4 = ('FIRE' not in tratar_1)
+                                        cd5 = ('FSPF' not in tratar_1)
+                                        cd6 = ('RAUT' not in tratar_1)
+                                        if cd1 * cd2 * cd3 * cd4 * cd5 * cd6:
+                                            tratar_2 = tratar_1.replace(':F2', ':UC1')
+                                            gravar_ponto(tratar_2, descricao_1)
+                                            k_Pint += 1
+                                    elif 'FPCn' in tratar_1:
+                                        for n_canal in range(1, 3):
+                                            texto_canal = tratar_1[tratar_1.find('FPCn'):-1] + str(n_canal)
+                                            tratar_2 = tratar_1.replace('FPCn', texto_canal)
+                                            gravar_ponto(tratar_2, descricao_1)
+                                            k_Pint += 1
+                                    elif tratar_1[-4:] == 'FDSD':  # Falha Dispositivo
+                                        disp_array = []  # Lista de dispositivos para P.Interface
+                                        if parametros_PINT['TS'] == 'Sim':
+                                            for nts in range(int(parametros_PINT['TS-DE']),
+                                                             int(parametros_PINT['TS-ATE']) + 1):
+                                                ts = 'TS' + str(nts)
+                                                disp_array.append([ts])
+                                        if parametros_PINT['RB'] == 'Sim':
+                                            for nrb in range(int(parametros_PINT['RB-DE']),
+                                                             int(parametros_PINT['RB-ATE']) + 1):
+                                                rb = 'RB' + str(nrb)
+                                                disp_array.append([rb])
+                                        if parametros_PINT['MM'] == 'Sim':
+                                            for nMM in range(int(parametros_PINT['MM-DE']),
+                                                             int(parametros_PINT['MM-ATE']) + 1):
+                                                MM = 'MM' + str(nMM)
+                                                disp_array.append([MM])
+                                        if tratar[-4:] == 'FDSD' and disp_array != '':  # Falha Dispositivo
+                                            for disp in disp_array:
+                                                tratar_1 = tratar.replace('{DISP}', disp[0])
+                                                gravar_ponto(tratar_1, descricao)
+                                                k_Pint += 1
+                                    else:
+                                        gravar_ponto(tratar_1, descricao_1)
+                                        k_Pint += 1
 
                         elif sheet.name == 'Trafo':
 
@@ -1057,6 +1279,11 @@ def gerarlp(lp_padrao, LP_Config):
                                                 tratar_2 = tratar_1.replace(':Z', ':{}'.format(cam))
                                                 gravar_ponto(tratar_2, descricao_1)
                                                 k_52 += 1
+                                        elif 'UC1' in tratar_1 and '(25)' in descricao_1 and len(arr)>1:
+                                            if arranjo == arr[1]:
+                                                tratar_2 = tratar_1.replace('UC1','UC2')
+                                                gravar_ponto(tratar_2, descricao_1)
+                                                k_52 += 1
                                         else:
                                             gravar_ponto(tratar_1, descricao_1)
                                             k_52 += 1
@@ -1447,7 +1674,9 @@ def gerarlp(lp_padrao, LP_Config):
               # 1 14 - Contador Prepara‡„o Reenergiza‡„o
               k_pr,
               # 1 15 - Contador Sistema Regula‡„o
-              k_sr]
+              k_sr,
+              # 1 16 - Contador Do Painel de Interface
+              k_Pint]
              ]
 
     saida = painelLT69(saida)
