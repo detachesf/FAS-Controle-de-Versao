@@ -62,9 +62,9 @@ def linhaInicialETitulos(arquivo, nomeAba):
         for i in range(sheet.ncols):
             texto = sheet.cell_value(li, i).upper().strip().replace("  "," ")
             if texto in TitulosPrinc:
-                titulossuperiores[texto] = (li, i)
-        if 'CHESF - N‹VEL 2' in titulossuperiores: break                  #Se foi passado pela linha com chave "ID (SAGE)" parar de varrer linhas
-
+                titulossuperiores[texto] = (li, i) #Pega a linha e coluna associada ao t¡tulo principal
+        if 'CHESF - N‹VEL 2' in titulossuperiores: break         #Se foi passado pela linha com chave "CHESF - N‹VEL 2" parar de varrer linhas
+    #Tratamento dos t¡tulos principais, se n„o estiver da mesma forma da aba PADRAO da lista de pontos, a mensagem de erro ‚ gerada
     for tit in TitulosPrinc:
         if tit not in titulossuperiores:
             showerror('Erro','T¡tulo {} n„o identificado no arquivo a ser checado, verifique se ele est  escrito desta mesma forma.'.format(tit))
@@ -74,13 +74,13 @@ def linhaInicialETitulos(arquivo, nomeAba):
     subtitulosn3 = {}
     subtitulosONS = {}
     subtitulosLO = {}
-
+# sess„o onde os subt¡tulos s„o captados da lista a ser checada
     for coluna in range(titulossuperiores['CHESF - N‹VEL 2'][1], titulossuperiores['CHESF - TELEASSIST‰NCIA N3'][1]):
         for i in range(1,3):
             if sheet.cell_value(titulossuperiores['CHESF - N‹VEL 2'][0] + i, coluna).upper().strip() != '':
                 subtitulosn2[sheet.cell_value(titulossuperiores['CHESF - N‹VEL 2'][0] + i, coluna).upper().strip()] = coluna
                 if coluna == titulossuperiores['CHESF - N‹VEL 2'][1]:
-                    li += 1
+                    li += 1 #guarda a £ltima linha de subt¡tulo preenchida
                 break
     for coluna in range(titulossuperiores['CHESF - TELEASSIST‰NCIA N3'][1], titulossuperiores['CHESF - N‹VEL 3'][1]):
         for i in range(1, 3):

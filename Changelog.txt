@@ -10,6 +10,8 @@ Todas as mudanças serão documentadas neste arquivo.
 
 - LP CONFIG:
   - Campo ACESSO-SEGREGADO para Lista de Pontos de Acessantes Segregados.
+- Checar LP
+  - Mensagem de erro Indicando o preenchimento correto das colunas de título, de acordo com a aba PADRAO da planilha lista de pontos padrão
 
 ### Modificado
 
