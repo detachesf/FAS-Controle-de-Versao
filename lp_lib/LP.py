@@ -193,8 +193,8 @@ def gerarlp(lp_padrao, LP_Config):
                                  'PASSCam': tratar_str_secc(sheet.cell(index_linha, 10).value),
                                  # Conjunto de comando das seccionadoras 
                                  'PASSSecc': tratar_str_secc(str(sheet.cell(index_linha, 11).value)),
-                                 # Sistema de Regula‡„o SAGE/SART...
-                                 'SISTREG': sheet.cell(index_linha, 12).value,
+                                 # Sistema de Regula‡„o via Aplica‡„o (SAGE) (Sim/N„o)...
+                                 'REGAPLIC': sheet.cell(index_linha, 12).value,
                                  # A que a parametriza‡„o se refere
                                  'TIPO': 'Trafo'})
         index_linha += 1
@@ -872,7 +872,7 @@ def gerarlp(lp_padrao, LP_Config):
                                     '#PASS'.upper() in observacao and bool(parametros_Trafo.get('PASSSecc', [None])[0]))
                                 # N„o contem no ID 'F9' ou contem 'F9' e "Bay Unit (F9)" definido como 'Sim'
                                 cd12 = ('F9' not in tratar) or ('F9' in tratar and parametros_Trafo['F9'] == 'Sim')
-                                cd13 = ('#APLICACAO' not in observacao.upper()) or ('#APLICACAO' in observacao.upper() and parametros_Trafo['SISTREG'] == 'SAGE')
+                                cd13 = ('#APLICACAO' not in observacao.upper()) or ('#APLICACAO' in observacao.upper() and parametros_Trafo['REGAPLIC'] == 'Sim')
 
                                 if (cd1 + cd2) * cd3 * cd4 * cd5 * cd6 * cd7 * cd8 * cd9 * cd10 * cd11 * cd12 * cd13:
                                     if '0XTY' in tratar:
