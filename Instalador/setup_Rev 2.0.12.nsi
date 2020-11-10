@@ -5,7 +5,7 @@ Name "FAS"
 
 # General Symbol Definitions
 !define REGKEY "SOFTWARE\$(^Name)"
-!define VERSION "REALESE_2.0.12"
+!define VERSION "2.0.12"
 !define COMPANY "DETA (DEPARTAMENTO DE ENGENRARIA DE AUTOMAÇÂO)"
 !define URL "http://novaintranet.chesf.gov.br/DE/SET/DETA/SitePages/FAS.aspx"
 

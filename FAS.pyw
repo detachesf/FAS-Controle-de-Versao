@@ -59,7 +59,7 @@ class Janela:
         self.caminhoArquivoLPEditado = ''
         self.pathchecar = getcwd
         self.versao = '2.0.12'
-        self.data = '16/10/2020'
+        self.data = '10/11/2020'
 
         # Tamanhos de frame
         frmlargura = 330
