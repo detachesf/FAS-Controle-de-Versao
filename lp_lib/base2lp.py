@@ -80,7 +80,11 @@ def base2lp(diretorio):
             for linha in arq.readlines():
                 k += 1
                 if linha.strip().startswith('#include'):
-                   dic.update(pdsfunc('{}\\{}'.format(caminho, linha.strip().split()[1].replace('/', '\\'))))
+                   if len(linha.strip().split()) <=2: #Caso o nome do arquivo de include n„o seja separado por espa‡o em branco
+                       include= '{}\\{}'.format(caminho, linha.strip().split()[1].replace('/', '\\'))
+                   elif len(linha.strip().split()) >2: #Caso o nomde do arquivo de include tenha separa‡„o por espa‡o em branco Ex: "BT 14D1"
+                       include= '{}\\{} {}'.format(caminho, linha.strip().split()[1].replace('/', '\\'),linha.strip().split()[2].replace('/', '\\'))
+                   dic.update(pdsfunc(include))
                 elif linha.strip() == 'PDS':
                     ID = OCR = NOME = TIPO = TAC = ''
                     ALRIN = SOE = 'X'
@@ -149,7 +153,11 @@ def base2lp(diretorio):
             for linha in arq.readlines():
                 k += 1
                 if linha.strip().startswith('#include'):
-                   dic.update(pdffunc('{}\\{}'.format(caminho, linha.strip().split()[1].replace('/','\\'))))
+                   if len(linha.strip().split()) <=2: #Caso o nome do arquivo de include n„o seja separado por espa‡o em branco
+                       include = '{}\\{}'.format(caminho, linha.strip().split()[1].replace('/', '\\'))
+                   elif len(linha.strip().split()) >2: #Caso o nomde do arquivo de include tenha separa‡„o por espa‡o em branco Ex: "BT 14D1"
+                       include = '{}\\{} {}'.format(caminho, linha.strip().split()[1].replace('/', '\\'),linha.strip().split()[2].replace('/', '\\'))
+                   dic.update(pdffunc(include))
                 elif linha.strip() == 'PDF':
                     ID = PNT = ''
                     novo = True
@@ -282,7 +290,11 @@ def base2lp(diretorio):
             for linha in arq.readlines():
                 k += 1
                 if linha.strip().startswith('#include'):
-                   dic.update(pasfunc('{}\\{}'.format(caminho, linha.strip().split()[1].replace('/', '\\'))))
+                   if len(linha.strip().split()) <=2: #Caso o nome do arquivo de include n„o seja separado por espa‡o em branco
+                       include = '{}\\{}'.format(caminho, linha.strip().split()[1].replace('/', '\\'))
+                   elif len(linha.strip().split()) >2: #Caso o nomde do arquivo de include tenha separa‡„o por espa‡o em branco Ex: "BT 14D1"
+                       include = '{}\\{} {}'.format(caminho, linha.strip().split()[1].replace('/', '\\'),linha.strip().split()[2].replace('/', '\\'))
+                   dic.update(pasfunc(include))
                 elif linha.strip() == 'PAS':
                     ID = OCR = NOME = TIPO = LIU = LIE = LIA = LSA = LSE = LSU = BNDMO =  TAC =''
                     ALRIN = 'X'
@@ -362,7 +374,11 @@ def base2lp(diretorio):
             for linha in arq.readlines():
                 k += 1
                 if linha.strip().startswith('#include'):
-                   dic.update(paffunc('{}\\{}'.format(caminho, linha.strip().split()[1].replace('/', '\\'))))
+                   if len(linha.strip().split()) <=2: #Caso o nome do arquivo de include n„o seja separado por espa‡o em branco
+                       include = '{}\\{}'.format(caminho, linha.strip().split()[1].replace('/', '\\'))
+                   elif len(linha.strip().split()) >2: #Caso o nomde do arquivo de include tenha separa‡„o por espa‡o em branco Ex: "BT 14D1"
+                       include = '{}\\{} {}'.format(caminho, linha.strip().split()[1].replace('/', '\\'),linha.strip().split()[2].replace('/', '\\'))
+                   dic.update(paffunc(include))
                 elif linha.strip() == 'PAF':
                     ID = PNT = ''
                     novo = True
@@ -389,12 +405,20 @@ def base2lp(diretorio):
             arq.seek(0)
             for linha in arq.readlines():
                 k += 1
+
                 if linha.strip().startswith('#include'):
-                   dic.update(cgsfunc('{}\\{}'.format(caminho, linha.strip().split()[1].replace('/', '\\'))))
+                    if len(
+                            linha.strip().split()) <= 2:  # Caso o nome do arquivo de include n„o seja separado por espa‡o em branco
+                        include = '{}\\{}'.format(caminho, linha.strip().split()[1].replace('/', '\\'))
+                    elif len(
+                            linha.strip().split()) > 2:  # Caso o nomde do arquivo de include tenha separa‡„o por espa‡o em branco Ex: "BT 14D1"
+                        include = '{}\\{} {}'.format(caminho, linha.strip().split()[1].replace('/', '\\'),
+                                                     linha.strip().split()[2].replace('/', '\\'))
+                    dic.update(cgsfunc(include))
                 elif linha.strip() == 'CGS':
-                    ID = NOME = TAC = ''
+                    ID = NOME = TAC = PAC = TIPOE = ''
                     novo = True
-                elif novo and (linha.strip() != '' and linha.strip() != 'CGS' and linha[0] != ';'):
+                elif novo and (linha.strip() != '' and linha.strip() != 'CGS' and linha != ';'):
                     if linha.split('=')[0].strip() == 'ID':
                         ID = linha.split('=')[1].strip()
                     elif linha.split('=')[0].strip() == 'NOME':
@@ -424,15 +448,25 @@ def base2lp(diretorio):
             for linha in arq.readlines():
                 k += 1
                 if linha.strip().startswith('#include'):
-                   dic.update(cgffunc('{}\\{}'.format(caminho, linha.strip().split()[1].replace('/', '\\'))))
+                    if len(
+                            linha.strip().split()) <= 2:  # Caso o nome do arquivo de include n„o seja separado por espa‡o em branco
+                        include = '{}\\{}'.format(caminho, linha.strip().split()[1].replace('/', '\\'))
+                    elif len(
+                            linha.strip().split()) > 2:  # Caso o nomde do arquivo de include tenha separa‡„o por espa‡o em branco Ex: "BT 14D1"
+                        include = '{}\\{} {}'.format(caminho, linha.strip().split()[1].replace('/', '\\'),
+                                                     linha.strip().split()[2].replace('/', '\\'))
+                    dic.update(cgffunc(include))
                 elif linha.strip() == 'CGF':
                     ID = PNT = ''
                     novo = True
-                elif novo and (linha.strip() != '' and linha.strip() != 'CGF' and linha[0] != ';'):
+                elif novo and (linha.strip() != '' and linha.strip() != 'CGF' and linha != ';'):
                     if linha.split('=')[0].strip() == 'ID':
                         ID = linha.split('=')[1].strip()
                     elif linha.split('=')[0].strip() == 'CGS':
                         CGS = linha.split('=')[1].strip()
+                    elif linha.split('=')[0].strip() == 'KCONV':
+                        if linha.split('=')[1].strip() == 'CGS':
+                            CGS = linha.split('=')[2].strip()
                     elif linha.split('=')[0].strip() == 'NV2':
                         NV2 = linha.split('=')[1].strip()
                     if k == kf:
@@ -455,7 +489,11 @@ def base2lp(diretorio):
             for linha in arq.readlines():
                 k += 1
                 if linha.strip().startswith('#include'):
-                   dic.update(tacfunc('{}\\{}'.format(caminho, linha.strip().split()[1].replace('/', '\\'))))
+                   if len(linha.strip().split()) <=2: #Caso o nome do arquivo de include n„o seja separado por espa‡o em branco
+                       include = '{}\\{}'.format(caminho, linha.strip().split()[1].replace('/', '\\'))
+                   elif len(linha.strip().split()) >2: #Caso o nomde do arquivo de include tenha separa‡„o por espa‡o em branco Ex: "BT 14D1"
+                       include = '{}\\{} {}'.format(caminho, linha.strip().split()[1].replace('/', '\\'),linha.strip().split()[2].replace('/', '\\'))
+                   dic.update(tacfunc(include))
                 elif linha.strip() == 'TAC':
                     ID = LSC = ''
                     novo = True
@@ -489,6 +527,7 @@ def base2lp(diretorio):
             ptd_dic = ptdfunc(diretorio)
         except:
             showwarning('Notifica‡„o', 'Arquivo "ptd.dat" n„o foi processado')
+            ptd_dic=''
         try:
             ptf_dic = ptffunc(diretorio)
         except:
@@ -632,8 +671,12 @@ def base2lp(diretorio):
             alarme = dado[4]
             obs = ''
             soe = 'X'
-            id_ptd = ptd_dic.get(tag, ['', ''])
-            end = ptf_dic.get(id_ptd[0], ['', ''])[0]
+            if ptd_dic != '':
+                id_ptd = ptd_dic.get(tag, ['', ''])
+                end = ptf_dic.get(id_ptd[0], ['', ''])[0]
+            else:
+                id_ptd = ''
+                end = ''
             lsa = dado[5]
             lse = dado[6]
             lsu = dado[7]              
