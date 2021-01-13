@@ -13,6 +13,8 @@ from os import startfile
 from tkinter import END
 from operator import itemgetter
 from difflib import get_close_matches
+from traceback import print_exc
+from sys import stdout
 
 try:
     from xlrd import open_workbook
@@ -72,6 +74,7 @@ def checar(LP_Padrao='', LP_Editado='', planilha='', relatorio='', LP_Config='',
         li, titulo_dic = linhaInicialETitulos(LP_Validar, Nome_Planilha)
         if li < 0:  # Se for um n£mero negativo ent„o n„o foi encontrado "ID (SAGE)" na lista
             raise NameError('Arquivo especificado n„o possui coluna com t¡tulo "ID (SAGE)".')
+
         for index_linha in range(li, sheet.nrows):  # Ler colunas da linha selecionada ao final
             if sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 2']['ID (SAGE)']).value != '' and \
                             sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 2']['ID (SAGE)']).value != 'CGS' and \
@@ -79,59 +82,59 @@ def checar(LP_Padrao='', LP_Editado='', planilha='', relatorio='', LP_Config='',
                             sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 2']['ID (SAGE)']).value != 'PAS':
                 try:  # Caso a descri‡„o do campo 6 seja "TELA"
                     # 0 - ID SAGE
-                    array_validar.append([sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 2']['ID (SAGE)']).value,
+                    array_validar.append([str(sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 2']['ID (SAGE)']).value),
                                           # N2
                                           # 1 - OCR
-                                          sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 2']['OCR (SAGE)']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 2']['OCR (SAGE)']).value),
                                           #1 - DESCRI€ŽO
-                                          sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 2']['DESCRI€ŽO']).value.strip(),
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 2']['DESCRI€ŽO']).value).strip(),
                                           #2 - TIPO
-                                          sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 2']['TIPO']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 2']['TIPO']).value),
                                           #3 - COMANDO
-                                          sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 2']['COMANDO']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 2']['COMANDO']).value),
                                           #4 - MEDI€ŽO
-                                          sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 2']['MEDI€ŽO']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 2']['MEDI€ŽO']).value),
                                           #5 - TELA
-                                          sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 2']['TELA']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 2']['TELA']).value),
                                           #6 - LISTA DE ALARMES
-                                          sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 2']['LISTA DE ALARMES']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 2']['LISTA DE ALARMES']).value),
                                           #7 - SOE
-                                          sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 2']['SOE']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 2']['SOE']).value),
                                           #TELEASSIST‰NCIA N3
                                           #8 - OCR
-                                          sheet.cell(index_linha, titulo_dic['CHESF - TELEASSIST‰NCIA N3']['OCR (SAGE)']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - TELEASSIST‰NCIA N3']['OCR (SAGE)']).value),
                                           #9 - COMANDO
-                                          sheet.cell(index_linha, titulo_dic['CHESF - TELEASSIST‰NCIA N3']['COMANDO']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - TELEASSIST‰NCIA N3']['COMANDO']).value),
                                           #10 - MEDI€ŽO
-                                          sheet.cell(index_linha, titulo_dic['CHESF - TELEASSIST‰NCIA N3']['MEDI€ŽO']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - TELEASSIST‰NCIA N3']['MEDI€ŽO']).value),
                                           #11 - LISTA DE ALARMES
-                                          sheet.cell(index_linha, titulo_dic['CHESF - TELEASSIST‰NCIA N3']['LISTA DE ALARME']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - TELEASSIST‰NCIA N3']['LISTA DE ALARME']).value),
                                           #12 - SOE
-                                          sheet.cell(index_linha, titulo_dic['CHESF - TELEASSIST‰NCIA N3']['SOE']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - TELEASSIST‰NCIA N3']['SOE']).value),
                                           #13 - OBSERVA€ŽO
-                                          sheet.cell(index_linha, titulo_dic['CHESF - TELEASSIST‰NCIA N3']['OBSERVA€ŽO']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - TELEASSIST‰NCIA N3']['OBSERVA€ŽO']).value),
                                           #15 - AGRUPAMENTO
-                                          sheet.cell(index_linha, titulo_dic['CHESF - TELEASSIST‰NCIA N3']['AGRUPAMENTO']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - TELEASSIST‰NCIA N3']['AGRUPAMENTO']).value),
                                           # N3
                                           #16 - OCR (SAGE)
-                                          sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 3']['OCR (SAGE)']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 3']['OCR (SAGE)']).value),
                                           #17 - COMANDO
-                                          sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 3']['COMANDO']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 3']['COMANDO']).value),
                                           #18 - MEDI€ŽO
-                                          sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 3']['MEDI€ŽO']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 3']['MEDI€ŽO']).value),
                                           #19 - LISTA DE ALARMES
-                                          sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 3']['LISTA DE ALARME']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 3']['LISTA DE ALARME']).value),
                                           #20 - SOE
-                                          sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 3']['SOE']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 3']['SOE']).value),
                                           #21 - OBSERVA€ŽO
-                                          sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 3']['OBSERVA€ŽO']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 3']['OBSERVA€ŽO']).value),
                                           #22 - AGRUPAMETO
-                                          sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 3']['AGRUPAMENTO']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 3']['AGRUPAMENTO']).value),
                                           #ONS
                                           #23 - ITEM
-                                          sheet.cell(index_linha, titulo_dic['ONS']['ITEM']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['ONS']['ITEM']).value),
                                           #24 - DESCRI€ŽO
-                                          sheet.cell(index_linha, titulo_dic['ONS']['DESCRI€ŽO']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['ONS']['DESCRI€ŽO']).value),
                                           #LIMITES OPERACIONAIS
                                           #25 - LIU
                                           sheet.cell(index_linha, titulo_dic['LIMITES OPERACIONAIS']['LIU']).value,
@@ -148,66 +151,66 @@ def checar(LP_Padrao='', LP_Editado='', planilha='', relatorio='', LP_Config='',
                                           #31 - BNDMO
                                           sheet.cell(index_linha, titulo_dic['LIMITES OPERACIONAIS']['BNDMO']).value,
                                           #32 - OBSERVA€™ES
-                                          sheet.cell(index_linha, titulo_dic['LIMITES OPERACIONAIS']['OBSERVA€™ES']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['LIMITES OPERACIONAIS']['OBSERVA€™ES']).value),
                                           #33 - ENDERE€O N3 Teleassistˆncia
                                           sheet.cell(index_linha, titulo_dic['CHESF - TELEASSIST‰NCIA N3']['ENDERE€O']).value,
                                           #34 - ENDERE€O N3
                                           sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 3']['ENDERE€O']).value])
                 except:  # Caso a descri‡„o do campo 6 seja "ANUNCIADOR"
                     # 0 - ID SAGE
-                    array_validar.append([sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 2']['ID (SAGE)']).value,
+                    array_validar.append([str(sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 2']['ID (SAGE)']).value),
                                           # N2
                                           # 1 - OCR
-                                          sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 2']['OCR (SAGE)']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 2']['OCR (SAGE)']).value),
                                           # 2 - DESCRI€ŽO
-                                          sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 2']['DESCRI€ŽO']).value.strip(),
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 2']['DESCRI€ŽO']).value).strip(),
                                           # 3 - TIPO
-                                          sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 2']['TIPO']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 2']['TIPO']).value),
                                           # 4 - COMANDO
-                                          sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 2']['COMANDO']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 2']['COMANDO']).value),
                                           # 5 - MEDI€ŽO
-                                          sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 2']['MEDI€ŽO']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 2']['MEDI€ŽO']).value),
                                           # 6 - TELA
-                                          sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 2']['ANUNCIADOR']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 2']['ANUNCIADOR']).value),
                                           # 7 - LISTA DE ALARMES
-                                          sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 2']['LISTA DE ALARMES']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 2']['LISTA DE ALARMES']).value),
                                           # 8 - SOE
-                                          sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 2']['SOE']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 2']['SOE']).value),
                                           #TELEASSIST‰NCIA N3
                                           # 9 - OCR
-                                          sheet.cell(index_linha, titulo_dic['CHESF - TELEASSIST‰NCIA N3']['OCR (SAGE)']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - TELEASSIST‰NCIA N3']['OCR (SAGE)']).value),
                                           #10 - COMANDO
-                                          sheet.cell(index_linha, titulo_dic['CHESF - TELEASSIST‰NCIA N3']['COMANDO']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - TELEASSIST‰NCIA N3']['COMANDO']).value),
                                           #11 - MEDI€ŽO
-                                          sheet.cell(index_linha, titulo_dic['CHESF - TELEASSIST‰NCIA N3']['MEDI€ŽO']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - TELEASSIST‰NCIA N3']['MEDI€ŽO']).value),
                                           #12 - LISTA DE ALARMES
-                                          sheet.cell(index_linha, titulo_dic['CHESF - TELEASSIST‰NCIA N3']['LISTA DE ALARME']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - TELEASSIST‰NCIA N3']['LISTA DE ALARME']).value),
                                           #13 - SOE
-                                          sheet.cell(index_linha, titulo_dic['CHESF - TELEASSIST‰NCIA N3']['SOE']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - TELEASSIST‰NCIA N3']['SOE']).value),
                                           #14 - OBSERVA€ŽO
-                                          sheet.cell(index_linha, titulo_dic['CHESF - TELEASSIST‰NCIA N3']['OBSERVA€ŽO']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - TELEASSIST‰NCIA N3']['OBSERVA€ŽO']).value),
                                           #15 - AGRUPAMENTO
-                                          sheet.cell(index_linha, titulo_dic['CHESF - TELEASSIST‰NCIA N3']['AGRUPAMENTO']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - TELEASSIST‰NCIA N3']['AGRUPAMENTO']).value),
                                           # N3
                                           #16 - OCR (SAGE)
-                                          sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 3']['OCR (SAGE)']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 3']['OCR (SAGE)']).value),
                                           #17 - COMANDO
-                                          sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 3']['COMANDO']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 3']['COMANDO']).value),
                                           #18 - MEDI€ŽO
-                                          sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 3']['MEDI€ŽO']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 3']['MEDI€ŽO']).value),
                                           #19 - LISTA DE ALARMES
-                                          sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 3']['LISTA DE ALARME']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 3']['LISTA DE ALARME']).value),
                                           #20 - SOE
-                                          sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 3']['SOE']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 3']['SOE']).value),
                                           #21 - OBSERVA€ŽO
-                                          sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 3']['OBSERVA€ŽO']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 3']['OBSERVA€ŽO']).value),
                                           #22 - AGRUPAMETO
-                                          sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 3']['AGRUPAMENTO']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 3']['AGRUPAMENTO']).value),
                                           #ONS
                                           #23 - ITEM
-                                          sheet.cell(index_linha, titulo_dic['ONS']['ITEM']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['ONS']['ITEM']).value),
                                           #24 - DESCRI€ŽO
-                                          sheet.cell(index_linha, titulo_dic['ONS']['DESCRI€ŽO']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['ONS']['DESCRI€ŽO']).value),
                                           #LIMITES OPERACIONAIS
                                           #25 - LIU
                                           sheet.cell(index_linha, titulo_dic['LIMITES OPERACIONAIS']['LIU']).value,
@@ -224,13 +227,15 @@ def checar(LP_Padrao='', LP_Editado='', planilha='', relatorio='', LP_Config='',
                                           #31 - BNDMO
                                           sheet.cell(index_linha, titulo_dic['LIMITES OPERACIONAIS']['BNDMO']).value,
                                           #32 - OBSERVA€™ES
-                                          sheet.cell(index_linha, titulo_dic['LIMITES OPERACIONAIS']['OBSERVA€™ES']).value,
+                                          str(sheet.cell(index_linha, titulo_dic['LIMITES OPERACIONAIS']['OBSERVA€™ES']).value),
                                           #33 - ENDERE€O N3 Teleassistˆncia
                                           sheet.cell(index_linha, titulo_dic['CHESF - TELEASSIST‰NCIA N3']['ENDERE€O']).value,
                                           #34 - ENDERE€O N3
                                           sheet.cell(index_linha, titulo_dic['CHESF - N‹VEL 3']['ENDERE€O']).value])
 
     except:
+        print_exc(file=stdout)
+        print(index_linha)
         showerror('Erro', 'O programa n„o reconhece o arquivo a ser checado como v lido')
         gerararquivo = False
 
