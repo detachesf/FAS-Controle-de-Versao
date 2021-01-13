@@ -2,6 +2,7 @@
 
 import pickle  # serve para armazenar objetos e vari†veis em arquivos
 import tkinter
+from tkinter import Tk
 from tkinter.messagebox import showerror
 from tkinter import ttk
 from tkinter.filedialog import askopenfilename, askdirectory
@@ -190,7 +191,105 @@ class Janela:
             self.nomeArquivoDOMO['text'] = path.basename(temp)
 
     def btEditarArqLPConfigClick(self):
-        startfile(self.caminhoArquivoLP_Comfig)
+        #startfile(self.caminhoArquivoLP_Comfig)
+        LPForm = Tk()
+        LPForm.title('Formul†rio de ConfiguraáÑo')
+        LPForm.geometry('500x500')
+        self.Frame1 = ttk.Frame(LPForm)
+        self.Frame2 = ttk.Frame(LPForm)
+        self.Frame1.pack()
+        self.Frame2.pack()
+
+        barmenu = tkinter.Menu(self.Frame1)
+        filemenu= tkinter.Menu(barmenu, tearoff=0)
+        filemenu.add_command(label="Novo")
+        filemenu.add_command(label="Abrir")
+        filemenu.add_command(label="Salvar")
+        filemenu.add_command(label="Salvar Como...")
+        filemenu.add_command(label="Fechar",command=LPForm.destroy)
+        filemenu.add_separator()
+
+        filemenu.add_command(label="Sair", command=LPForm.quit)
+        barmenu.add_cascade(label="Arquivo", menu=filemenu)
+
+        helpmenu = tkinter.Menu(barmenu, tearoff=0)
+        helpmenu.add_command(label="Sobre", command='donothing')
+        barmenu.add_cascade(label="Ajuda", menu=helpmenu)
+
+        LPForm.config(menu=barmenu)
+
+        self.mnArquivo = tkinter.Menu(self.menubar, tearoff=0)
+        self.mnArquivo.add_command(label='Abrir pasta do programa', underline=0, command=self.fcExplorer)
+        self.mnArquivo.add_command(label='Limpar relat¢rio', underline=0, command=self.fcLimparRelatorio)
+        self.mnArquivo.add_separator()
+        self.mnArquivo.add_command(label='Sair', underline=0, command=exit)
+        self.menubar.add_cascade(label='Arquivo', underline=0, menu=self.mnArquivo)
+
+        nb= ttk.Notebook(self.Frame2) #Cria o multipage
+        nb.grid(row=1, column=0, columnspan=500, rowspan=490, sticky='NESW')
+
+        page1 = ttk.Frame(nb)
+        nb.add(page1, text='LT') #Cria a aba do multipage
+
+        FrmLt1 = ttk.Frame(page1,relief='raised')
+        FrmLt1.grid(row=0, column=0)
+        Label1= tkinter.Label(FrmLt1, text="Linha de TransmissÑo 1")
+        Label1.grid(row=0, column=0, padx=2, pady=2, columnspan=2, sticky="W")
+        R1 = tkinter.Radiobutton(FrmLt1, text="500 kV", variable='IntVar', value=1,
+                                 command='sel')
+        R1.grid(row=1, column=0, padx=10, pady=10)
+
+        R2 = tkinter.Radiobutton(FrmLt1, text="230 kV", variable='IntVar', value=2,
+                                 command='sel')
+        R2.grid(row=1, column=1, padx=10, pady=10)
+        R3 = tkinter.Radiobutton(FrmLt1, text="138 kV", variable='IntVar', value=3,
+                                 command='sel')
+        R3.grid(row=1, column=2, padx=10, pady=10)
+
+        FrmLt2 = ttk.Frame(page1)
+        FrmLt2.grid(row=0, column=1)
+
+        pag2= ttk.Frame(nb)
+        nb.add(pag2,  text='PAINEL SAGE E BASTIDOR DE REDE')
+
+        page3 = ttk.Frame(nb)
+        nb.add(page3, text='TRAFO')  # Cria a aba do multipage
+
+        pag4 = ttk.Frame(nb)
+        nb.add(pag4, text='VéO DE TRANSF./DISJ. CENTRAL')
+
+        page5 = ttk.Frame(nb)
+        nb.add(page5, text='REATOR')  # Cria a aba do multipage
+
+        pag6 = ttk.Frame(nb)
+        nb.add(pag6, text='TRAFO TERRA')
+
+        page7 = ttk.Frame(nb)
+        nb.add(page7, text='PAINEL DE PROTEÄéO DE BARRAS')  # Cria a aba do multipage
+
+        pag8 = ttk.Frame(nb)
+        nb.add(pag8, text='ACESSO - VéO SEGREGADO')
+
+        page9 = ttk.Frame(nb)
+        nb.add(page9, text='BANCO CAPACITOR SHUNT')  # Cria a aba do multipage
+
+        pag10 = ttk.Frame(nb)
+        nb.add(pag10, text='BANCO CAPACITOR SêRIE')
+
+        page11 = ttk.Frame(nb)
+        nb.add(page11, text='ECE')  # Cria a aba do multipage
+
+        pag12 = ttk.Frame(nb)
+        nb.add(pag12, text='SISTEMA REGULAÄéO')
+
+        page13 = ttk.Frame(nb)
+        nb.add(page13, text='PREP.REEN.')  # Cria a aba do multipage
+
+        pag14 = ttk.Frame(nb)
+        nb.add(pag14, text='COMPENSADOR SãNCRONO')
+
+        pag15 = ttk.Frame(nb)
+        nb.add(pag15, text='SERVIÄOS AUXILIARES')
 
     def botaoEscolheArquivoLPConfigClick(self):
         temp = askopenfilename(

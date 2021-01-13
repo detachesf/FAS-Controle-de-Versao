@@ -1,30 +1,31 @@
 # -*- coding: cp860 -*-
-from tkinter.messagebox import showerror, askyesno, showwarning
+from tkinter.messagebox import askyesno
 from os import listdir, path, getcwd, startfile
+from FASgtkui import mensagem_aviso, mensagem_erro, pergunta_sim_nao
 
-dados= '''
-Vers„o 2.0.9
-Atualiza‡„o do programa: 18/04/2016
+dados = '''
+Vers„o 2.0.12
+Atualiza‡„o do programa: 10/11/2020
 Gera‡„o de LP no padr„o Chesf tendo como base os arquivos .dat de configura‡„o de base SAGE
 '''
 
 try:
     from lp_lib.gerarPlanilhaLP import gerarPlanilha
 except:
-    showerror('Erro', 'Arquivo "gerarPlanilhaLP.py" deve estar no diret¢rio "lp_lib"')
+    mensagem_erro('Erro', 'Arquivo "gerarPlanilhaLP.py" deve estar no diret¢rio "lp_lib"')
 
 
 def base2lp(diretorio):
-    nome_arq_saida = './LP_da_Base.xlsx'                # Nome do arquivo de sa¡da
-    seq_arq = 0                                         # Sequˆncia do n£mero de arquivo
-    while path.exists(nome_arq_saida):                  # Enquanto existir na pasta um arquivo com o nome definido
-        seq_arq += 1                                    # Adicionar um a sequˆncia do n£mero do arquivo
+    nome_arq_saida = './LP_da_Base.xlsx'  # Nome do arquivo de sa¡da
+    seq_arq = 0  # Sequˆncia do n£mero de arquivo
+    while path.exists(nome_arq_saida):  # Enquanto existir na pasta um arquivo com o nome definido
+        seq_arq += 1  # Adicionar um a sequˆncia do n£mero do arquivo
         nome_arq_saida = nome_arq_saida[0:12] + '_' + str(seq_arq) + '.xlsx'  # Definir novo nome de arquivo
-    
-    arq_lp = gerarPlanilha(nome_arq_saida)   # Gera um arquivo Excel com uma planilha com formata‡„o da LP Padr„o
+
+    arq_lp = gerarPlanilha(nome_arq_saida)  # Gera um arquivo Excel com uma planilha com formata‡„o da LP Padr„o
     planilha_lp = arq_lp.worksheets()[0]
     planilha_relatorio = arq_lp.add_worksheet('RELATORIO')
-    
+
     # ***** Captar texto de arquivos de telas para verificar preenchimento da coluna anunciador *****
     try:
         nome_arq_tela = '{}/ihm/VTelasBotoes.led'.format(diretorio.rsplit('/', 2)[0])
@@ -35,10 +36,10 @@ def base2lp(diretorio):
                 telas.append(linha.split('\"')[1].split()[1])
         arq_telas.close()
     except:
-        showwarning('Aten‡„o', 'O arquivo {}/ihm/VTelasBotoes.led n„o pode ser carregado. A coluna "ANUNCIADOR" da \
+        mensagem_aviso('Aviso', 'O arquivo {}/ihm/VTelasBotoes.led n„o pode ser carregado. A coluna "ANUNCIADOR" da \
                     tabela gerada n„o ser  preenchida.'.format(diretorio.rsplit('/', 2)[0]))
         telas = []
-           
+
     texto_telas = ''
     for tela in telas:
         try:
@@ -46,26 +47,26 @@ def base2lp(diretorio):
             texto_telas += arq_txt.read()
             arq_txt.close()
         except:
-            showerror('Erro', 'O arquivo {}/{} n„o pode ser carregado'.format(diretorio.rsplit('/', 2)[0], tela))
-                
+            mensagem_erro('Erro', 'O arquivo {}/{} n„o pode ser carregado'.format(diretorio.rsplit('/', 2)[0], tela))
+
     if 'pds.dat' not in listdir(diretorio):
-        showerror('Erro', 'Arquivo "pds.dat" n„o encontrado no diret¢rio {}'.format(diretorio))
+        mensagem_erro('Erro', 'Arquivo "pds.dat" n„o encontrado no diret¢rio {}'.format(diretorio))
     elif 'pdd.dat' not in listdir(diretorio):
-        showerror('Erro', 'Arquivo "pdd.dat" n„o encontrado no diret¢rio {}'.format(diretorio))
+        mensagem_erro('Erro', 'Arquivo "pdd.dat" n„o encontrado no diret¢rio {}'.format(diretorio))
     elif 'pdf.dat' not in listdir(diretorio):
-        showerror('Erro', 'Arquivo "pdf.dat" n„o encontrado no diret¢rio {}'.format(diretorio))
+        mensagem_erro('Erro', 'Arquivo "pdf.dat" n„o encontrado no diret¢rio {}'.format(diretorio))
     elif 'pas.dat' not in listdir(diretorio):
-        showerror('Erro', 'Arquivo "pas.dat" n„o encontrado no diret¢rio {}'.format(diretorio))
+        mensagem_erro('Erro', 'Arquivo "pas.dat" n„o encontrado no diret¢rio {}'.format(diretorio))
     elif 'pad.dat' not in listdir(diretorio):
-        showerror('Erro', 'Arquivo "pad.dat" n„o encontrado no diret¢rio {}'.format(diretorio))
+        mensagem_erro('Erro', 'Arquivo "pad.dat" n„o encontrado no diret¢rio {}'.format(diretorio))
     elif 'paf.dat' not in listdir(diretorio):
-        showerror('Erro', 'Arquivo "paf.dat" n„o encontrado no diret¢rio {}'.format(diretorio))
+        mensagem_erro('Erro', 'Arquivo "paf.dat" n„o encontrado no diret¢rio {}'.format(diretorio))
     elif 'cgs.dat' not in listdir(diretorio):
-        showerror('Erro', 'Arquivo "cgs.dat" n„o encontrado no diret¢rio {}'.format(diretorio))
+        mensagem_erro('Erro', 'Arquivo "cgs.dat" n„o encontrado no diret¢rio {}'.format(diretorio))
     elif 'cgf.dat' not in listdir(diretorio):
-        showerror('Erro', 'Arquivo "cgf.dat" n„o encontrado no diret¢rio {}'.format(diretorio))
+        mensagem_erro('Erro', 'Arquivo "cgf.dat" n„o encontrado no diret¢rio {}'.format(diretorio))
     elif 'tac.dat' not in listdir(diretorio):
-        showerror('Erro', 'Arquivo "tac.dat" n„o encontrado no diret¢rio {}'.format(diretorio))
+        mensagem_erro('Erro', 'Arquivo "tac.dat" n„o encontrado no diret¢rio {}'.format(diretorio))
     else:
         # ********** PDS **********
         def pdsfunc(caminho):
@@ -80,11 +81,14 @@ def base2lp(diretorio):
             for linha in arq.readlines():
                 k += 1
                 if linha.strip().startswith('#include'):
-                   if len(linha.strip().split()) <=2: #Caso o nome do arquivo de include n„o seja separado por espa‡o em branco
-                       include= '{}\\{}'.format(caminho, linha.strip().split()[1].replace('/', '\\'))
-                   elif len(linha.strip().split()) >2: #Caso o nomde do arquivo de include tenha separa‡„o por espa‡o em branco Ex: "BT 14D1"
-                       include= '{}\\{} {}'.format(caminho, linha.strip().split()[1].replace('/', '\\'),linha.strip().split()[2].replace('/', '\\'))
-                   dic.update(pdsfunc(include))
+                    if len(
+                            linha.strip().split()) <= 2:  # Caso o nome do arquivo de include n„o seja separado por espa‡o em branco
+                        include = '{}\\{}'.format(caminho, linha.strip().split()[1].replace('/', '\\'))
+                    elif len(
+                            linha.strip().split()) > 2:  # Caso o nomde do arquivo de include tenha separa‡„o por espa‡o em branco Ex: "BT 14D1"
+                        include = '{}\\{} {}'.format(caminho, linha.strip().split()[1].replace('/', '\\'),
+                                                     linha.strip().split()[2].replace('/', '\\'))
+                    dic.update(pdsfunc(include))
                 elif linha.strip() == 'PDS':
                     ID = OCR = NOME = TIPO = TAC = ''
                     ALRIN = SOE = 'X'
@@ -107,7 +111,7 @@ def base2lp(diretorio):
                     if k == kf:  # Fim do arquivo
                         dic[ID] = [OCR, NOME, TIPO, ALRIN, SOE, TAC]
                 elif novo:
-                    dic[ID] = [OCR, NOME, TIPO, ALRIN,SOE, TAC]
+                    dic[ID] = [OCR, NOME, TIPO, ALRIN, SOE, TAC]
                     novo = False
             arq.close()
             return dic
@@ -124,9 +128,9 @@ def base2lp(diretorio):
             for linha in arq.readlines():
                 k += 1
                 if linha.strip().startswith('#include'):
-                   dic.update(pddfunc('{}\\{}'.format(caminho, linha.strip().split()[1].replace('/','\\'))))
+                    dic.update(pddfunc('{}\\{}'.format(caminho, linha.strip().split()[1].replace('/', '\\'))))
                 elif linha.strip() == 'PDD':
-                    ID = PDS =''
+                    ID = PDS = ''
                     novo = True
                 elif novo and (linha.strip() != '' and linha.strip() != 'PDD' and linha[0] != ';'):
                     if linha.split('=')[0].strip() == 'ID':
@@ -153,11 +157,14 @@ def base2lp(diretorio):
             for linha in arq.readlines():
                 k += 1
                 if linha.strip().startswith('#include'):
-                   if len(linha.strip().split()) <=2: #Caso o nome do arquivo de include n„o seja separado por espa‡o em branco
-                       include = '{}\\{}'.format(caminho, linha.strip().split()[1].replace('/', '\\'))
-                   elif len(linha.strip().split()) >2: #Caso o nomde do arquivo de include tenha separa‡„o por espa‡o em branco Ex: "BT 14D1"
-                       include = '{}\\{} {}'.format(caminho, linha.strip().split()[1].replace('/', '\\'),linha.strip().split()[2].replace('/', '\\'))
-                   dic.update(pdffunc(include))
+                    if len(
+                            linha.strip().split()) <= 2:  # Caso o nome do arquivo de include n„o seja separado por espa‡o em branco
+                        include = '{}\\{}'.format(caminho, linha.strip().split()[1].replace('/', '\\'))
+                    elif len(
+                            linha.strip().split()) > 2:  # Caso o nomde do arquivo de include tenha separa‡„o por espa‡o em branco Ex: "BT 14D1"
+                        include = '{}\\{} {}'.format(caminho, linha.strip().split()[1].replace('/', '\\'),
+                                                     linha.strip().split()[2].replace('/', '\\'))
+                    dic.update(pdffunc(include))
                 elif linha.strip() == 'PDF':
                     ID = PNT = ''
                     novo = True
@@ -190,10 +197,10 @@ def base2lp(diretorio):
             for linha in arq.readlines():
                 k += 1
                 if linha.strip().startswith('#include'):
-                   dic.update(ptsfunc('{}\\{}'.format(caminho, linha.strip().split()[1].replace('/', '\\'))))
+                    dic.update(ptsfunc('{}\\{}'.format(caminho, linha.strip().split()[1].replace('/', '\\'))))
                 elif linha.strip() == 'PTS':
-                    ID = OCR = NOME = TIPO = LSA = LSE = LSU =  TAC = ''
-                    ALRIN =  'X'
+                    ID = OCR = NOME = TIPO = LSA = LSE = LSU = TAC = ''
+                    ALRIN = 'X'
                     novo = True
                 elif novo and (linha.strip() != '' and linha.strip() != 'PTS' and linha[0] != ';'):
                     if linha.split('=')[0].strip() == 'ID':
@@ -205,7 +212,7 @@ def base2lp(diretorio):
                     elif linha.split('=')[0].strip() == 'TIPO':
                         TIPO = linha.split('=')[1].strip()
                     elif linha.split('=')[0].strip() == 'ALRIN':
-                        ALRIN = ('' if linha.split('=')[1].strip() == 'SIM' else  'X')
+                        ALRIN = ('' if linha.split('=')[1].strip() == 'SIM' else 'X')
                     elif linha.split('=')[0].strip() == 'LSA':
                         LSA = linha.split('=')[1].strip()
                     elif linha.split('=')[0].strip() == 'LSE':
@@ -216,7 +223,7 @@ def base2lp(diretorio):
                         TAC = linha.split('=')[1].strip()
                     if k == kf: dic[ID] = [OCR, NOME, TIPO, ALRIN, LSA, LSE, LSU, TAC]
                 elif novo:
-                    dic.update({ID:[OCR, NOME, TIPO, ALRIN, LSA, LSE, LSU, TAC]})
+                    dic.update({ID: [OCR, NOME, TIPO, ALRIN, LSA, LSE, LSU, TAC]})
                     novo = False
             arq.close()
             return dic
@@ -233,9 +240,9 @@ def base2lp(diretorio):
             for linha in arq.readlines():
                 k += 1
                 if linha.strip().startswith('#include'):
-                   dic.update(ptdfunc('{}\\{}'.format(caminho, linha.strip().split()[1].replace('/', '\\'))))
+                    dic.update(ptdfunc('{}\\{}'.format(caminho, linha.strip().split()[1].replace('/', '\\'))))
                 elif linha.strip() == 'PTD':
-                    ID = PTS =''
+                    ID = PTS = ''
                     novo = True
                 elif novo and (linha.strip() != '' and linha.strip() != 'PTD' and linha[0] != ';'):
                     if linha.split('=')[0].strip() == 'ID':
@@ -262,7 +269,7 @@ def base2lp(diretorio):
             for linha in arq.readlines():
                 k += 1
                 if linha.strip().startswith('#include'):
-                   dic.update(ptffunc('{}\\{}'.format(caminho, linha.strip().split()[1].replace('/', '\\'))))
+                    dic.update(ptffunc('{}\\{}'.format(caminho, linha.strip().split()[1].replace('/', '\\'))))
                 elif linha.strip() == 'PTF':
                     ID = PNT = ''
                     novo = True
@@ -290,13 +297,16 @@ def base2lp(diretorio):
             for linha in arq.readlines():
                 k += 1
                 if linha.strip().startswith('#include'):
-                   if len(linha.strip().split()) <=2: #Caso o nome do arquivo de include n„o seja separado por espa‡o em branco
-                       include = '{}\\{}'.format(caminho, linha.strip().split()[1].replace('/', '\\'))
-                   elif len(linha.strip().split()) >2: #Caso o nomde do arquivo de include tenha separa‡„o por espa‡o em branco Ex: "BT 14D1"
-                       include = '{}\\{} {}'.format(caminho, linha.strip().split()[1].replace('/', '\\'),linha.strip().split()[2].replace('/', '\\'))
-                   dic.update(pasfunc(include))
+                    if len(
+                            linha.strip().split()) <= 2:  # Caso o nome do arquivo de include n„o seja separado por espa‡o em branco
+                        include = '{}\\{}'.format(caminho, linha.strip().split()[1].replace('/', '\\'))
+                    elif len(
+                            linha.strip().split()) > 2:  # Caso o nomde do arquivo de include tenha separa‡„o por espa‡o em branco Ex: "BT 14D1"
+                        include = '{}\\{} {}'.format(caminho, linha.strip().split()[1].replace('/', '\\'),
+                                                     linha.strip().split()[2].replace('/', '\\'))
+                    dic.update(pasfunc(include))
                 elif linha.strip() == 'PAS':
-                    ID = OCR = NOME = TIPO = LIU = LIE = LIA = LSA = LSE = LSU = BNDMO =  TAC =''
+                    ID = OCR = NOME = TIPO = LIU = LIE = LIA = LSA = LSE = LSU = BNDMO = TAC = ''
                     ALRIN = 'X'
                     novo = True
                 elif novo and (linha.strip() != '' and linha.strip() != 'PAS' and linha[0] != ';'):
@@ -309,7 +319,7 @@ def base2lp(diretorio):
                     elif linha.split('=')[0].strip() == 'TIPO':
                         TIPO = linha.split('=')[1].strip()
                     elif linha.split('=')[0].strip() == 'ALRIN':
-                        ALRIN = ('' if linha.split('=')[1].strip() == 'SIM' else  'X')
+                        ALRIN = ('' if linha.split('=')[1].strip() == 'SIM' else 'X')
                     elif linha.split('=')[0].strip() == 'LIU':
                         LIU = linha.split('=')[1].strip()
                     elif linha.split('=')[0].strip() == 'LIE':
@@ -346,9 +356,9 @@ def base2lp(diretorio):
             for linha in arq.readlines():
                 k += 1
                 if linha.strip().startswith('#include'):
-                   dic.update(padfunc('{}\\{}'.format(caminho, linha.strip().split()[1].replace('/', '\\'))))
+                    dic.update(padfunc('{}\\{}'.format(caminho, linha.strip().split()[1].replace('/', '\\'))))
                 elif linha.strip() == 'PAD':
-                    ID = PAS =''
+                    ID = PAS = ''
                     novo = True
                 elif novo and (linha.strip() != '' and linha.strip() != 'PAD' and linha[0] != ';'):
                     if linha.split('=')[0].strip() == 'ID':
@@ -374,11 +384,14 @@ def base2lp(diretorio):
             for linha in arq.readlines():
                 k += 1
                 if linha.strip().startswith('#include'):
-                   if len(linha.strip().split()) <=2: #Caso o nome do arquivo de include n„o seja separado por espa‡o em branco
-                       include = '{}\\{}'.format(caminho, linha.strip().split()[1].replace('/', '\\'))
-                   elif len(linha.strip().split()) >2: #Caso o nomde do arquivo de include tenha separa‡„o por espa‡o em branco Ex: "BT 14D1"
-                       include = '{}\\{} {}'.format(caminho, linha.strip().split()[1].replace('/', '\\'),linha.strip().split()[2].replace('/', '\\'))
-                   dic.update(paffunc(include))
+                    if len(
+                            linha.strip().split()) <= 2:  # Caso o nome do arquivo de include n„o seja separado por espa‡o em branco
+                        include = '{}\\{}'.format(caminho, linha.strip().split()[1].replace('/', '\\'))
+                    elif len(
+                            linha.strip().split()) > 2:  # Caso o nomde do arquivo de include tenha separa‡„o por espa‡o em branco Ex: "BT 14D1"
+                        include = '{}\\{} {}'.format(caminho, linha.strip().split()[1].replace('/', '\\'),
+                                                     linha.strip().split()[2].replace('/', '\\'))
+                    dic.update(paffunc(include))
                 elif linha.strip() == 'PAF':
                     ID = PNT = ''
                     novo = True
@@ -489,11 +502,14 @@ def base2lp(diretorio):
             for linha in arq.readlines():
                 k += 1
                 if linha.strip().startswith('#include'):
-                   if len(linha.strip().split()) <=2: #Caso o nome do arquivo de include n„o seja separado por espa‡o em branco
-                       include = '{}\\{}'.format(caminho, linha.strip().split()[1].replace('/', '\\'))
-                   elif len(linha.strip().split()) >2: #Caso o nomde do arquivo de include tenha separa‡„o por espa‡o em branco Ex: "BT 14D1"
-                       include = '{}\\{} {}'.format(caminho, linha.strip().split()[1].replace('/', '\\'),linha.strip().split()[2].replace('/', '\\'))
-                   dic.update(tacfunc(include))
+                    if len(
+                            linha.strip().split()) <= 2:  # Caso o nome do arquivo de include n„o seja separado por espa‡o em branco
+                        include = '{}\\{}'.format(caminho, linha.strip().split()[1].replace('/', '\\'))
+                    elif len(
+                            linha.strip().split()) > 2:  # Caso o nomde do arquivo de include tenha separa‡„o por espa‡o em branco Ex: "BT 14D1"
+                        include = '{}\\{} {}'.format(caminho, linha.strip().split()[1].replace('/', '\\'),
+                                                     linha.strip().split()[2].replace('/', '\\'))
+                    dic.update(tacfunc(include))
                 elif linha.strip() == 'TAC':
                     ID = LSC = ''
                     novo = True
@@ -522,16 +538,16 @@ def base2lp(diretorio):
         try:
             pts_dic = ptsfunc(diretorio)
         except:
-            showwarning('Notifica‡„o', 'Arquivo "pts.dat" n„o foi processado')
+            mensagem_aviso('Notifica‡„o', 'Arquivo "pts.dat" n„o foi processado')
         try:
             ptd_dic = ptdfunc(diretorio)
         except:
-            showwarning('Notifica‡„o', 'Arquivo "ptd.dat" n„o foi processado')
-            ptd_dic=''
+            mensagem_aviso('Notifica‡„o', 'Arquivo "ptd.dat" n„o foi processado')
+            ptd_dic = ''
         try:
             ptf_dic = ptffunc(diretorio)
         except:
-            showwarning('Notifica‡„o', 'Arquivo "ptf.dat" n„o foi processado')
+            mensagem_aviso('Notifica‡„o', 'Arquivo "ptf.dat" n„o foi processado')
 
         # ********** Gravar Pontos Digitais Excel **********
         pdig = []
@@ -546,7 +562,7 @@ def base2lp(diretorio):
                     planilha_relatorio.write(linha_rel, 0, id_tag)
                     linha_rel += 1
             pdig.append([id_tag] + pds_dic[id_tag] + pdf_id)
-        
+
         linha = 6
         for dado in pdig:  # Passa por todas as linhas do array de pontos digitais gravando pontos no Excel
             tac = dado[6]
@@ -560,25 +576,25 @@ def base2lp(diretorio):
             alarme = dado[4]
             soe = dado[5]
             obs = ''
-            
+
             id_pdd = pdd_dic.get(tag, ['', ''])
             end = pdf_dic.get(id_pdd[0], ['', ''])[1]
-        
-            planilha_lp.write(linha, 0, linha - 5)              # escreve na coluna "ITEM"
-            planilha_lp.write(linha, 2, tac)                    # escreve na coluna "TAC"
-            planilha_lp.write(linha, 3, lsc)                    # escreve na coluna "IED"
-            planilha_lp.write(linha, 7, id_protocolo)           # escreve na coluna "ID PROTOCOLO"
-            planilha_lp.write(linha, 9, tag)                    # escreve na coluna "ID (SAGE)"
-            planilha_lp.write(linha, 10, ocr)                   # escreve na coluna "OCR"
-            planilha_lp.write(linha, 11, descr)                 # escreve na coluna "DESCRI€ŽO"
-            planilha_lp.write(linha, 12, tipo)                  # escreve na coluna "TIPO"
-            planilha_lp.write(linha, 15, anunciador)            # escreve na coluna "ANUNCIADOR"
-            planilha_lp.write(linha, 16, alarme)                # escreve na coluna "LISTA DE ALARMES"
-            planilha_lp.write(linha, 17, soe)                   # escreve na coluna "SOE"
-            planilha_lp.write(linha, 18, obs)                   # escreve na coluna "OBSERVA€ŽO"
-            planilha_lp.write(linha, 34, end)                   # escreve na coluna "ENDERECO"
-            linha += 1                                          # incrementa a linha
-  
+
+            planilha_lp.write(linha, 0, linha - 5)  # escreve na coluna "ITEM"
+            planilha_lp.write(linha, 2, tac)  # escreve na coluna "TAC"
+            planilha_lp.write(linha, 3, lsc)  # escreve na coluna "IED"
+            planilha_lp.write(linha, 7, id_protocolo)  # escreve na coluna "ID PROTOCOLO"
+            planilha_lp.write(linha, 9, tag)  # escreve na coluna "ID (SAGE)"
+            planilha_lp.write(linha, 10, ocr)  # escreve na coluna "OCR"
+            planilha_lp.write(linha, 11, descr)  # escreve na coluna "DESCRI€ŽO"
+            planilha_lp.write(linha, 12, tipo)  # escreve na coluna "TIPO"
+            planilha_lp.write(linha, 15, anunciador)  # escreve na coluna "ANUNCIADOR"
+            planilha_lp.write(linha, 16, alarme)  # escreve na coluna "LISTA DE ALARMES"
+            planilha_lp.write(linha, 17, soe)  # escreve na coluna "SOE"
+            planilha_lp.write(linha, 18, obs)  # escreve na coluna "OBSERVA€ŽO"
+            planilha_lp.write(linha, 34, end)  # escreve na coluna "ENDERECO"
+            linha += 1  # incrementa a linha
+
         # ********** Gravar Pontos Anal¢gicos Excel **********
         pana = []
         linha_rel = 1
@@ -588,11 +604,11 @@ def base2lp(diretorio):
                 paf_id = paf_dic[id_tag]
             except:
                 paf_id = ['']
-                if 'CALC' not in pas_dic[id_tag][11] and 'LOCAL' not in pas_dic[id_tag][11]:                
+                if 'CALC' not in pas_dic[id_tag][11] and 'LOCAL' not in pas_dic[id_tag][11]:
                     planilha_relatorio.write(linha_rel, 2, id_tag)
                     linha_rel += 1
             pana.append([id_tag] + pas_dic[id_tag] + paf_id)
-        
+
         med_dic = {'FR': 'Hz', 'KV': 'kV', 'AM': 'A', 'DI': 'km', 'MV': 'MVAR', 'MW': 'MW', 'TM': 'ø C'}
         for dado in pana:  # Passa por todas as linhas do array de pontos anal¢gicos gravando pontos no Excel
             tac = dado[12]
@@ -608,40 +624,40 @@ def base2lp(diretorio):
             obs = ''
             soe = 'X'
 
-            id_pad = pad_dic.get(tag,['', ''])
+            id_pad = pad_dic.get(tag, ['', ''])
             end = paf_dic.get(id_pad[0], ['', ''])[0]
-            
+
             liu = dado[5]
             lie = dado[6]
             lia = dado[7]
             lsa = dado[8]
             lse = dado[9]
             lsu = dado[10]
-            bndmo = dado[11]                     
-            
-            planilha_lp.write(linha, 0, linha - 5)              # escreve na coluna "ITEM"
-            planilha_lp.write(linha, 2, tac)                    # escreve na coluna "TAC"
-            planilha_lp.write(linha, 3, lsc)                    # escreve na coluna "IED"
-            planilha_lp.write(linha, 7, id_protocolo)           # escreve na coluna "ID PROTOCOLO"
-            planilha_lp.write(linha, 9, tag)                    # escreve na coluna "ID (SAGE)"
-            planilha_lp.write(linha, 10, ocr)                   # escreve na coluna "OCR"
-            planilha_lp.write(linha, 11, descr)                 # escreve na coluna "DESCRI€ŽO"
-            planilha_lp.write(linha, 12, tipo)                  # escreve na coluna "TIPO"
-            planilha_lp.write(linha, 13, '')                    # escreve na coluna "COMANDO"
-            planilha_lp.write(linha, 14, medicao)               # escreve na coluna "MEDI€ŽO"
-            planilha_lp.write(linha, 15, anunciador)            # escreve na coluna "ANUNCIADOR"
-            planilha_lp.write(linha, 16, alarme)                # escreve na coluna "LISTA DE ALARMES"
-            planilha_lp.write(linha, 17, soe)                   # escreve na coluna "SOE"
-            planilha_lp.write(linha, 18, obs)                   # escreve na coluna "OBSERVA€ŽO"
-            planilha_lp.write(linha, 34, end)                   # escreve na coluna "ENDERECO"
-            planilha_lp.write(linha, 38, liu)                   # escreve na coluna "LIU"
-            planilha_lp.write(linha, 39, lie)                   # escreve na coluna "LIE"
-            planilha_lp.write(linha, 40, lia)                   # escreve na coluna "LIA"
-            planilha_lp.write(linha, 41, lsa)                   # escreve na coluna "LSA"
-            planilha_lp.write(linha, 42, lse)                   # escreve na coluna "LSE"
-            planilha_lp.write(linha, 43, lsu)                   # escreve na coluna "LSU"
-            planilha_lp.write(linha, 44, bndmo)                 # escreve na coluna "BNDMO"
-            linha += 1                                          # incrementa a linha  
+            bndmo = dado[11]
+
+            planilha_lp.write(linha, 0, linha - 5)  # escreve na coluna "ITEM"
+            planilha_lp.write(linha, 2, tac)  # escreve na coluna "TAC"
+            planilha_lp.write(linha, 3, lsc)  # escreve na coluna "IED"
+            planilha_lp.write(linha, 7, id_protocolo)  # escreve na coluna "ID PROTOCOLO"
+            planilha_lp.write(linha, 9, tag)  # escreve na coluna "ID (SAGE)"
+            planilha_lp.write(linha, 10, ocr)  # escreve na coluna "OCR"
+            planilha_lp.write(linha, 11, descr)  # escreve na coluna "DESCRI€ŽO"
+            planilha_lp.write(linha, 12, tipo)  # escreve na coluna "TIPO"
+            planilha_lp.write(linha, 13, '')  # escreve na coluna "COMANDO"
+            planilha_lp.write(linha, 14, medicao)  # escreve na coluna "MEDI€ŽO"
+            planilha_lp.write(linha, 15, anunciador)  # escreve na coluna "ANUNCIADOR"
+            planilha_lp.write(linha, 16, alarme)  # escreve na coluna "LISTA DE ALARMES"
+            planilha_lp.write(linha, 17, soe)  # escreve na coluna "SOE"
+            planilha_lp.write(linha, 18, obs)  # escreve na coluna "OBSERVA€ŽO"
+            planilha_lp.write(linha, 34, end)  # escreve na coluna "ENDERECO"
+            planilha_lp.write(linha, 38, liu)  # escreve na coluna "LIU"
+            planilha_lp.write(linha, 39, lie)  # escreve na coluna "LIE"
+            planilha_lp.write(linha, 40, lia)  # escreve na coluna "LIA"
+            planilha_lp.write(linha, 41, lsa)  # escreve na coluna "LSA"
+            planilha_lp.write(linha, 42, lse)  # escreve na coluna "LSE"
+            planilha_lp.write(linha, 43, lsu)  # escreve na coluna "LSU"
+            planilha_lp.write(linha, 44, bndmo)  # escreve na coluna "BNDMO"
+            linha += 1  # incrementa a linha  
 
         # ********** Gravar Pontos Totalizadores Excel **********
         ptot = []
@@ -658,7 +674,7 @@ def base2lp(diretorio):
                         linha_rel += 1
                 ptot.append([id_tag] + pts_dic[id_tag] + ptf_id)
         except:
-            showwarning('Aten‡„o', 'N„o foram gravados pontos totalizadores')      
+            mensagem_aviso('Aten‡„o', 'N„o foram gravados pontos totalizadores')
         for dado in ptot:  # Passa por todas as linhas do array de pontos anal¢gicos gravando pontos no Excel
             tac = dado[8]
             lsc = tac_dic.get(tac, ['?'])[0]
@@ -679,27 +695,27 @@ def base2lp(diretorio):
                 end = ''
             lsa = dado[5]
             lse = dado[6]
-            lsu = dado[7]              
-            
-            planilha_lp.write(linha, 0, linha - 5)              # escreve na coluna "ITEM"
-            planilha_lp.write(linha, 2, tac)                    # escreve na coluna "TAC"
-            planilha_lp.write(linha, 3, lsc)                    # escreve na coluna "IED"
-            planilha_lp.write(linha, 7, id_protocolo)           # escreve na coluna "ID PROTOCOLO"
-            planilha_lp.write(linha, 9, tag)                    # escreve na coluna "ID (SAGE)"
-            planilha_lp.write(linha, 10, ocr)                   # escreve na coluna "OCR"
-            planilha_lp.write(linha, 11, descr)                 # escreve na coluna "DESCRI€ŽO"
-            planilha_lp.write(linha, 12, tipo)                  # escreve na coluna "TIPO"
-            planilha_lp.write(linha, 13, '')                    # escreve na coluna "COMANDO"
-            planilha_lp.write(linha, 15, anunciador)            # escreve na coluna "ANUNCIADOR"
-            planilha_lp.write(linha, 16, alarme)                # escreve na coluna "LISTA DE ALARMES"
-            planilha_lp.write(linha, 17, soe)                   # escreve na coluna "SOE"
-            planilha_lp.write(linha, 18, obs)                   # escreve na coluna "OBSERVA€ŽO"
-            planilha_lp.write(linha, 34, end)                   # escreve na coluna "ENDERECO"
-            planilha_lp.write(linha, 41, lsa)                   # escreve na coluna "LSA"
-            planilha_lp.write(linha, 42, lse)                   # escreve na coluna "LSE"
-            planilha_lp.write(linha, 43, lsu)                   # escreve na coluna "LSU"
-            linha += 1                                          # incrementa a linha
-        
+            lsu = dado[7]
+
+            planilha_lp.write(linha, 0, linha - 5)  # escreve na coluna "ITEM"
+            planilha_lp.write(linha, 2, tac)  # escreve na coluna "TAC"
+            planilha_lp.write(linha, 3, lsc)  # escreve na coluna "IED"
+            planilha_lp.write(linha, 7, id_protocolo)  # escreve na coluna "ID PROTOCOLO"
+            planilha_lp.write(linha, 9, tag)  # escreve na coluna "ID (SAGE)"
+            planilha_lp.write(linha, 10, ocr)  # escreve na coluna "OCR"
+            planilha_lp.write(linha, 11, descr)  # escreve na coluna "DESCRI€ŽO"
+            planilha_lp.write(linha, 12, tipo)  # escreve na coluna "TIPO"
+            planilha_lp.write(linha, 13, '')  # escreve na coluna "COMANDO"
+            planilha_lp.write(linha, 15, anunciador)  # escreve na coluna "ANUNCIADOR"
+            planilha_lp.write(linha, 16, alarme)  # escreve na coluna "LISTA DE ALARMES"
+            planilha_lp.write(linha, 17, soe)  # escreve na coluna "SOE"
+            planilha_lp.write(linha, 18, obs)  # escreve na coluna "OBSERVA€ŽO"
+            planilha_lp.write(linha, 34, end)  # escreve na coluna "ENDERECO"
+            planilha_lp.write(linha, 41, lsa)  # escreve na coluna "LSA"
+            planilha_lp.write(linha, 42, lse)  # escreve na coluna "LSE"
+            planilha_lp.write(linha, 43, lsu)  # escreve na coluna "LSU"
+            linha += 1  # incrementa a linha
+
         # ********** Gravar Pontos Comandos Excel **********
         pcmd = []
         linha_rel = 1
@@ -722,9 +738,9 @@ def base2lp(diretorio):
                 cgf_com = ['CD']
             else:
                 cgf_com = ['CD']
-                
-            pcmd.append([id_tag] + cgs_dic[id_tag] + cgf_id+cgf_com)
-        
+
+            pcmd.append([id_tag] + cgs_dic[id_tag] + cgf_id + cgf_com)
+
         for dado in pcmd:  # Passa por todas as linhas do array de pontos anal¢gicos gravando pontos no Excel
             tac = dado[3]
             lsc = tac_dic.get(tac, ['?'])[0]
@@ -733,26 +749,29 @@ def base2lp(diretorio):
             descr = dado[1]
             pac = dado[2]
             tipo = dado[4]
-            comando = dado[6]          
-            
-            if (tag == 'LOCAL') or ('COR' not in tag) or (len(tag) == len(pac)): 
-                planilha_lp.write(linha, 0, linha - 5)             # escreve na coluna "ITEM"
-                planilha_lp.write(linha, 2, tac)                   # escreve na coluna "TAC"
-                planilha_lp.write(linha, 3, lsc)                   # escreve na coluna "IED"
-                planilha_lp.write(linha, 7, id_protocolo)          # escreve na coluna "ID PROTOCOLO"
-                planilha_lp.write(linha, 9, tag)                   # escreve na coluna "ID (SAGE)"
-                planilha_lp.write(linha, 11, descr)                # escreve na coluna "DESCRI€ŽO"
-                planilha_lp.write(linha, 12, tipo)                 # escreve na coluna "TIPO"
-                planilha_lp.write(linha, 13, comando)              # escreve na coluna "COMANDO"
-                linha += 1                                         # incrementa a linha        
+            comando = dado[6]
+
+            if (tag == 'LOCAL') or ('COR' not in tag) or (len(tag) == len(pac)):
+                planilha_lp.write(linha, 0, linha - 5)  # escreve na coluna "ITEM"
+                planilha_lp.write(linha, 2, tac)  # escreve na coluna "TAC"
+                planilha_lp.write(linha, 3, lsc)  # escreve na coluna "IED"
+                planilha_lp.write(linha, 7, id_protocolo)  # escreve na coluna "ID PROTOCOLO"
+                planilha_lp.write(linha, 9, tag)  # escreve na coluna "ID (SAGE)"
+                planilha_lp.write(linha, 11, descr)  # escreve na coluna "DESCRI€ŽO"
+                planilha_lp.write(linha, 12, tipo)  # escreve na coluna "TIPO"
+                planilha_lp.write(linha, 13, comando)  # escreve na coluna "COMANDO"
+                linha += 1  # incrementa a linha        
 
         arq_lp.close()
-                             
-        abrirarquivo = askyesno('Aviso', 'Arquivo \"' + nome_arq_saida[2:] + '\" gerado em ' + getcwd() + '\n\n Deseja abrir o arquivo gerado agora?')
-        if abrirarquivo : startfile(getcwd() + '\\' + nome_arq_saida[2:])
-        
+
+        abrirarquivo = pergunta_sim_nao('Aviso', 'Arquivo \"' + nome_arq_saida[
+                                                        2:] + '\" gerado em ' + getcwd() + '\n\n Deseja abrir o arquivo gerado agora?')
+        if abrirarquivo: startfile(getcwd() + '\\' + nome_arq_saida[2:])
+
+
 if __name__ == "__main__":
     from tkinter.filedialog import askdirectory
+
     diretorio = askdirectory(title='Selecione o diret¢rio que est„o os arquivos .dat')
     if diretorio:
         base2lp(diretorio)
