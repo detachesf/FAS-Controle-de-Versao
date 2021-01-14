@@ -113,6 +113,12 @@ class Manipulador(object):
         self.NotbkReator_Linha = ['selec_linha_reator_', 'reator_entry_cod_', 'reator_entry_painel_',
                                   'reator_checkbtt_manob_', 'reator_combobox_equip_', 'reator_checkbtt_rdp_', 'reator_checkbtt_bunitf9_',
                                   'reator_entry_campass_', 'reator_entry_conjuntosecc_']
+        self.NotbkAcesso_Linha = ['selec_linha_acesso_', 'acesso_entry_codvao_','acesso_entry_painelacess_','acesso_checkbtt_painelexist_',
+                                  'acesso_entry_num_uc_chesf_','acesso_entry_num_uc_acessante_','acesso_combobox_arranjo_', 'acesso_checkbtt_ts_',
+                                  'acesso_entry_ts_de_', 'acesso_entry_ts_ate_', 'acesso_checkbtt_rb_', 'acesso_entry_redbox_de_',
+                                  'acesso_entry_redbox_ate_', 'acesso_checkbtt_multimedidor_', 'acesso_entry_mm_de_', 'acesso_entry_mm_ate_',
+                                  'acesso_entry_lt_remota_']
+
         # Variáveis Auxiliares na mecânica da tela de configuração
 
         self.NotbkLT_Linha_dic = {}  # dicionário para armazenar os objetos adicionados dinâmicamente
@@ -120,6 +126,7 @@ class Manipulador(object):
         self.NotbkVaoTrans_Linha_dic = {}
         self.NotbkPaisage_Linha_dic = {}
         self.NotbkReator_Linha_dic = {}
+        self.NotbkAcesso_Linha_dic = {}
 
         self.Arranjos = ['DISJ E MEIO', 'BS', 'BPT', 'BD3',
                          'BD4']  # Array com os arranjos possíveis para preencher os comboboxes
@@ -129,12 +136,14 @@ class Manipulador(object):
         self.Num_de_VaoTrans = [1]
         self.Num_de_Paisage = [1]
         self.Num_de_Reator = [1]
+        self.Num_de_Acesso = [1]
 
         self.Linhas_Removidas_LT = []  # Variável que registra as linhas que foram removidas
         self.Linhas_Removidas_Trafo = []
         self.Linhas_Removidas_VaoTrans = []
         self.Linhas_Removidas_Paisage = []
         self.Linhas_Removidas_Reator = []
+        self.Linhas_Removidas_Acesso = []
 
         # Carregando objetos
 
@@ -147,6 +156,9 @@ class Manipulador(object):
         self.tabela_VaoTrans: Gtk.Table = builder.get_object('tabela_vaotransf')
         self.tabela_Paisage: Gtk.Table = builder.get_object('tabela_painel_sage')
         self.tabela_Reator: Gtk.Table = builder.get_object('tabela_reator')
+        self.tabela_Acesso: Gtk.Table = builder.get_object('tabela_acesso')
+
+        self.notebook: Gtk.Notebook = builder.get_object('notebook1')
 
     def on_janela_principal_destroy(self, window):
         Gtk.main_quit()  # Encerra a aplicação quando fechar a janela no X vermelho
@@ -169,9 +181,9 @@ class Manipulador(object):
     # Ações executadas quando o botão adicionar for clicado
 
     def on_LT_button_add_linha_clicked(self, button):
-
         self.adicionar_linha(self.Linhas_Removidas_LT, self.Num_de_LT, 'LT', self.NotbkLT_Linha, self.NotbkLT_Linha_dic,
                              self.tabela_LT)
+
 
     def on_Trafo_button_add_linha_clicked(self, button):
         self.adicionar_linha(self.Linhas_Removidas_Trafo, self.Num_de_Trafo, 'Trafo', self.NotbkTrafo_Linha,
@@ -324,6 +336,25 @@ class Manipulador(object):
                              Gtk.ComboBoxText(),
                              Gtk.CheckButton(),
                              Gtk.CheckButton(),
+                             Gtk.Entry(),
+                             Gtk.Entry()]
+
+        elif tipo_evento == 'Acesso':
+            array_objetos = [Gtk.CheckButton(),
+                             Gtk.Entry(),
+                             Gtk.Entry(),
+                             Gtk.CheckButton(),
+                             Gtk.Entry(),
+                             Gtk.Entry(),
+                             Gtk.ComboBoxText(),
+                             Gtk.CheckButton(),
+                             Gtk.Entry(),
+                             Gtk.Entry(),
+                             Gtk.CheckButton(),
+                             Gtk.Entry(),
+                             Gtk.Entry(),
+                             Gtk.CheckButton(),
+                             Gtk.Entry(),
                              Gtk.Entry(),
                              Gtk.Entry()]
         if not Linhas_Removidas:  # identifica se já foi removida alguma linha anteriormente
