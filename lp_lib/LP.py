@@ -1,6 +1,9 @@
 # -*- coding: cp860 -*-
 from tkinter.messagebox import showerror
 import re
+from sys import stdout
+from traceback import print_exc
+
 
 try:
     from xlrd import open_workbook
@@ -439,6 +442,7 @@ def gerarlp(lp_padrao, LP_Config):
     try:
         book = open_workbook(lp_padrao)  # Abrir arquivo de LP Padr„o definido no arquivo de configura‡„o
     except:
+        print_exc(file=stdout)
         aviso = 'Arquivo \"' + lp_padrao + u'\" n„o encontrado'
         showerror('Erro', aviso)
 
@@ -593,7 +597,9 @@ def gerarlp(lp_padrao, LP_Config):
                                 cd13 = ('#85PNL' not in observacao.upper()) or (
                                     '#85PNL' in tratar and parametros_LT['85PNL'] == 'Sim')
                                 cd14 = ('#ACESSANTE' not in observacao.upper())
-                                if cd1 * cd2 * cd3 * cd4 * cd5 * cd6 * cd7 * cd8 * cd9 * cd10 * cd11 * cd12 * cd13* cd14 :
+
+
+                                if cd1 * cd2 * cd3 * cd4 * cd5 * cd6 * cd7 * cd8 * cd9 * cd10 * cd11 * cd12 * cd13 * cd14 :
 
                                     tratar_1 = tratar.replace('0YYY', parametros_LT['COD'])
                                     descricao_0 = descricao.replace('0YYY', parametros_LT['COD'])
@@ -671,7 +677,9 @@ def gerarlp(lp_padrao, LP_Config):
                                 # N„o conste na obesrva‡„o #PAINEL ou conste #PAINEL e o PAINELINT definido como Sim
                                 cd2 = ('#PAINEL' not in observacao.upper()) or (
                                             '#PAINEL' in observacao.upper() and parametros_PINT['PNLEXIST'] == 'N„o')
-                                if cd1 * cd2:
+                                cd3 = ('Medida Inexistente para os casos de linhas e alimentadores de 69kV e 13,8kV' not in observacao or ('Medida Inexistente para os casos de linhas e alimentadores de 69kV e 13,8kV' in observacao and parametros_PINT['COD'][1] != '2'))
+
+                                if cd1 * cd2 * cd3:
 
                                     tratar_1 = tratar.replace('YYY', parametros_PINT['COD'][-3:])
                                     descricao_0 = descricao.replace('YYY',parametros_PINT['COD'][-3:])
@@ -682,7 +690,7 @@ def gerarlp(lp_padrao, LP_Config):
                                             painel = parametros_PINT['PNL'][0] + 'UA12-' + parametros_PINT['PNL'][6]
                                             tratar_2 = tratar_1.replace('{PNL}', painel)
                                             if 'UC1' in tratar_1:
-                                                if parametros_PINT['N£mero_UC_CHESF'] != "" and parametros_PINT['PNLEXIST'] =='Sim':
+                                                if parametros_PINT['N£mero_UC_CHESF'] != "" and parametros_PINT['PNLEXIST'] == 'Sim':
                                                     if int(parametros_PINT['N£mero_UC_CHESF']) != 1:
                                                         tratar_3 = tratar_2.replace('UC1','UC'+ '{:.0f}'.format(parametros_PINT['N£mero_UC_CHESF']))
                                                         if 'FPCn' in tratar_3:
@@ -715,6 +723,9 @@ def gerarlp(lp_padrao, LP_Config):
                                                     tratar_3 = tratar_2.replace('UC1', 'UC' + '{:.0f}'.format(
                                                     parametros_PINT['N£mero_UC_ACESSANTE']))
                                                     if int(parametros_PINT['N£mero_UC_ACESSANTE']) != 1:
+                                                        gravar_ponto(tratar_3, descricao_1)
+                                                        k_Pint += 1
+                                                    else:
                                                         gravar_ponto(tratar_3, descricao_1)
                                                         k_Pint += 1
                                                 else:
@@ -1225,6 +1236,11 @@ def gerarlp(lp_padrao, LP_Config):
                                 else:
                                     arr = [parametros_vao['ARR']]
 
+                                if parametros_vao['TIPO'] =='BT':
+                                    VaoTransf = True
+                                else:
+                                    VaoTransf = False
+
                                 k_arr = True
                                 for arranjo in arr:
                                     # Arranjo diferente de Barra Dupla a 3 chaves e diferente de BCS, ou Arranjo igual a Barra Dupla a 3 chaves ou BCS e N„o contenha no ID ':43:'
@@ -1239,13 +1255,18 @@ def gerarlp(lp_padrao, LP_Config):
 
                                     cd4 = ('#MONOPOLAR' not in observacao.upper() or (
                                         '#MONOPOLAR' in observacao.upper() and parametros_vao['79'] == 'MONO/TRI'))
+
                                     # Caso Tenha F9 em ID
                                     if 'F9' not in tratar:
                                         cd5 = True
                                     elif parametros_vao['COD'] == 'BCS':
                                         cd5 = False
                                     elif parametros_vao.get('F9', False):
-                                        if parametros_vao['F9'] == 'Sim': cd5 = True
+                                        print(parametros_vao['F9'])
+                                        if parametros_vao['F9'] == 'Sim':
+                                            cd5 = True
+                                        else:
+                                            cd5 = False
                                     else:
                                         cd5 = False
                                         # N„o se trate de ponto de Falha Sele‡„o Prote‡„o Intr¡nseca ou se trate deste ponto e seja um Trafo
@@ -1267,7 +1288,10 @@ def gerarlp(lp_padrao, LP_Config):
                                     cd11 = ('00:PBSS' not in tratar) or (
                                         '00:PBSS' in tratar and not bool(parametros_vao.get('PASSSecc', [None])[0]))
 
-                                    if cd1 * cd2 * cd3 * cd4 * cd5 * cd6 * cd7 * cd8 * cd9 * cd10 * cd11:
+                                    cd12 = ('Aplic vel a Disjuntor de transferˆncia' not in observacao or
+                                            ('Aplic vel a Disjuntor de transferˆncia' in observacao and VaoTransf))
+
+                                    if cd1 * cd2 * cd3 * cd4 * cd5 * cd6 * cd7 * cd8 * cd9 * cd10 * cd11 * cd12:
                                         if k_arr:  # Arranjo a ser processado ‚ o da posi‡„o 0 de "arr"
                                             cod_disj = parametros_vao['COD'][1:]
                                             k_arr = False

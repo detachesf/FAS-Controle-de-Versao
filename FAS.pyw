@@ -211,6 +211,7 @@ class Janela:
             try:
                 book = open_workbook(temp)  # Abrir arquivo de a ser checado
             except:
+
                 aviso = 'Arquivo \"' + temp + '\" n„o encontrado'
                 showerror('Erro', aviso)
             array_combo = []
@@ -228,6 +229,7 @@ class Janela:
         try:
             arq_conf = open_workbook(self.caminhoArquivoLP_Comfig)  # Abrir arquivo de LP_Config
         except:
+            print_exc(file=stdout)
             aviso = 'Arquivo \"' + self.caminhoArquivoLP_Comfig + u'\" n„o encontrado'
             showerror('Erro', aviso)
         try:
