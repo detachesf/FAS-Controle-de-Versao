@@ -113,11 +113,29 @@ class Manipulador(object):
         self.NotbkReator_Linha = ['selec_linha_reator_', 'reator_entry_cod_', 'reator_entry_painel_',
                                   'reator_checkbtt_manob_', 'reator_combobox_equip_', 'reator_checkbtt_rdp_', 'reator_checkbtt_bunitf9_',
                                   'reator_entry_campass_', 'reator_entry_conjuntosecc_']
+
         self.NotbkAcesso_Linha = ['selec_linha_acesso_', 'acesso_entry_codvao_','acesso_entry_painelacess_','acesso_checkbtt_painelexist_',
                                   'acesso_entry_num_uc_chesf_','acesso_entry_num_uc_acessante_','acesso_combobox_arranjo_', 'acesso_checkbtt_ts_',
                                   'acesso_entry_ts_de_', 'acesso_entry_ts_ate_', 'acesso_checkbtt_rb_', 'acesso_entry_redbox_de_',
                                   'acesso_entry_redbox_ate_', 'acesso_checkbtt_multimedidor_', 'acesso_entry_mm_de_', 'acesso_entry_mm_ate_',
                                   'acesso_entry_lt_remota_']
+        self.NotbkTterra_Linha = ['selec_linha_tterra_', 'tterra_entry_codigo_', 'tterra_entry_painel_','tterra_entry_camaraspass_', 'tterra_entry_conjuntosecc_']
+        self.NotbkProtbarra_Linha = ['selec_linha_protbarra_','protbarra_entry_painel_', 'protbarra_entry_qtpan_','protbarra_combobox_arranjo_',
+                                     'protbarra_checkbtt_bu_no_painel_','protbarra_entry_vaos_']
+
+        self.NotbkBcapshunt_Linha = ['selec_linha_bcapshunt_','bcapshunt_entry_codigo_','bcapshunt_entry_painel_','bcapshunt_combobox_arranjo_',
+                                     'bcapshunt_checkbtt_rdp_','bcapshunt_checkbtt_bunitf9_']
+
+        self.NotbkBcapserie_Linha = ['selec_linha_bcapserie_','bcapserie_entry_codigo_','bcapserie_entry_painel_']
+
+        self.NotbkEce_Linha = ['selec_linha_ece_', 'ece_entry_codigo_', 'ece_entry_painel_']
+
+        self.NotbkSistreg_Linha = ['selec_linha_sistreg_','sistreg_combobox_nome_','sistreg_combobox_tesao_reg_',
+                                   'sistreg_entry_painel_']
+
+        self.NotbkPrepreen_Linha = ['selec_linha_prepreen_', 'prepreen_entry_sistema_']
+
+        self.NotbkCompsinc_Linha = ['selec_linha_compsinc_', 'compsinc_entry_codigo_', 'compsinc_entry_painel_']
 
         # Variáveis Auxiliares na mecânica da tela de configuração
 
@@ -127,6 +145,14 @@ class Manipulador(object):
         self.NotbkPaisage_Linha_dic = {}
         self.NotbkReator_Linha_dic = {}
         self.NotbkAcesso_Linha_dic = {}
+        self.NotbkTterra_Linha_dic = {}
+        self.NotbkProtbarra_Linha_dic = {}
+        self.NotbkBcapshunt_Linha_dic = {}
+        self.NotbkBcapserie_Linha_dic = {}
+        self.NotbkEce_Linha_dic = {}
+        self.NotbkSistreg_Linha_dic = {}
+        self.NotbkPrepreen_Linha_dic = {}
+        self.NotbkCompsinc_Linha_dic = {}
 
         self.Arranjos = ['DISJ E MEIO', 'BS', 'BPT', 'BD3',
                          'BD4']  # Array com os arranjos possíveis para preencher os comboboxes
@@ -137,6 +163,14 @@ class Manipulador(object):
         self.Num_de_Paisage = [1]
         self.Num_de_Reator = [1]
         self.Num_de_Acesso = [1]
+        self.Num_de_Tterra = [1]
+        self.Num_de_Protbarra = [1]
+        self.Num_de_Bcapshunt = [1]
+        self.Num_de_Bcapserie = [1]
+        self.Num_de_Ece = [1]
+        self.Num_de_Sistreg = [1]
+        self.Num_de_Prepreen = [1]
+        self.Num_de_Compsinc = [1]
 
         self.Linhas_Removidas_LT = []  # Variável que registra as linhas que foram removidas
         self.Linhas_Removidas_Trafo = []
@@ -144,6 +178,14 @@ class Manipulador(object):
         self.Linhas_Removidas_Paisage = []
         self.Linhas_Removidas_Reator = []
         self.Linhas_Removidas_Acesso = []
+        self.Linhas_Removidas_Tterra = []
+        self.Linhas_Removidas_Protbarra = []
+        self.Linhas_Removidas_Bcapshunt = []
+        self.Linhas_Removidas_Bcapserie = []
+        self.Linhas_Removidas_Ece = []
+        self.Linhas_Removidas_Sistreg = []
+        self.Linhas_Removidas_Prepreen = []
+        self.Linhas_Removidas_Compsinc = []
 
         # Carregando objetos
 
@@ -157,6 +199,14 @@ class Manipulador(object):
         self.tabela_Paisage: Gtk.Table = builder.get_object('tabela_painel_sage')
         self.tabela_Reator: Gtk.Table = builder.get_object('tabela_reator')
         self.tabela_Acesso: Gtk.Table = builder.get_object('tabela_acesso')
+        self.tabela_Tterra: Gtk.Table = builder.get_object('tabela_tterra')
+        self.tabela_Protbarra: Gtk.Table = builder.get_object('tabela_protbarra')
+        self.tabela_Bcapshunt: Gtk.Table = builder.get_object('tabela_bcapshunt')
+        self.tabela_Bcapserie: Gtk.Table = builder.get_object('tabela_bcapserie')
+        self.tabela_Ece: Gtk.Table = builder.get_object('tabela_ece')
+        self.tabela_Sistreg: Gtk.Table = builder.get_object('tabela_sist_reg')
+        self.tabela_Prepreen: Gtk.Table = builder.get_object('tabela_prepreen')
+        self.tabela_Compsinc: Gtk.Table = builder.get_object('tabela_compsinc')
 
         self.notebook: Gtk.Notebook = builder.get_object('notebook1')
 
@@ -179,98 +229,194 @@ class Manipulador(object):
     # Sinais da tela do evento LT
 
     # Ações executadas quando o botão adicionar for clicado
+    def on_button_add_linha_clicked(self, button):
 
-    def on_LT_button_add_linha_clicked(self, button):
-        self.adicionar_linha(self.Linhas_Removidas_LT, self.Num_de_LT, 'LT', self.NotbkLT_Linha, self.NotbkLT_Linha_dic,
-                             self.tabela_LT)
+        Aba = self.notebook.get_current_page() #captura a aba ativa
 
-
-    def on_Trafo_button_add_linha_clicked(self, button):
-        self.adicionar_linha(self.Linhas_Removidas_Trafo, self.Num_de_Trafo, 'Trafo', self.NotbkTrafo_Linha,
-                             self.NotbkTrafo_Linha_dic, self.tabela_Trafo)
-
-    def on_VaoTransf_button_add_linha_clicked(self, button):
-
-        self.adicionar_linha(self.Linhas_Removidas_VaoTrans, self.Num_de_VaoTrans, 'VaoTrans',
-                             self.NotbkVaoTrans_Linha, self.NotbkVaoTrans_Linha_dic, self.tabela_VaoTrans)
-
-    def on_paisage_button_add_linha_clicked(self, button):
-
-        self.adicionar_linha(self.Linhas_Removidas_Paisage, self.Num_de_Paisage, 'Paisage',
-                             self.NotbkPaisage_Linha, self.NotbkPaisage_Linha_dic, self.tabela_Paisage)
-    def on_reator_button_add_linha_clicked(self, button):
-
-        self.adicionar_linha(self.Linhas_Removidas_Reator, self.Num_de_Reator, 'Reator',
-                             self.NotbkReator_Linha, self.NotbkReator_Linha_dic, self.tabela_Reator)
-
+        if Aba == 0: #Aba da LT
+            self.adicionar_linha(self.Linhas_Removidas_LT, self.Num_de_LT, 'LT', self.NotbkLT_Linha,
+                                 self.NotbkLT_Linha_dic,
+                                 self.tabela_LT)
+        elif Aba == 1: #Aba do Trafo
+            self.adicionar_linha(self.Linhas_Removidas_Trafo, self.Num_de_Trafo, 'Trafo', self.NotbkTrafo_Linha,
+                                 self.NotbkTrafo_Linha_dic, self.tabela_Trafo)
+        elif Aba == 2: #Aba do Vão de Transferência
+            self.adicionar_linha(self.Linhas_Removidas_VaoTrans, self.Num_de_VaoTrans, 'VaoTrans',
+                                 self.NotbkVaoTrans_Linha, self.NotbkVaoTrans_Linha_dic, self.tabela_VaoTrans)
+        elif Aba == 3: #Aba do Painel Sage e Bastidor de Rede
+            self.adicionar_linha(self.Linhas_Removidas_Paisage, self.Num_de_Paisage, 'Paisage',
+                                 self.NotbkPaisage_Linha, self.NotbkPaisage_Linha_dic, self.tabela_Paisage)
+        elif Aba == 4: #Aba do Reator
+            self.adicionar_linha(self.Linhas_Removidas_Reator, self.Num_de_Reator, 'Reator',
+                                 self.NotbkReator_Linha, self.NotbkReator_Linha_dic, self.tabela_Reator)
+        elif Aba == 5: #Aba do Acesso Segregado
+            self.adicionar_linha(self.Linhas_Removidas_Acesso, self.Num_de_Acesso, 'Acesso',
+                                 self.NotbkAcesso_Linha, self.NotbkAcesso_Linha_dic, self.tabela_Acesso)
+        elif Aba == 6: #Aba do Trafo Terra
+            self.adicionar_linha(self.Linhas_Removidas_Tterra, self.Num_de_Tterra, 'Tterra',
+                                 self.NotbkTterra_Linha, self.NotbkTterra_Linha_dic, self.tabela_Tterra)
+        elif Aba == 7:  # Aba de Proteção de Barra
+            self.adicionar_linha(self.Linhas_Removidas_Protbarra, self.Num_de_Protbarra, 'Protbarra',
+                                 self.NotbkProtbarra_Linha, self.NotbkProtbarra_Linha_dic, self.tabela_Protbarra)
+        elif Aba == 8:  # Aba do Banco de Capacitores shunt
+            self.adicionar_linha(self.Linhas_Removidas_Bcapshunt, self.Num_de_Bcapshunt, 'Bcapshunt',
+                                 self.NotbkBcapshunt_Linha, self.NotbkBcapshunt_Linha_dic, self.tabela_Bcapshunt)
+        elif Aba == 9:  # Aba do Banco de Capacitores série
+            self.adicionar_linha(self.Linhas_Removidas_Bcapserie, self.Num_de_Bcapserie, 'Bcapserie',
+                                 self.NotbkBcapserie_Linha, self.NotbkBcapserie_Linha_dic, self.tabela_Bcapserie)
+        elif Aba == 10: # Aba do ECE
+            self.adicionar_linha(self.Linhas_Removidas_Ece, self.Num_de_Ece, 'Ece',
+                                 self.NotbkEce_Linha, self.NotbkEce_Linha_dic, self.tabela_Ece)
+        elif Aba == 11: # Aba do Sistema de Regulação
+            self.adicionar_linha(self.Linhas_Removidas_Sistreg, self.Num_de_Sistreg, 'Sistreg',
+                                 self.NotbkSistreg_Linha, self.NotbkSistreg_Linha_dic, self.tabela_Sistreg)
+        elif Aba == 12: #Aba de Preparação para Reenergização
+            self.adicionar_linha(self.Linhas_Removidas_Prepreen, self.Num_de_Prepreen, 'Prepreen',
+                                 self.NotbkPrepreen_Linha, self.NotbkPrepreen_Linha_dic, self.tabela_Prepreen)
+        elif Aba == 13: #Aba do Compensador Síncrono
+            self.adicionar_linha(self.Linhas_Removidas_Compsinc, self.Num_de_Compsinc, 'Compsinc',
+                                 self.NotbkCompsinc_Linha, self.NotbkCompsinc_Linha_dic, self.tabela_Compsinc)
     # Ações executadas quando o botão excluir for clicado
+    def on_button_Excluir_clicked(self, button):
 
-    def on_LT_button_Excluir_clicked(self, button):
+        Aba = self.notebook.get_current_page()  # captura a aba ativa
 
-        self.exclui_linha(self.Linhas_Removidas_LT, self.Num_de_LT, self.NotbkLT_Linha, self.NotbkLT_Linha_dic)
+        if Aba == 0:  # Aba da LT
+            self.exclui_linha(self.Linhas_Removidas_LT, self.Num_de_LT, self.NotbkLT_Linha, self.NotbkLT_Linha_dic)
+        elif Aba == 1:  # Aba do Trafo
+            self.exclui_linha(self.Linhas_Removidas_Trafo, self.Num_de_Trafo, self.NotbkTrafo_Linha,self.NotbkTrafo_Linha_dic)
+        elif Aba == 2:  # Aba do Vão de Transferência
+            self.exclui_linha(self.Linhas_Removidas_VaoTrans, self.Num_de_VaoTrans,
+                                 self.NotbkVaoTrans_Linha, self.NotbkVaoTrans_Linha_dic)
+        elif Aba == 3:  # Aba do Painel Sage e Bastidor de Rede
+            self.exclui_linha(self.Linhas_Removidas_Paisage, self.Num_de_Paisage,
+                                 self.NotbkPaisage_Linha, self.NotbkPaisage_Linha_dic)
+        elif Aba == 4:  # Aba do Reator
+            self.exclui_linha(self.Linhas_Removidas_Reator, self.Num_de_Reator,
+                                 self.NotbkReator_Linha, self.NotbkReator_Linha_dic)
+        elif Aba == 5:  # Aba do Acesso Segregado
+            self.exclui_linha(self.Linhas_Removidas_Acesso, self.Num_de_Acesso,
+                                 self.NotbkAcesso_Linha, self.NotbkAcesso_Linha_dic)
+        elif Aba == 6:  # Aba do Trafo Terra
+            self.exclui_linha(self.Linhas_Removidas_Tterra, self.Num_de_Tterra,
+                              self.NotbkTterra_Linha, self.NotbkTterra_Linha_dic)
+        elif Aba == 7:  # Aba de Proteção de Barra
+            self.exclui_linha(self.Linhas_Removidas_Protbarra, self.Num_de_Protbarra,
+                              self.NotbkProtbarra_Linha, self.NotbkProtbarra_Linha_dic)
+        elif Aba == 8:  # Aba do Banco de Capacitores shunt
+            self.exclui_linha(self.Linhas_Removidas_Bcapshunt, self.Num_de_Bcapshunt,
+                                 self.NotbkBcapshunt_Linha, self.NotbkBcapshunt_Linha_dic)
+        elif Aba == 9:  # Aba do Banco de Capacitores série
+            self.exclui_linha(self.Linhas_Removidas_Bcapserie, self.Num_de_Bcapserie,
+                              self.NotbkBcapserie_Linha, self.NotbkBcapserie_Linha_dic)
 
-    def on_Trafo_button_Excluir_clicked(self, button):
-        self.exclui_linha(self.Linhas_Removidas_Trafo, self.Num_de_Trafo, self.NotbkTrafo_Linha,
-                          self.NotbkTrafo_Linha_dic)
+        elif Aba == 10:  # Aba do ECE
+            self.exclui_linha(self.Linhas_Removidas_Ece, self.Num_de_Ece,
+                                 self.NotbkEce_Linha, self.NotbkEce_Linha_dic)
 
-    def on_VaoTransf_button_Excluir_clicked(self, button):
+        elif Aba == 11: # Aba do Sistema de Regulação
+            self.exclui_linha(self.Linhas_Removidas_Sistreg, self.Num_de_Sistreg,
+                                 self.NotbkSistreg_Linha, self.NotbkSistreg_Linha_dic)
 
-        self.exclui_linha(self.Linhas_Removidas_VaoTrans, self.Num_de_VaoTrans,
-                          self.NotbkVaoTrans_Linha, self.NotbkVaoTrans_Linha_dic)
-
-    def on_paisage_button_Excluir_clicked(self, button):
-
-        self.exclui_linha(self.Linhas_Removidas_Paisage, self.Num_de_Paisage,
-                          self.NotbkPaisage_Linha, self.NotbkPaisage_Linha_dic)
-
-    def on_reator_button_Excluir_clicked(self, button):
-
-        self.exclui_linha(self.Linhas_Removidas_Reator, self.Num_de_Reator,
-                          self.NotbkReator_Linha, self.NotbkReator_Linha_dic)
+        elif Aba == 12: #Aba de Preparação para Reenergização
+            self.exclui_linha(self.Linhas_Removidas_Prepreen, self.Num_de_Prepreen,
+                                 self.NotbkPrepreen_Linha, self.NotbkPrepreen_Linha_dic)
+        elif Aba == 13: #Aba do Compensador Síncrono
+            self.exclui_linha(self.Linhas_Removidas_Compsinc, self.Num_de_Compsinc,
+                                 self.NotbkCompsinc_Linha, self.NotbkCompsinc_Linha_dic)
 
     # Ações executadas quando o botão duplicar for clicado
-    def on_LT_button_duplicar_clicked(self, button):
-        self.prepara_para_duplicar(self.Linhas_Removidas_LT, self.Num_de_LT, 'LT', self.NotbkLT_Linha,
-                                   self.NotbkLT_Linha_dic, self.tabela_LT)
+    def on_button_duplicar_clicked(self, button):
 
-    def on_Trafo_button_duplicar_clicked(self, button):
+        Aba = self.notebook.get_current_page()  # captura a aba ativa
 
-        self.prepara_para_duplicar(self.Linhas_Removidas_Trafo, self.Num_de_Trafo, 'Trafo', self.NotbkTrafo_Linha,
-                                   self.NotbkTrafo_Linha_dic, self.tabela_Trafo)
-
-    def on_VaoTransf_button_duplicar_clicked(self, button):
-
-        self.prepara_para_duplicar(self.Linhas_Removidas_VaoTrans, self.Num_de_VaoTrans, 'VaoTrans',
-                                   self.NotbkVaoTrans_Linha, self.NotbkVaoTrans_Linha_dic, self.tabela_VaoTrans)
-    def on_paisage_button_duplicar_clicked(self, button):
-
-        self.prepara_para_duplicar(self.Linhas_Removidas_Paisage, self.Num_de_Paisage, 'Paisage',
-                                   self.NotbkPaisage_Linha, self.NotbkPaisage_Linha_dic, self.tabela_Paisage)
-    def on_reator_button_duplicar_clicked(self, button):
-
-        self.prepara_para_duplicar(self.Linhas_Removidas_Reator, self.Num_de_Reator, 'Reator',
-                                   self.NotbkReator_Linha, self.NotbkReator_Linha_dic, self.tabela_Reator)
+        if Aba == 0:  # Aba da LT
+            self.prepara_para_duplicar(self.Linhas_Removidas_LT, self.Num_de_LT, 'LT', self.NotbkLT_Linha,
+                                       self.NotbkLT_Linha_dic, self.tabela_LT)
+        elif Aba == 1:  # Aba do Trafo
+            self.prepara_para_duplicar(self.Linhas_Removidas_Trafo, self.Num_de_Trafo, 'Trafo', self.NotbkTrafo_Linha,
+                                       self.NotbkTrafo_Linha_dic, self.tabela_Trafo)
+        elif Aba == 2:  # Aba do Vão de Transferência
+            self.prepara_para_duplicar(self.Linhas_Removidas_VaoTrans, self.Num_de_VaoTrans, 'VaoTrans',
+                                       self.NotbkVaoTrans_Linha, self.NotbkVaoTrans_Linha_dic, self.tabela_VaoTrans)
+        elif Aba == 3:  # Aba do Painel Sage e Bastidor de Rede
+            self.prepara_para_duplicar(self.Linhas_Removidas_Paisage, self.Num_de_Paisage, 'Paisage',
+                                       self.NotbkPaisage_Linha, self.NotbkPaisage_Linha_dic, self.tabela_Paisage)
+        elif Aba == 4:  # Aba do Reator
+            self.prepara_para_duplicar(self.Linhas_Removidas_Reator, self.Num_de_Reator, 'Reator',
+                                       self.NotbkReator_Linha, self.NotbkReator_Linha_dic, self.tabela_Reator)
+        elif Aba == 5:  # Aba do Acesso Segregado
+            self.prepara_para_duplicar(self.Linhas_Removidas_Acesso, self.Num_de_Acesso, 'Acesso',
+                                 self.NotbkAcesso_Linha, self.NotbkAcesso_Linha_dic, self.tabela_Acesso)
+        elif Aba == 6:  # Aba do Trafo Terra
+            self.prepara_para_duplicar(self.Linhas_Removidas_Tterra, self.Num_de_Tterra, 'Tterra',
+                                       self.NotbkTterra_Linha, self.NotbkTterra_Linha_dic, self.tabela_Tterra)
+        elif Aba == 7:  # Aba de Proteção de Barra
+            self.prepara_para_duplicar(self.Linhas_Removidas_Protbarra, self.Num_de_Protbarra, 'Protbarra',
+                                 self.NotbkProtbarra_Linha, self.NotbkProtbarra_Linha_dic, self.tabela_Protbarra)
+        elif Aba == 8:  # Aba do Banco de Capacitores shunt
+            self.prepara_para_duplicar(self.Linhas_Removidas_Bcapshunt, self.Num_de_Bcapshunt, 'Bcapshunt',
+                                 self.NotbkBcapshunt_Linha, self.NotbkBcapshunt_Linha_dic, self.tabela_Bcapshunt)
+        elif Aba == 9:  # Aba do Banco de Capacitores série
+            self.prepara_para_duplicar(self.Linhas_Removidas_Bcapserie, self.Num_de_Bcapserie, 'Bcapserie',
+                                 self.NotbkBcapserie_Linha, self.NotbkBcapserie_Linha_dic, self.tabela_Bcapserie)
+        elif Aba == 10:  # Aba do ECE
+            self.prepara_para_duplicar(self.Linhas_Removidas_Ece, self.Num_de_Ece, 'Ece',
+                                 self.NotbkEce_Linha, self.NotbkEce_Linha_dic, self.tabela_Ece)
+        elif Aba == 11: # Aba do Sistema de Regulação
+            self.prepara_para_duplicar(self.Linhas_Removidas_Sistreg, self.Num_de_Sistreg, 'Sistreg',
+                                 self.NotbkSistreg_Linha, self.NotbkSistreg_Linha_dic, self.tabela_Sistreg)
+        elif Aba == 12: #Aba de Preparação para Reenergização
+            self.prepara_para_duplicar(self.Linhas_Removidas_Prepreen, self.Num_de_Prepreen, 'Prepreen',
+                                 self.NotbkPrepreen_Linha, self.NotbkPrepreen_Linha_dic, self.tabela_Prepreen)
+        elif Aba == 13: #Aba do Compensador Síncrono
+            self.prepara_para_duplicar(self.Linhas_Removidas_Compsinc, self.Num_de_Compsinc, 'Compsinc',
+                                 self.NotbkCompsinc_Linha, self.NotbkCompsinc_Linha_dic, self.tabela_Compsinc)
 
     # Ações executadas quando o botão limpar for clicado
-    def on_LT_button_limpar_clicked(self, button):
 
-        self.limpar_linha(self.Num_de_LT, self.NotbkLT_Linha, self.NotbkLT_Linha_dic)
+    def on_button_limpar_clicked(self, button):
 
-    def on_Trafo_button_limpar_clicked(self, button):
+        Aba = self.notebook.get_current_page()  # captura a aba ativa
 
-        self.limpar_linha(self.Num_de_LT, self.NotbkTrafo_Linha, self.NotbkTrafo_Linha_dic)
+        if Aba == 0:  # Aba da LT
+            self.limpar_linha(self.Num_de_LT, self.NotbkLT_Linha, self.NotbkLT_Linha_dic)
 
-    def on_VaoTransf_button_limpar_clicked(self, button):
+        elif Aba == 1:  # Aba do Trafo
+            self.limpar_linha( self.Num_de_Trafo, self.NotbkTrafo_Linha, self.NotbkTrafo_Linha_dic)
 
-        self.limpar_linha(self.Num_de_VaoTrans, self.NotbkVaoTrans_Linha, self.NotbkVaoTrans_Linha_dic)
+        elif Aba == 2:  # Aba do Vão de Transferência
+            self.limpar_linha(self.Num_de_VaoTrans, self.NotbkVaoTrans_Linha, self.NotbkVaoTrans_Linha_dic)
 
-    def on_paisage_button_limpar_clicked(self, button):
+        elif Aba == 3:  # Aba do Painel Sage e Bastidor de Rede
+            self.limpar_linha(self.Num_de_Paisage, self.NotbkPaisage_Linha, self.NotbkPaisage_Linha_dic)
 
-        self.limpar_linha(self.Num_de_Paisage, self.NotbkPaisage_Linha, self.NotbkPaisage_Linha_dic)
+        elif Aba == 4:  # Aba do Reator
+            self.limpar_linha(self.Num_de_Reator, self.NotbkReator_Linha, self.NotbkReator_Linha_dic)
 
-    def on_reator_button_limpar_clicked(self, button):
+        elif Aba == 5:  # Aba do Acesso Segregado
+            self.limpar_linha(self.Num_de_Acesso, self.NotbkAcesso_Linha, self.NotbkAcesso_Linha_dic)
 
-        self.limpar_linha(self.Num_de_Reator, self.NotbkReator_Linha, self.NotbkReator_Linha_dic)
+        elif Aba == 6:  # Aba do Trafo Terra
+            self.limpar_linha(self.Num_de_Tterra, self.NotbkTterra_Linha, self.NotbkTterra_Linha_dic)
+
+        elif Aba == 7:  # Aba de Proteção de Barra
+            self.limpar_linha(self.Num_de_Protbarra, self.NotbkProtbarra_Linha, self.NotbkProtbarra_Linha_dic)
+
+        elif Aba == 8:  # Aba do Banco de Capacitores shunt
+            self.limpar_linha(self.Num_de_Bcapshunt, self.NotbkBcapshunt_Linha, self.NotbkBcapshunt_Linha_dic)
+
+        elif Aba == 9:  # Aba do Banco de Capacitores série
+            self.limpar_linha(self.Num_de_Bcapserie, self.NotbkBcapserie_Linha, self.NotbkBcapserie_Linha_dic)
+        elif Aba == 10:  # Aba do ECE
+            self.limpar_linha(self.Num_de_Ece, self.NotbkEce_Linha, self.NotbkEce_Linha_dic)
+        elif Aba == 11: # Aba do Sistema de Regulação
+            self.limpar_linha(self.Num_de_Sistreg, self.NotbkSistreg_Linha, self.NotbkSistreg_Linha_dic)
+        elif Aba == 12: #Aba de Preparação para Reenergização
+            self.limpar_linha(self.Num_de_Prepreen, self.NotbkPrepreen_Linha, self.NotbkPrepreen_Linha_dic)
+        elif Aba == 13: #Aba do Compensador Síncrono
+            self.limpar_linha(self.Num_de_Compsinc, self.NotbkCompsinc_Linha, self.NotbkCompsinc_Linha_dic)
+
 
     # Funções de ação gerais
 
@@ -314,7 +460,6 @@ class Manipulador(object):
                              Gtk.Entry(),
                              Gtk.Entry(),
                              ]
-
         elif tipo_evento == 'Paisage':
             array_objetos = [Gtk.CheckButton(),
                              Gtk.Entry(),
@@ -357,6 +502,53 @@ class Manipulador(object):
                              Gtk.Entry(),
                              Gtk.Entry(),
                              Gtk.Entry()]
+        elif tipo_evento == 'Tterra':
+            array_objetos = [Gtk.CheckButton(),
+                             Gtk.Entry(),
+                             Gtk.Entry(),
+                             Gtk.Entry(),
+                             Gtk.Entry()]
+        elif tipo_evento == 'Protbarra':
+            array_objetos = [Gtk.CheckButton(),
+                         Gtk.Entry(),
+                         Gtk.Entry(),
+                         Gtk.ComboBoxText(),
+                         Gtk.CheckButton(),
+                         Gtk.Entry()]
+
+        elif tipo_evento == 'Bcapshunt':
+            array_objetos = [Gtk.CheckButton(),
+                             Gtk.Entry(),
+                             Gtk.Entry(),
+                             Gtk.ComboBoxText(),
+                             Gtk.CheckButton(),
+                             Gtk.CheckButton()]
+
+        elif tipo_evento == 'Bcapserie':
+            array_objetos = [Gtk.CheckButton(),
+                             Gtk.Entry(),
+                             Gtk.Entry()]
+
+        elif tipo_evento == 'Ece':
+            array_objetos = [Gtk.CheckButton(),
+                             Gtk.Entry(),
+                             Gtk.Entry()]
+
+        elif tipo_evento == 'Sistreg':
+            array_objetos = [Gtk.CheckButton(),
+                             Gtk.ComboBoxText(),
+                             Gtk.ComboBoxText(),
+                             Gtk.Entry()]
+
+        elif tipo_evento == 'Prepreen':
+            array_objetos = [Gtk.CheckButton(),
+                             Gtk.Entry()]
+
+        elif tipo_evento == 'Compsinc':
+            array_objetos = [Gtk.CheckButton(),
+                             Gtk.Entry(),
+                             Gtk.Entry()]
+
         if not Linhas_Removidas:  # identifica se já foi removida alguma linha anteriormente
             # Caso nenhuma linha tenha sido removida, a nova linha a adicionar será uma a mais da ultima
             indice_a_adicionar = max(Numero_linhas_ativas, key=int) + 1
@@ -424,6 +616,17 @@ class Manipulador(object):
                 if objeto.get_name().__contains__('equip'):
                     objeto.append_text('Banco Monof.')
                     objeto.append_text('Trifásico')
+            if tipo_evento == 'Sistreg':
+                if objeto.get_name().__contains__('nome'):
+                    objeto.append_text('SAGE')
+                    objeto.append_text('UTR-')
+                    objeto.append_text('PCPG')
+                    objeto.append_text('SART')
+                if objeto.get_name().__contains__('tesao_reg'):
+                    objeto.append_text('230kV')
+                    objeto.append_text('138kV')
+                    objeto.append_text('69kV')
+                    objeto.append_text('13,8kV')
         return indice_a_adicionar
 
     # Função principal para realizar a cópia das linhas selecionadas
@@ -530,12 +733,14 @@ class Manipulador(object):
 
     # Função que exclui a(s) linha(s) selecionada(s)
     def exclui_linha(self, Linhas_Removidas, Numero_linhas_ativas, array_nomes_objetos, dicionario_objetos):
+        linhas_removidas_agora=[]
         for linha in Numero_linhas_ativas:  # Varre todas as linhas para achar os checkboxes selecionados
             try:  # Caso para os objetos que foram criados no botão adicionar (dinamicamente)
                 check_select: Gtk.CheckButton = dicionario_objetos[
                     array_nomes_objetos[0] + str(linha)]  # Resgatando o objeto checkbutton da linha
                 if check_select.get_active():
                     Linhas_Removidas.append(linha)
+                    linhas_removidas_agora.append(linha)
                     for item in array_nomes_objetos:
                         objeto = dicionario_objetos[
                             item + str(linha)]  # Resgatando os objetos armazenados no dicionário
@@ -550,7 +755,7 @@ class Manipulador(object):
                         objeto = builder.get_object(item + str(1))
                         objeto.destroy()
 
-        for linha_remov in Linhas_Removidas:  # Remove as linhas removidas do array de linhas ativas
+        for linha_remov in linhas_removidas_agora:  # Remove as linhas removidas do array de linhas ativas
             del Numero_linhas_ativas[Numero_linhas_ativas.index(linha_remov)]
 
     # Funções Adicionais Auxiliares
@@ -568,11 +773,18 @@ class Manipulador(object):
             if linha_a_duplicar != linha:
                 if (array_nomes_objetos[0] + str(linha_a_duplicar)) in dicionario_objetos:
                     codigo_evento: Gtk.Entry = dicionario_objetos[array_nomes_objetos[1] + str(linha_a_duplicar)]
-                    if codigo_evento.get_text() == '':
-                        preenchidas = False
-                        break
-                    else:
-                        preenchidas = True
+                    if codigo_evento.get_name().__contains__('entry'):
+                        if codigo_evento.get_text() == '':
+                            preenchidas = False
+                            break
+                        else:
+                            preenchidas = True
+                    elif codigo_evento.get_name().__contains__('combobox'):
+                        if codigo_evento.get_active() == -1:
+                            preenchidas = False
+                            break
+                        else:
+                            preenchidas = True
         if preenchidas:
             return [preenchidas, 0]
         else:
