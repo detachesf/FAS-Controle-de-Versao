@@ -6,9 +6,9 @@ import threading
 from time import sleep
 
 try:
-    from xlrd import open_workbook
+    from openpyxl import load_workbook,cell
 except:
-    showerror('Erro', 'M¢dulo xlrd n„o instalado')
+    showerror('Erro', 'M¢dulo openpyxl n„o instalado')
 
 dados= '''            
 Vers„o do programa: 2.0.12
@@ -53,16 +53,16 @@ def linhaInicialETitulos(arquivo, nomeAba):
     'D (SAGE)' o valor de retorno de linhaInicial ser  -1 (menos um).  
     """   
     
-    arq_conf = open_workbook(arquivo)  
-    sheet = arq_conf.sheet_by_name(nomeAba)
+    arq_conf = load_workbook(arquivo, data_only=True)
+    sheet = arq_conf[nomeAba]
     titulossuperiores = {}
     TitulosPrinc = ['CHESF - N‹VEL 2', 'CHESF - TELEASSIST‰NCIA N3', 'CHESF - N‹VEL 3', 'ONS', 'LIMITES OPERACIONAIS']
     titulos = {}
-    for li in range(1, 10):                                         #Varrer as linhas de 2 a 10
-        for i in range(sheet.ncols):
-            texto = sheet.cell_value(li, i).upper().strip().replace("  "," ")
+    for li in range(2, 10):                                         #Varrer as linhas de 2 a 10
+        for i in range(sheet.max_column):
+            texto = str(sheet.cell(row=li, column=i+1).value).upper().strip().replace("  "," ")
             if texto in TitulosPrinc:
-                titulossuperiores[texto] = (li, i) #Pega a linha e coluna associada ao t¡tulo principal
+                titulossuperiores[texto] = (li, i+1) #Pega a linha e coluna associada ao t¡tulo principal
         if 'CHESF - N‹VEL 2' in titulossuperiores: break         #Se foi passado pela linha com chave "CHESF - N‹VEL 2" parar de varrer linhas
     #Tratamento dos t¡tulos principais, se n„o estiver da mesma forma da aba PADRAO da lista de pontos, a mensagem de erro ‚ gerada
     for tit in TitulosPrinc:
@@ -75,39 +75,39 @@ def linhaInicialETitulos(arquivo, nomeAba):
     subtitulosONS = {}
     subtitulosLO = {}
 # sess„o onde os subt¡tulos s„o captados da lista a ser checada
-    for coluna in range(titulossuperiores['CHESF - N‹VEL 2'][1], titulossuperiores['CHESF - TELEASSIST‰NCIA N3'][1]):
+    for coluna in range( titulossuperiores['CHESF - N‹VEL 2'][1], titulossuperiores['CHESF - TELEASSIST‰NCIA N3'][1]):
         for i in range(1,3):
-            if sheet.cell_value(titulossuperiores['CHESF - N‹VEL 2'][0] + i, coluna).upper().strip() != '':
-                subtitulosn2[sheet.cell_value(titulossuperiores['CHESF - N‹VEL 2'][0] + i, coluna).upper().strip()] = coluna
+            if str(sheet.cell(row = titulossuperiores['CHESF - N‹VEL 2'][0] + i, column = coluna).value).upper().strip() != '':
+                subtitulosn2[str(sheet.cell(row = titulossuperiores['CHESF - N‹VEL 2'][0] + i, column = coluna).value).upper().strip()] = coluna
                 if coluna == titulossuperiores['CHESF - N‹VEL 2'][1]:
                     li += 1 #guarda a £ltima linha de subt¡tulo preenchida
                 break
     for coluna in range(titulossuperiores['CHESF - TELEASSIST‰NCIA N3'][1], titulossuperiores['CHESF - N‹VEL 3'][1]):
         for i in range(1, 3):
-            if sheet.cell_value(titulossuperiores['CHESF - TELEASSIST‰NCIA N3'][0] + i, coluna).upper().strip() != '':
-                subtitulosn3Tele[sheet.cell_value(titulossuperiores['CHESF - TELEASSIST‰NCIA N3'][0] + i, coluna).upper().strip()] = coluna
+            if str(sheet.cell(row=titulossuperiores['CHESF - TELEASSIST‰NCIA N3'][0] + i, column=coluna).value).upper().strip() != '':
+                subtitulosn3Tele[str(sheet.cell(row=titulossuperiores['CHESF - TELEASSIST‰NCIA N3'][0] + i, column=coluna).value).upper().strip()] = coluna
                 if titulossuperiores['CHESF - TELEASSIST‰NCIA N3'][0] + i > li:
                     li = titulossuperiores['CHESF - TELEASSIST‰NCIA N3'][0] + i
                 break
 
     for coluna in range(titulossuperiores['CHESF - N‹VEL 3'][1], titulossuperiores['ONS'][1]):
         for i in range(1, 3):
-            if sheet.cell_value(titulossuperiores['CHESF - N‹VEL 3'][0] + i, coluna).upper().strip() != '':
-                subtitulosn3[sheet.cell_value(titulossuperiores['CHESF - N‹VEL 3'][0] + i, coluna).upper().strip()] = coluna
+            if str(sheet.cell(row=titulossuperiores['CHESF - N‹VEL 3'][0] + i,column = coluna).value).upper().strip() != '':
+                subtitulosn3[str(sheet.cell(titulossuperiores['CHESF - N‹VEL 3'][0] + i, coluna).value).upper().strip()] = coluna
                 if titulossuperiores['CHESF - N‹VEL 3'][0] + i > li:
                     li = titulossuperiores['CHESF - N‹VEL 3'][0] + i
                 break
 
     for coluna in range(titulossuperiores['ONS'][1], titulossuperiores['LIMITES OPERACIONAIS'][1]):
-        if sheet.cell_value(titulossuperiores['ONS'][0] + 2, coluna).upper().strip() != '':
-            subtitulosONS[sheet.cell_value(titulossuperiores['ONS'][0] + 2, coluna).upper().strip()] = coluna
+        if str(sheet.cell(row = titulossuperiores['ONS'][0] + 2,column = coluna).value).upper().strip() != '':
+            subtitulosONS[str(sheet.cell(row = titulossuperiores['ONS'][0] + 2, column = coluna).value).upper().strip()] = coluna
             if titulossuperiores['ONS'][0] + 2 > li:
                 li = titulossuperiores['ONS'][0] + 2
 
     for coluna in range(titulossuperiores['LIMITES OPERACIONAIS'][1], titulossuperiores['LIMITES OPERACIONAIS'][1] + 8):
         for i in range(1, 3):
-            if sheet.cell_value(titulossuperiores['LIMITES OPERACIONAIS'][0] + i, coluna).upper().strip() != '':
-                subtitulosLO[sheet.cell_value(titulossuperiores['LIMITES OPERACIONAIS'][0] + i, coluna).upper().strip()] = coluna
+            if str(sheet.cell(row = titulossuperiores['LIMITES OPERACIONAIS'][0] + i, column = coluna).value).upper().strip() != '':
+                subtitulosLO[str(sheet.cell(row = titulossuperiores['LIMITES OPERACIONAIS'][0] + i, column = coluna).value).upper().strip()] = coluna
                 if titulossuperiores['LIMITES OPERACIONAIS'][0] + i > li:
                     li = titulossuperiores['LIMITES OPERACIONAIS'][0] + i
                 break
@@ -145,7 +145,7 @@ def linhaInicialETitulos(arquivo, nomeAba):
     li += 1  # Seleciona linha ap¢s o t¡tulo
     if 'ID (SAGE)' in titulos['CHESF - N‹VEL 2']:                               #Verifica se foi encontrado chave "ID (SAGE)"
         while True:
-            if sheet.cell_value(li, titulos['CHESF - N‹VEL 2']['ID (SAGE)']):              #Verifica se a c‚lula est  preenchida com algum valor
+            if sheet.cell(row = li, column=titulos['CHESF - N‹VEL 2']['ID (SAGE)']).value:              #Verifica se a c‚lula est  preenchida com algum valor
                 break                                                   #Parar de procurar linha preenchida
             else:
                 li += 1                                                 #Selecionar linha seguinte

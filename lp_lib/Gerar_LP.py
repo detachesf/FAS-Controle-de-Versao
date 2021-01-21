@@ -15,7 +15,6 @@ try:
     from xlrd import open_workbook
 except:
     showerror('Erro','Modulo xlrd n„o instalado')
-
 try:
     from lp_lib.LP import gerarlp
 except:
@@ -61,17 +60,17 @@ def gerar(LP_Padrao,relatorio,LP_Config):
         descr = dado[2]
         if dado[9].value == 'Em caso de religamento Monopolar' or\
            dado[9].value == 'Para arranjos disjuntor e meio.' or\
-           dado[9].value.find('{PNL}') > -1 or\
+           str(dado[9].value).find('{PNL}') > -1 or\
            dado[9].value == 'Apenas para Banco Monof sico.' or\
            dado[9].value == 'Apenas para Trafo Trif sico.' or\
            dado[9].value == 'Sele‡„o de sincronismo para Barra Dupla' or\
            dado[9].value == '\"n\" - N£mero do Canal Ÿptico.' or\
-           dado[9].value.startswith('Para sistemas #PASS') or\
-           dado[9].value.find('(SAGE, UTR-, PCPG)') > -1 or\
-           dado[9].value.find('{DISP}') > -1 or\
-           dado[9].value.find('UCn') > -1 or\
-           dado[9].value.find('"n"-') > -1 or\
-           dado[9].value.find('n-') > -1 :
+           str(dado[9].value).startswith('Para sistemas #PASS') or\
+           str(dado[9].value).find('(SAGE, UTR-, PCPG)') > -1 or\
+           str(dado[9].value).find('{DISP}') > -1 or\
+           str(dado[9].value).find('UCn') > -1 or\
+           str(dado[9].value).find('"n"-') > -1 or\
+           str(dado[9].value).find('n-') > -1 :
             obs = ''
         else:
             obs = dado[9].value

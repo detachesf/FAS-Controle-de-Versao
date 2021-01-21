@@ -8,12 +8,16 @@ Gera‡„o de LP no padr„o Chesf tendo como base a planilha CEPEL de gera‡„o de bas
 
 from tkinter.messagebox import showerror, showwarning, askyesno
 from os import path, getcwd, startfile
-
+from sys import stdout
+from traceback import print_exc
 try:
     from xlrd import open_workbook
 except:
     showerror('Erro', 'M¢dulo xlrd n„o instalado')
-
+try:
+    from openpyxl import load_workbook,cell
+except:
+    showerror('Erro', 'M¢dulo openpyxl n„o instalado')
 try:
     from lp_lib.gerarPlanilhaLP import gerarPlanilha
 except:
@@ -33,26 +37,26 @@ def cepel2lp(arqcepel):
     planilha_relatorio = arq_LP.add_worksheet('RELATORIO')
     
     try:
-        arq_cepel = open_workbook(arqcepel)  # Abrir Planilha CEPEL
+        arq_cepel = load_workbook(arqcepel, data_only=True)  # Abrir Planilha CEPEL
     except:
-        showerror('Erro', 'Planilha CEPEL n„o encontrada')
+        showerror('Erro', 'Planilha CEPEL n„o encontrada ou formato n„o suportado, utilize arquivos .xlsm ou .xlsx')
 
     def Titulos(sheet):
         titulos = {}
-        for li in range(1,10):                                          #Varrer as linhas de 2 a 10
-            for i in range(sheet.ncols):                                #Varrer as colunas da linha
-                texto_coluna = str(sheet.cell_value(li,i)).upper().strip()   #Pegar texto da c‚lula
+        for li in range(2,10):                                          #Varrer as linhas de 2 a 10
+            for i in range(sheet.max_column):                                #Varrer as colunas da linha
+                texto_coluna = str(sheet.cell(row= li, column= i+1).value).upper().strip()   #Pegar texto da c‚lula
                 if texto_coluna == '':                                  #Gravar £ltima posi‡„o com valor vazio
-                    titulos[texto_coluna] = i
+                    titulos[texto_coluna] = i+1
                 elif texto_coluna not in titulos:                       #Iserir chave se n„o existir no dicion rio
-                    titulos[texto_coluna] = i
+                    titulos[texto_coluna] = i+1
             if 'ID' in titulos: break                     #Se foi passado pela linha com chave "ID (SAGE)" parar de varrer linhas 
         
         li += 1                                                         #Seleciona linha ap¢s o t¡tulo
         if 'ID' in titulos:                               #Verifica se foi encontrado chave "ID (SAGE)"
             while True:
-                if sheet.nrows == li: break 
-                if sheet.cell_value(li,titulos['ID']):              #Verifica se a c‚lula est  preenchida com algum valor
+                if sheet.max_row+1 == li: break 
+                if sheet.cell(row=li,column=titulos['ID']).value:              #Verifica se a c‚lula est  preenchida com algum valor
                     break                                                   #Parar de procurar linha preenchida
                 else:
                     li += 1                                                 #Selecionar linha seguinte
@@ -64,95 +68,97 @@ def cepel2lp(arqcepel):
     ##### Ler PDS #####
     try:
         try:
-            pds_sh = arq_cepel.sheet_by_name('PDS')  # Abrir planilha "PDS" da Planilha CEPEL
+            pds_sh = arq_cepel['PDS']  # Abrir planilha "PDS" da Planilha CEPEL
         except:
-            pds_sh = arq_cepel.sheet_by_name('pds')  # Abrir planilha "PDS" da Planilha CEPEL
+            pds_sh = arq_cepel['pds']  # Abrir planilha "PDS" da Planilha CEPEL
         li, titulo_dic = Titulos(pds_sh)
         pds_dic = {}
-        for index_linha in range(li, pds_sh.nrows):
-            ID = pds_sh.cell_value(index_linha, titulo_dic['ID'])
+        for index_linha in range(li, pds_sh.max_row+1):
+            ID ='' if str(pds_sh.cell(row = index_linha, column = titulo_dic['ID']).value) == 'None' else str(pds_sh.cell(row = index_linha, column = titulo_dic['ID']).value)
             ColProc = titulo_dic.get('','#None')  # Pegar coluna com T¡tulo vazio com informa‡„o x/y
             if ColProc != '#None':  #Se existir coluna x/y
-                c3 = str(pds_sh.cell_value(index_linha, ColProc)).strip().lower() =='x'
+                c3 = str(pds_sh.cell(row=index_linha, column= ColProc).value).strip().lower() =='x'
             else:
                 c3 = True
-            if ID.strip() and ID.strip()[0] != ';' and c3:
-                OCR = pds_sh.cell_value(index_linha, titulo_dic['OCR'])
-                NOME = pds_sh.cell_value(index_linha, titulo_dic['NOME'])
-                TIPO = pds_sh.cell_value(index_linha, titulo_dic['TIPO'])
-                ALRIN = '' if pds_sh.cell_value(index_linha, titulo_dic['ALRIN']).strip() == 'SIM' else  'X'
-                SOE = '' if pds_sh.cell_value(index_linha, titulo_dic['SOEIN']).strip() == 'SIM' else  'X'
-                TAC = pds_sh.cell_value(index_linha, titulo_dic['TAC'])
+            if str(ID).strip() and str(ID).strip()[0] != ';' and c3:
+                OCR = '' if str(pds_sh.cell(row = index_linha, column= titulo_dic['OCR']).value) =='None' else str(pds_sh.cell(row = index_linha, column= titulo_dic['OCR']).value)
+                NOME =  '' if str(pds_sh.cell(row = index_linha, column= titulo_dic['NOME']).value) == 'None' else str(pds_sh.cell(row = index_linha, column= titulo_dic['NOME']).value)
+                TIPO = '' if str(pds_sh.cell(row = index_linha, column= titulo_dic['TIPO']).value) == 'None' else str(pds_sh.cell(row = index_linha, column= titulo_dic['TIPO']).value)
+                ALRIN = '' if str(pds_sh.cell(row = index_linha, column= titulo_dic['ALRIN']).value).strip() == 'SIM' else  'X'
+                SOE = '' if str(pds_sh.cell(row = index_linha, column= titulo_dic['SOEIN']).value).strip() == 'SIM' else  'X'
+                TAC = '' if str(pds_sh.cell(row = index_linha, column= titulo_dic['TAC']).value) == 'None' else str(pds_sh.cell(row = index_linha, column= titulo_dic['TAC']).value)
                 pds_dic[ID] = [OCR, NOME, TIPO, ALRIN,SOE, TAC]
     except:
+        print_exc(file=stdout)
         showerror('Erro', 'N„o foi poss¡vel processar a planilha PDS')
                 
     ##### Ler PDD #####
     try:
         try:
-            pdd_sh = arq_cepel.sheet_by_name('PDD')  # Abrir planilha "PDD" da Planilha CEPEL
+            pdd_sh = arq_cepel['PDD']  # Abrir planilha "PDD" da Planilha CEPEL
         except:
-            pdd_sh = arq_cepel.sheet_by_name('pdd')  # Abrir planilha "PDD" da Planilha CEPEL
+            pdd_sh = arq_cepel['pdd']  # Abrir planilha "PDD" da Planilha CEPEL
         li, titulo_dic = Titulos(pdd_sh)
         pdd_dic = {}
-        for index_linha in range(li, pdd_sh.nrows):
-            ID = pdd_sh.cell_value(index_linha, titulo_dic['ID'])
+        for index_linha in range(li, pdd_sh.max_row+1):
+            ID = '' if str(pdd_sh.cell(row = index_linha, column= titulo_dic['ID']).value) == 'None' else str(pdd_sh.cell(row = index_linha, column= titulo_dic['ID']).value)
             ColProc = titulo_dic.get('','#None')  # Pegar coluna com T¡tulo vazio com informa‡„o x/y
             if ColProc != '#None':  #Se existir coluna x/y
-                c3 = str(pdd_sh.cell_value(index_linha, ColProc)).strip().lower() =='x'
+                c3 = str(pdd_sh.cell(row = index_linha, column= ColProc).value).strip().lower() =='x'
             else:
                 c3 = True
-            if ID.strip() and ID.strip()[0] != ';' and c3:
-                PDS = pdd_sh.cell_value(index_linha, titulo_dic['PDS'])
+            if str(ID).strip() and str(ID).strip()[0] != ';' and c3:
+                PDS = '' if str(pdd_sh.cell(row = index_linha, column= titulo_dic['PDS']).value) == 'None' else str(pdd_sh.cell(row = index_linha, column= titulo_dic['PDS']).value)
                 pdd_dic[PDS] = [ID]
     except:
         showerror('Erro', 'N„o foi poss¡vel processar a planilha PDD')
     ##### Ler PDF #####
     try:
         try:
-            pdf_sh = arq_cepel.sheet_by_name('PDF')  # Abrir planilha "PDF" da Planilha CEPEL
+            pdf_sh = arq_cepel['PDF']  # Abrir planilha "PDF" da Planilha CEPEL
         except:
-            pdf_sh = arq_cepel.sheet_by_name('pdf')  # Abrir planilha "PDF" da Planilha CEPEL
+            pdf_sh = arq_cepel['pdf']  # Abrir planilha "PDF" da Planilha CEPEL
         li, titulo_dic = Titulos(pdf_sh)
         pdf_dic = {}
-        for index_linha in range(li, pdf_sh.nrows):
-            ID = pdf_sh.cell_value(index_linha, titulo_dic['ID'])
+        for index_linha in range(li, pdf_sh.max_row+1):
+            ID = '' if str(pdf_sh.cell(row = index_linha, column= titulo_dic['ID']).value) == 'None' else str(pdf_sh.cell(row = index_linha, column= titulo_dic['ID']).value)
             ColProc = titulo_dic.get('','#None')  # Pegar coluna com T¡tulo vazio com informa‡„o x/y
             if ColProc != '#None':  #Se existir coluna x/y
-                c3 = str(pdf_sh.cell_value(index_linha, ColProc)).strip().lower() =='x'
+                c3 = str(pdf_sh.cell(row = index_linha, column= ColProc).value).strip().lower() =='x'
             else:
                 c3 = True
-            if ID.strip() and ID.strip()[0] != ';':
-                PNT = pdf_sh.cell_value(index_linha, titulo_dic['PNT'])
-                ORDEM = pdf_sh.cell_value(index_linha, titulo_dic['ORDEM'])
+            if str(ID).strip() and str(ID).strip()[0] != ';':
+                PNT = '' if str(pdf_sh.cell(row = index_linha, column= titulo_dic['PNT']).value) == 'None' else str(pdf_sh.cell(row = index_linha, column= titulo_dic['PNT']).value)
+                ORDEM = '' if str(pdf_sh.cell(row = index_linha, column= titulo_dic['ORDEM']).value) == 'None' else str(pdf_sh.cell(row = index_linha, column= titulo_dic['ORDEM']).value)
                 pdf_dic[PNT] = [ID,ORDEM]
     except:
+        print_exc(file = stdout)
         showerror('Erro', 'N„o foi poss¡vel processar a planilha PDF')
         
         ##### Ler PTS #####
     try:
         try:
-            pts_sh = arq_cepel.sheet_by_name('PTS')  # Abrir planilha "PTS" da Planilha CEPEL
+            pts_sh = arq_cepel['PTS']  # Abrir planilha "PTS" da Planilha CEPEL
         except:
-            pts_sh = arq_cepel.sheet_by_name('pts')  # Abrir planilha "PTS" da Planilha CEPEL
+            pts_sh = arq_cepel['pts']  # Abrir planilha "PTS" da Planilha CEPEL
         li, titulo_dic = Titulos(pts_sh)
         pts_dic = {}
-        for index_linha in range(li, pts_sh.nrows):
-            ID = pts_sh.cell_value(index_linha, titulo_dic['ID'])
+        for index_linha in range(li, pts_sh.max_row+1):
+            ID = '' if str(pts_sh.cell(row = index_linha, column= titulo_dic['ID']).value) == 'None' else str(pts_sh.cell(row = index_linha, column= titulo_dic['ID']).value)
             ColProc = titulo_dic.get('','#None')  # Pegar coluna com T¡tulo vazio com informa‡„o x/y
             if ColProc != '#None':  #Se existir coluna x/y
-                c3 = str(pts_sh.cell_value(index_linha, ColProc)).strip().lower() =='x'
+                c3 = str(pts_sh.cell(row = index_linha, column= ColProc).value).strip().lower() =='x'
             else:
                 c3 = True
-            if ID.strip() and ID.strip()[0] != ';':
-                OCR = pts_sh.cell_value(index_linha, titulo_dic['OCR'])
-                NOME = pts_sh.cell_value(index_linha, titulo_dic['NOME'])
-                TIPO = pts_sh.cell_value(index_linha, titulo_dic['TIPO'])
-                ALRIN = '' if pts_sh.cell_value(index_linha, titulo_dic['ALRIN']).strip() == 'SIM' else  'X'
-                LSA = pts_sh.cell_value(index_linha, titulo_dic['LSA'])
-                LSE = pts_sh.cell_value(index_linha, titulo_dic['LSE'])
-                LSU = pts_sh.cell_value(index_linha, titulo_dic['LSU'])
-                TAC = pts_sh.cell_value(index_linha, titulo_dic['TAC'])
+            if str(ID).strip() and str(ID).strip()[0] != ';':
+                OCR = '' if str(pts_sh.cell(row = index_linha, column= titulo_dic['OCR']).value) == 'None' else str(pts_sh.cell(row = index_linha, column= titulo_dic['OCR']).value)
+                NOME = '' if str(pts_sh.cell(row = index_linha, column= titulo_dic['NOME']).value) == 'None' else str(pts_sh.cell(row = index_linha, column= titulo_dic['NOME']).value)
+                TIPO = '' if str(pts_sh.cell(row = index_linha, column= titulo_dic['TIPO']).value) == 'None' else str(pts_sh.cell(row = index_linha, column= titulo_dic['TIPO']).value)
+                ALRIN = '' if str(pts_sh.cell(row = index_linha, column= titulo_dic['ALRIN']).value).strip() == 'SIM' else  'X'
+                LSA = '' if str(pts_sh.cell(row = index_linha, column= titulo_dic['LSA']).value) == 'None' else str(pts_sh.cell(row = index_linha, column= titulo_dic['LSA']).value)
+                LSE = '' if str(pts_sh.cell(row = index_linha, column= titulo_dic['LSE']).value) == 'None' else str(pts_sh.cell(row = index_linha, column= titulo_dic['LSE']).value)
+                LSU = '' if str(pts_sh.cell(row = index_linha, column= titulo_dic['LSU']).value) =='None' else str(pts_sh.cell(row = index_linha, column= titulo_dic['LSU']).value)
+                TAC = '' if str(pts_sh.cell(row = index_linha, column= titulo_dic['TAC']).value) == 'None' else str(pts_sh.cell(row = index_linha, column= titulo_dic['TAC']).value)
                 pts_dic.update({ID:[OCR, NOME, TIPO, ALRIN, LSA, LSE, LSU, TAC]})
     except:
         showwarning('Aten‡„o', 'N„o foi poss¡vel processar a planilha PTS')
@@ -160,20 +166,20 @@ def cepel2lp(arqcepel):
         ##### Ler PTD #####
     try:
         try:
-            ptd_sh = arq_cepel.sheet_by_name('PTD')  # Abrir planilha "PTD" da Planilha CEPEL
+            ptd_sh = arq_cepel['PTD']  # Abrir planilha "PTD" da Planilha CEPEL
         except:
-            ptd_sh = arq_cepel.sheet_by_name('ptd')  # Abrir planilha "PTD" da Planilha CEPEL
+            ptd_sh = arq_cepel['ptd']  # Abrir planilha "PTD" da Planilha CEPEL
         li, titulo_dic = Titulos(ptd_sh)
         ptd_dic = {}
-        for index_linha in range(li, ptd_sh.nrows):
-            ID = ptd_sh.cell_value(index_linha, titulo_dic['ID'])
+        for index_linha in range(li, ptd_sh.max_row+1):
+            ID = '' if str(ptd_sh.cell(row = index_linha, column= titulo_dic['ID']).value) == 'None' else str(ptd_sh.cell(row = index_linha, column= titulo_dic['ID']).value)
             ColProc = titulo_dic.get('','#None')  # Pegar coluna com T¡tulo vazio com informa‡„o x/y
             if ColProc != '#None':  #Se existir coluna x/y
-                c3 = str(ptd_sh.cell_value(index_linha, ColProc)).strip().lower() =='x'
+                c3 = str(ptd_sh.cell(row = index_linha, column= ColProc).value).strip().lower() =='x'
             else:
                 c3 = True
-            if ID.strip() and ID.strip()[0] != ';':
-                PTS = ptd_sh.cell_value(index_linha, titulo_dic['PTS'])
+            if str(ID).strip() and str(ID).strip()[0] != ';':
+                PTS = '' if str(ptd_sh.cell(row = index_linha, column= titulo_dic['PTS']).value) == 'None' else str(ptd_sh.cell(row = index_linha, column= titulo_dic['PTS']).value)
                 ptd_dic[PTS] = [ID]
     except:
         showwarning('Aten‡„o', 'N„o foi poss¡vel processar a planilha PTD')        
@@ -181,20 +187,20 @@ def cepel2lp(arqcepel):
         ##### Ler PTF #####
     try:
         try:
-            ptf_sh = arq_cepel.sheet_by_name('PTF')  # Abrir planilha "PTF" da Planilha CEPEL
+            ptf_sh = arq_cepel['PTF']  # Abrir planilha "PTF" da Planilha CEPEL
         except:
-            ptf_sh = arq_cepel.sheet_by_name('ptf')  # Abrir planilha "PTF" da Planilha CEPEL
+            ptf_sh = arq_cepel['ptf']  # Abrir planilha "PTF" da Planilha CEPEL
         li, titulo_dic = Titulos(ptf_sh)
         ptf_dic = {}
-        for index_linha in range(li, ptf_sh.nrows):
-            ID = ptf_sh.cell_value(index_linha, titulo_dic['ID'])
+        for index_linha in range(li, ptf_sh.max_row+1):
+            ID = '' if str(ptf_sh.cell(row = index_linha, column= titulo_dic['ID']).value) == 'None' else str(ptf_sh.cell(row = index_linha, column= titulo_dic['ID']).value)
             ColProc = titulo_dic.get('','#None')  # Pegar coluna com T¡tulo vazio com informa‡„o x/y
             if ColProc != '#None':  #Se existir coluna x/y
-                c3 = ptf_sh.cell_value(index_linha, ColProc).strip().lower() =='x'
+                c3 = str(ptf_sh.cell(row = index_linha, column= ColProc).value).strip().lower() =='x'
             else:
                 c3 = True
-            if ID.strip() and ID.strip()[0] != ';':
-                PNT = ptf_sh.cell_value(index_linha, titulo_dic['PNT'])
+            if str(ID).strip() and str(ID).strip()[0] != ';':
+                PNT ='' if str(ptf_sh.cell(row = index_linha, column= titulo_dic['PNT']).value) == 'None' else str(ptf_sh.cell(row = index_linha, column= titulo_dic['PNT']).value)
                 ptf_dic[PNT] = [ID]
     except:
         showwarning('Aten‡„o', 'N„o foi poss¡vel processar a planilha PTF')        
@@ -202,142 +208,148 @@ def cepel2lp(arqcepel):
         ##### Ler PAS #####
     try:
         try:
-            pas_sh = arq_cepel.sheet_by_name('PAS')  # Abrir planilha "PAS" da Planilha CEPEL
+            pas_sh = arq_cepel['PAS']  # Abrir planilha "PAS" da Planilha CEPEL
         except:
-            pas_sh = arq_cepel.sheet_by_name('pas')  # Abrir planilha "PAS" da Planilha CEPEL
+            pas_sh = arq_cepel['pas']  # Abrir planilha "PAS" da Planilha CEPEL
         li,titulo_dic = Titulos(pas_sh)
         pas_dic = {}
-        for index_linha in range(li, pas_sh.nrows):
-            ID = pas_sh.cell_value(index_linha, titulo_dic['ID'])
+        for index_linha in range(li, pas_sh.max_row+1):
+            ID = '' if str(pas_sh.cell(row = index_linha, column= titulo_dic['ID']).value) == 'None' else str(pas_sh.cell(row = index_linha, column= titulo_dic['ID']).value)
             ColProc = titulo_dic.get('','#None')  # Pegar coluna com T¡tulo vazio com informa‡„o x/y
             if ColProc != '#None':  #Se existir coluna x/y
-                c3 = str(pas_sh.cell_value(index_linha, ColProc)).strip().lower() =='x'
+                c3 = str(pas_sh.cell(row = index_linha, column= ColProc).value).strip().lower() =='x'
             else:
                 c3 = True
-            if ID.strip() and ID.strip()[0] != ';':
-                OCR = pas_sh.cell_value(index_linha, titulo_dic['OCR'])
-                NOME = pas_sh.cell_value(index_linha, titulo_dic['NOME'])
-                TIPO = pas_sh.cell_value(index_linha, titulo_dic['TIPO'])
-                ALRIN = '' if pas_sh.cell_value(index_linha, titulo_dic['ALRIN']).strip() == 'SIM' else  'X'
-                LIU = pas_sh.cell_value(index_linha, titulo_dic['LIU'])
-                LIE = pas_sh.cell_value(index_linha, titulo_dic['LIE'])
-                LIA = pas_sh.cell_value(index_linha, titulo_dic['LIA'])
-                LSA = pas_sh.cell_value(index_linha, titulo_dic['LSA'])
-                LSE = pas_sh.cell_value(index_linha, titulo_dic['LSE'])
-                LSU = pas_sh.cell_value(index_linha, titulo_dic['LSU'])
-                BNDMO = pas_sh.cell_value(index_linha, titulo_dic['BNDMO'])
-                TAC = pas_sh.cell_value(index_linha, titulo_dic['TAC'])
+            if str(ID).strip() and str(ID).strip()[0] != ';':
+                OCR = '' if str(pas_sh.cell(row = index_linha, column= titulo_dic['OCR']).value) == 'None' else str(pas_sh.cell(row = index_linha, column= titulo_dic['OCR']).value)
+                NOME ='' if str(pas_sh.cell(row = index_linha, column= titulo_dic['NOME']).value) == 'None' else str(pas_sh.cell(row = index_linha, column= titulo_dic['NOME']).value)
+                TIPO = '' if str(pas_sh.cell(row = index_linha, column= titulo_dic['TIPO']).value) == 'None' else str(pas_sh.cell(row = index_linha, column= titulo_dic['TIPO']).value)
+                ALRIN = '' if str(pas_sh.cell(row = index_linha, column= titulo_dic['ALRIN']).value).strip() == 'SIM' else  'X'
+                LIU = '' if str(pas_sh.cell(row = index_linha, column= titulo_dic['LIU']).value) == 'None' else str(pas_sh.cell(row = index_linha, column= titulo_dic['LIU']).value)
+                LIE = '' if str(pas_sh.cell(row = index_linha, column= titulo_dic['LIE']).value) == 'None' else str(pas_sh.cell(row = index_linha, column= titulo_dic['LIE']).value)
+                LIA = '' if str(pas_sh.cell(row = index_linha, column= titulo_dic['LIA']).value) == 'None' else str(pas_sh.cell(row = index_linha, column= titulo_dic['LIA']).value)
+                LSA = '' if str(pas_sh.cell(row = index_linha, column= titulo_dic['LSA']).value) == 'None' else str(pas_sh.cell(row = index_linha, column= titulo_dic['LSA']).value)
+                LSE = '' if str(pas_sh.cell(row = index_linha, column= titulo_dic['LSE']).value) == 'None' else str(pas_sh.cell(row = index_linha, column= titulo_dic['LSE']).value)
+                LSU = '' if str(pas_sh.cell(row = index_linha, column= titulo_dic['LSU']).value) == 'None' else str(pas_sh.cell(row = index_linha, column= titulo_dic['LSU']).value)
+                BNDMO = '' if str(pas_sh.cell(row = index_linha, column= titulo_dic['BNDMO']).value) == 'None' else str(pas_sh.cell(row = index_linha, column= titulo_dic['BNDMO']).value)
+                TAC = ''  if str(pas_sh.cell(row = index_linha, column= titulo_dic['TAC']).value) == 'None' else str(pas_sh.cell(row = index_linha, column= titulo_dic['TAC']).value)
                 pas_dic[ID] = [OCR, NOME, TIPO, ALRIN, LIU, LIE, LIA, LSA, LSE, LSU, BNDMO, TAC]
     except:
+        print_exc(file=stdout)
         showerror('Erro', 'N„o foi poss¡vel processar a planilha PAS')        
         
         ##### Ler PAD #####
     try:
         try:
-            pad_sh = arq_cepel.sheet_by_name('PAD')  # Abrir planilha "PAD" da Planilha CEPEL
+            pad_sh = arq_cepel['PAD']  # Abrir planilha "PAD" da Planilha CEPEL
         except:
-            pad_sh = arq_cepel.sheet_by_name('pad')  # Abrir planilha "PAD" da Planilha CEPEL
+            pad_sh = arq_cepel['pad']  # Abrir planilha "PAD" da Planilha CEPEL
         li, titulo_dic = Titulos(pad_sh)
         pad_dic = {}
-        for index_linha in range(li, pad_sh.nrows):
-            ID = pad_sh.cell_value(index_linha, titulo_dic['ID'])
+        for index_linha in range(li, pad_sh.max_row+1):
+            ID ='' if str(pad_sh.cell(row = index_linha, column= titulo_dic['ID']).value) == 'None' else str(pad_sh.cell(row = index_linha, column= titulo_dic['ID']).value)
             ColProc = titulo_dic.get('','#None')  # Pegar coluna com T¡tulo vazio com informa‡„o x/y
             if ColProc != '#None':  #Se existir coluna x/y
-                c3 = str(pad_sh.cell_value(index_linha, ColProc)).strip().lower() =='x'
+                c3 = str(pad_sh.cell(row = index_linha, column= ColProc).value).strip().lower() =='x'
             else:
                 c3 = True
-            if ID.strip() and ID.strip()[0] != ';':
-                PAS = pad_sh.cell_value(index_linha, titulo_dic['PAS'])
+            if str(ID).strip() and str(ID).strip()[0] != ';':
+                PAS = '' if str(pad_sh.cell(row = index_linha, column= titulo_dic['PAS']).value) else str(pad_sh.cell(row = index_linha, column= titulo_dic['PAS']).value)
                 pad_dic[PAS] = [ID]
     except:
+        print_exc(file=stdout)
         showerror('Erro', 'N„o foi poss¡vel processar a planilha PAD')
         
         ##### Ler PAF #####
     try:
         try:
-            paf_sh = arq_cepel.sheet_by_name('PAF')  # Abrir planilha "PAF" da Planilha CEPEL
+            paf_sh = arq_cepel['PAF']  # Abrir planilha "PAF" da Planilha CEPEL
         except:
-            paf_sh = arq_cepel.sheet_by_name('paf')  # Abrir planilha "PAF" da Planilha CEPEL
+            paf_sh = arq_cepel['paf']  # Abrir planilha "PAF" da Planilha CEPEL
         li, titulo_dic = Titulos(paf_sh)
         paf_dic = {}
-        for index_linha in range(li, paf_sh.nrows):
-            ID = paf_sh.cell_value(index_linha, titulo_dic['ID'])
+        for index_linha in range(li, paf_sh.max_row+1):
+            ID = '' if str(paf_sh.cell(row = index_linha, column= titulo_dic['ID']).value) else str(paf_sh.cell(row = index_linha, column= titulo_dic['ID']).value)
             ColProc = titulo_dic.get('','#None')  # Pegar coluna com T¡tulo vazio com informa‡„o x/y
             if ColProc != '#None':  #Se existir coluna x/y
-                c3 = str(paf_sh.cell_value(index_linha, ColProc)).strip().lower() =='x'
+                c3 = str(paf_sh.cell(row = index_linha, column= ColProc).value).strip().lower() == 'x'
             else:
                 c3 = True
-            if ID.strip() and ID.strip()[0] != ';':
-                PNT = paf_sh.cell_value(index_linha, titulo_dic['PNT'])
+            if str(ID).strip() and str(ID).strip()[0] != ';':
+                PNT = '' if str(paf_sh.cell(row = index_linha, column= titulo_dic['PNT']).value) else str(paf_sh.cell(row = index_linha, column= titulo_dic['PNT']).value)
                 paf_dic[PNT] = [ID]
     except:
+        print_exc(file=stdout)
         showerror('Erro', 'N„o foi poss¡vel processar a planilha PAF')
 
         ##### Ler CGS #####
     try:
         try:
-            cgs_sh = arq_cepel.sheet_by_name('CGS')  # Abrir planilha "CGS" da Planilha CEPEL
+            cgs_sh = arq_cepel['CGS']  # Abrir planilha "CGS" da Planilha CEPEL
         except:
-            cgs_sh = arq_cepel.sheet_by_name('cgs')  # Abrir planilha "CGS" da Planilha CEPEL
+            cgs_sh = arq_cepel['cgs']  # Abrir planilha "CGS" da Planilha CEPEL
         li, titulo_dic = Titulos(cgs_sh)
         cgs_dic = {}
-        for index_linha in range(li, cgs_sh.nrows):
-            ID = cgs_sh.cell_value(index_linha, titulo_dic['ID'])
+        for index_linha in range(li, cgs_sh.max_row+1):
+            ID = '' if str(cgs_sh.cell(row = index_linha, column= titulo_dic['ID']).value) == 'None' else str(cgs_sh.cell(row = index_linha, column= titulo_dic['ID']).value)
             ColProc = titulo_dic.get('','#None')  # Pegar coluna com T¡tulo vazio com informa‡„o x/y
             if ColProc != '#None':  #Se existir coluna x/y
-                c3 = str(cgs_sh.cell_value(index_linha, ColProc)).strip().lower() =='x'
+                c3 = str(cgs_sh.cell(row = index_linha, column= ColProc).value).strip().lower() =='x'
             else:
                 c3 = True
-            if ID.strip() and ID.strip()[0] != ';':
-                NOME = cgs_sh.cell_value(index_linha, titulo_dic['NOME'])
-                PAC = cgs_sh.cell_value(index_linha, titulo_dic['PAC'])
-                TAC = cgs_sh.cell_value(index_linha, titulo_dic['TAC'])
-                TIPOE = cgs_sh.cell_value(index_linha, titulo_dic['TIPOE'])
+            if str(ID).strip() and str(ID).strip()[0] != ';':
+                NOME = '' if str(cgs_sh.cell(row = index_linha, column= titulo_dic['NOME']).value) == 'None' else str(cgs_sh.cell(row = index_linha, column= titulo_dic['NOME']).value)
+                PAC = '' if str(cgs_sh.cell(row = index_linha, column= titulo_dic['PAC']).value) == 'None' else str(cgs_sh.cell(row = index_linha, column= titulo_dic['PAC']).value)
+                TAC = '' if str(cgs_sh.cell(row = index_linha, column= titulo_dic['TAC']).value) == 'None' else str(cgs_sh.cell(row = index_linha, column= titulo_dic['TAC']).value)
+                TIPOE = '' if str(cgs_sh.cell(row = index_linha, column= titulo_dic['TIPOE']).value) == 'None' else str(cgs_sh.cell(row = index_linha, column= titulo_dic['TIPOE']).value)
                 cgs_dic.update({ID:[NOME, PAC, TAC, TIPOE]})
     except:
+        print_exc(file=stdout)
         showerror('Erro', 'N„o foi poss¡vel processar a planilha CGS')
         
         ##### Ler CGF #####
     try:
         try:
-            cgf_sh = arq_cepel.sheet_by_name('CGF')  # Abrir planilha "CGF" da Planilha CEPEL
+            cgf_sh = arq_cepel['CGF']  # Abrir planilha "CGF" da Planilha CEPEL
         except:
-            cgf_sh = arq_cepel.sheet_by_name('cgf')  # Abrir planilha "CGF" da Planilha CEPEL
+            cgf_sh = arq_cepel['cgf']  # Abrir planilha "CGF" da Planilha CEPEL
         li, titulo_dic = Titulos(cgf_sh)
         cgf_dic = {}
-        for index_linha in range(li, cgf_sh.nrows):
-            ID = cgf_sh.cell_value(index_linha, titulo_dic['ID'])
+        for index_linha in range(li, cgf_sh.max_row+1):
+            ID = '' if str(cgf_sh.cell(row = index_linha, column= titulo_dic['ID']).value) == 'None' else str(cgf_sh.cell(row = index_linha, column= titulo_dic['ID']).value)
             ColProc = titulo_dic.get('','#None')  # Pegar coluna com T¡tulo vazio com informa‡„o x/y
             if ColProc != '#None':  #Se existir coluna x/y
-                c3 = str(cgf_sh.cell_value(index_linha, ColProc)).strip().lower() =='x'
+                c3 = str(cgf_sh.cell(row = index_linha, column= ColProc).value).strip().lower() =='x'
             else:
                 c3 = True
-            if ID.strip() and ID.strip()[0] != ';':
-                CGS = cgf_sh.cell_value(index_linha, titulo_dic['CGS'])
-                NV2 = cgf_sh.cell_value(index_linha, titulo_dic['NV2'])
+            if str(ID).strip() and str(ID).strip()[0] != ';':
+                CGS = '' if str(cgf_sh.cell(row = index_linha, column= titulo_dic['CGS']).value) == 'None' else str(cgf_sh.cell(row = index_linha, column= titulo_dic['CGS']).value)
+                NV2 = '' if str(cgf_sh.cell(row = index_linha, column= titulo_dic['NV2']).value) == 'None' else str(cgf_sh.cell(row = index_linha, column= titulo_dic['NV2']).value)
                 cgf_dic[CGS] = [ID, NV2]
     except:
+        print_exc(file=stdout)
         showerror('Erro', 'N„o foi poss¡vel processar a planilha CGF')
         
         ##### Ler TAC #####
     try:
         try:
-            tac_sh = arq_cepel.sheet_by_name('TAC')  # Abrir planilha "TAC" da Planilha CEPEL
+            tac_sh = arq_cepel['TAC']  # Abrir planilha "TAC" da Planilha CEPEL
         except:
-            tac_sh = arq_cepel.sheet_by_name('tac')  # Abrir planilha "TAC" da Planilha CEPEL
+            tac_sh = arq_cepel['tac']  # Abrir planilha "TAC" da Planilha CEPEL
         li, titulo_dic = Titulos(tac_sh)
         tac_dic = {}
-        for index_linha in range(li, tac_sh.nrows):
-            ID = tac_sh.cell_value(index_linha, titulo_dic['ID'])
+        for index_linha in range(li, tac_sh.max_row+1):
+            ID = '' if str(tac_sh.cell(row = index_linha, column= titulo_dic['ID']).value) == 'None' else str(tac_sh.cell(row = index_linha, column= titulo_dic['ID']).value)
             ColProc = titulo_dic.get('','#None')  # Pegar coluna com T¡tulo vazio com informa‡„o x/y
             if ColProc != '#None':  #Se existir coluna x/y
-                c3 = str(tac_sh.cell_value(index_linha, ColProc)).strip().lower() =='x'
+                c3 = str(tac_sh.cell(row = index_linha, column= ColProc).value).strip().lower() =='x'
             else:
                 c3 = True
-            if ID.strip() and ID.strip()[0] != ';':
-                LSC = tac_sh.cell_value(index_linha, titulo_dic['LSC'])
+            if str(ID).strip() and str(ID).strip()[0] != ';':
+                LSC = '' if  str(tac_sh.cell(row = index_linha, column= titulo_dic['LSC']).value) == 'None' else str(tac_sh.cell(row = index_linha, column= titulo_dic['LSC']).value)
                 tac_dic[ID] = [LSC]
     except:
+        print_exc(file=stdout)
         showerror('Erro', 'N„o foi poss¡vel processar a planilha TAC')
                 
     ##### Gravar Pontos Digitais Excel #####
