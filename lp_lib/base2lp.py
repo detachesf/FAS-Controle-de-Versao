@@ -556,7 +556,7 @@ def base2lp(diretorio):
             ocr = dado[1]
             descr = dado[2]
             tipo = dado[3]
-            anunciador = ('X' if tag in texto_telas else '')
+            anunciador = ('X' if 'WHERE id = '+tag in texto_telas else '')
             alarme = dado[4]
             soe = dado[5]
             obs = ''
@@ -603,7 +603,7 @@ def base2lp(diretorio):
             descr = dado[2]
             tipo = dado[3]
             medicao = med_dic.get(tipo[:2], '')
-            anunciador = ('X' if tag in texto_telas else '')
+            anunciador = ('X' if 'WHERE id = '+tag in texto_telas else '')
             alarme = dado[4]
             obs = ''
             soe = 'X'
@@ -667,7 +667,7 @@ def base2lp(diretorio):
             ocr = dado[1]
             descr = dado[2]
             tipo = dado[3]
-            anunciador = ('X' if tag in texto_telas else '')
+            anunciador = ('X' if 'WHERE id = '+tag in texto_telas else '')
             alarme = dado[4]
             obs = ''
             soe = 'X'
