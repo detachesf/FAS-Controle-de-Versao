@@ -727,7 +727,7 @@ def gerarlp(lp_padrao, LP_Config):
                                             else:
                                                 gravar_ponto(tratar_2, descricao_1)
                                                 k_Pint += 1
-                                        else:
+                                        if  '#ACESSANTE' in observacao.upper():
                                             tratar_2 = tratar_1.replace('{PNL}', parametros_PINT['PNL'])
                                             if 'UC1' in tratar_1:
                                                 if parametros_PINT['N£mero_UC_ACESSANTE'] != '':
