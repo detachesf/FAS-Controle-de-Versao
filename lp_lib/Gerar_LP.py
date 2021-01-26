@@ -27,7 +27,7 @@ except:
     showerror('Erro','Arquivo "gerarPlanilhaLP.py" deve estar no mesmo diret¢rio "lp_lib"')
 
 
-def gerar(LP_Padrao,relatorio,LP_Config):
+def gerar(LP_Padrao, relatorio, LP_Config):
 
     try:
         arq_conf = open_workbook(LP_Config) #Abrir arquivo de configura‡„o

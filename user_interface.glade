@@ -2,37 +2,6 @@
 <!-- Generated with glade 3.38.2 -->
 <interface>
   <requires lib="gtk+" version="3.24"/>
-  <object class="GtkFileChooserDialog" id="arqconf_salvar_dialogo">
-    <property name="can-focus">False</property>
-    <property name="type-hint">dialog</property>
-    <child internal-child="vbox">
-      <object class="GtkBox">
-        <property name="can-focus">False</property>
-        <property name="orientation">vertical</property>
-        <property name="spacing">2</property>
-        <child internal-child="action_area">
-          <object class="GtkButtonBox">
-            <property name="can-focus">False</property>
-            <property name="layout-style">end</property>
-            <child>
-              <placeholder/>
-            </child>
-            <child>
-              <placeholder/>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">False</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-      </object>
-    </child>
-  </object>
   <object class="GtkFileChooserDialog" id="diretorio_dialogo">
     <property name="width-request">800</property>
     <property name="can-focus">False</property>
@@ -133,6 +102,165 @@
       </object>
     </child>
   </object>
+  <object class="GtkFileFilter" id="filefilter1">
+    <mime-types>
+      <mime-type>fas</mime-type>
+    </mime-types>
+    <patterns>
+      <pattern>*.fas</pattern>
+    </patterns>
+  </object>
+  <object class="GtkFileChooserDialog" id="arqconf_abrir_dialogo">
+    <property name="can-focus">False</property>
+    <property name="type-hint">dialog</property>
+    <property name="filter">filefilter1</property>
+    <signal name="selection-changed" handler="on_arqconf_abrir_dialogo_selection_changed" swapped="no"/>
+    <child internal-child="vbox">
+      <object class="GtkBox">
+        <property name="can-focus">False</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">2</property>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox">
+            <property name="can-focus">False</property>
+            <property name="layout-style">end</property>
+            <child>
+              <object class="GtkButton" id="arqconf_button_abrir">
+                <property name="label" translatable="yes">Abrir</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <signal name="clicked" handler="on_arqconf_button_abrir_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="arqconf_abrir_button_cancelar">
+                <property name="label" translatable="yes">Cancelar</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <signal name="clicked" handler="on_arqconf_abrir_button_cancelar_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <placeholder/>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkFileChooserDialog" id="arqconf_salvar_dialogo">
+    <property name="can-focus">False</property>
+    <property name="title" translatable="yes">Salvar Arquivo de Parametrização</property>
+    <property name="destroy-with-parent">True</property>
+    <property name="icon">CHESF.png</property>
+    <property name="type-hint">dialog</property>
+    <property name="deletable">False</property>
+    <property name="do-overwrite-confirmation">True</property>
+    <property name="filter">filefilter1</property>
+    <signal name="confirm-overwrite" handler="on_arqconf_salvar_dialogo_confirm_overwrite" swapped="no"/>
+    <child internal-child="vbox">
+      <object class="GtkBox">
+        <property name="can-focus">False</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">2</property>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox">
+            <property name="can-focus">False</property>
+            <property name="layout-style">end</property>
+            <child>
+              <object class="GtkButton" id="arqconf_button_salvar">
+                <property name="label" translatable="yes">Salvar</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <signal name="clicked" handler="on_arqconf_button_salvar_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="arqconf_button_cancelar">
+                <property name="label" translatable="yes">Cancelar</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <signal name="clicked" handler="on_arqconf_button_cancelar_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <!-- n-columns=2 n-rows=1 -->
+          <object class="GtkGrid">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="valign">center</property>
+            <property name="hexpand">False</property>
+            <property name="column-spacing">5</property>
+            <child>
+              <object class="GtkLabel">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="margin-start">10</property>
+                <property name="label" translatable="yes">Nome:</property>
+              </object>
+              <packing>
+                <property name="left-attach">0</property>
+                <property name="top-attach">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkEntry" id="arqconf_entry_nome-arquivo">
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="valign">center</property>
+                <property name="hexpand">True</property>
+              </object>
+              <packing>
+                <property name="left-attach">1</property>
+                <property name="top-attach">0</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">True</property>
+            <property name="fill">True</property>
+            <property name="position">2</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
   <object class="GtkImage" id="image34">
     <property name="visible">True</property>
     <property name="can-focus">False</property>
@@ -185,7 +313,7 @@
                         <property name="use-underline">True</property>
                         <property name="use-stock">True</property>
                         <property name="always-show-image">True</property>
-                        <signal name="activate" handler="on_arqconf_menubar_arquivo_abrir_activate" swapped="no"/>
+                        <signal name="activate" handler="on_arqconf_abrir_activate" swapped="no"/>
                       </object>
                     </child>
                     <child>
@@ -196,7 +324,7 @@
                         <property name="use-underline">True</property>
                         <property name="use-stock">True</property>
                         <property name="always-show-image">True</property>
-                        <signal name="activate" handler="on_arqconf_menubar_arquivo_salvar_activate" swapped="no"/>
+                        <signal name="activate" handler="on_arqconf_salvar_activate" swapped="no"/>
                       </object>
                     </child>
                     <child>
@@ -454,7 +582,7 @@
                 <property name="tooltip-text" translatable="yes">Abrir</property>
                 <property name="use-underline">True</property>
                 <property name="icon-name">document-open-symbolic</property>
-                <signal name="clicked" handler="on_toolbar_abrir_clicked" swapped="no"/>
+                <signal name="clicked" handler="on_arqconf_abrir_activate" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -468,7 +596,7 @@
                 <property name="tooltip-text" translatable="yes">Salvar</property>
                 <property name="use-underline">True</property>
                 <property name="icon-name">document-save-symbolic</property>
-                <signal name="clicked" handler="on_toolbar_salvar_clicked" swapped="no"/>
+                <signal name="clicked" handler="on_arqconf_salvar_activate" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -813,7 +941,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkFileChooserButton">
+                  <object class="GtkFileChooserButton" id="file_chooser_arqconf">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="title" translatable="yes"/>
@@ -824,10 +952,32 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkFileChooserButton">
+                  <object class="GtkBox">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="title" translatable="yes"/>
+                    <child>
+                      <object class="GtkFileChooserButton">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="title" translatable="yes"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkComboBoxText">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
                   </object>
                   <packing>
                     <property name="left-attach">3</property>
@@ -2674,6 +2824,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                             </child>
                             <child>
                               <object class="GtkEntry" id="paisage_entry_painel_1">
+                                <property name="name">paisage_entry_painel_1</property>
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="halign">center</property>
@@ -2703,7 +2854,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkEntry" id="paisage_entry_sw_de_1">
+                              <object class="GtkEntry" id="paisage_entry_sw-de_1">
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="halign">center</property>
@@ -2718,7 +2869,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkEntry" id="paisage_entry_sw_ate_1">
+                              <object class="GtkEntry" id="paisage_entry_sw-ate_1">
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="halign">center</property>
@@ -2733,7 +2884,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkEntry" id="paisage_entry_nportas_sw_1">
+                              <object class="GtkEntry" id="paisage_entry_nportas-sw_1">
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="halign">center</property>
@@ -2763,7 +2914,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkEntry" id="paisage_entry_nporta_fw_1">
+                              <object class="GtkEntry" id="paisage_entry_nporta-fw_1">
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="halign">center</property>
@@ -2793,7 +2944,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkEntry" id="paisage_entry_rb_de_1">
+                              <object class="GtkEntry" id="paisage_entry_rb-de_1">
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="halign">center</property>
@@ -2808,7 +2959,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkEntry" id="paisage_entry_rb_ate_1">
+                              <object class="GtkEntry" id="paisage_entry_rb-ate_1">
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="halign">center</property>
@@ -2823,7 +2974,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkEntry" id="paisage_entry_nporta_rb_1">
+                              <object class="GtkEntry" id="paisage_entry_nporta-rb_1">
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="halign">center</property>
@@ -2930,7 +3081,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkEntry" id="paisage_entry_rdp_de1">
+                          <object class="GtkEntry" id="paisage_entry_rdp-central-de_1">
                             <property name="visible">True</property>
                             <property name="can-focus">True</property>
                             <property name="input-purpose">number</property>
@@ -2941,7 +3092,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkEntry" id="paisage_entry_rdp_ate1">
+                          <object class="GtkEntry" id="paisage_entry_rdp-central-ate_1">
                             <property name="visible">True</property>
                             <property name="can-focus">True</property>
                             <property name="input-purpose">number</property>
@@ -3001,12 +3152,13 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                       <object class="GtkViewport">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="halign">center</property>
+                        <property name="halign">start</property>
                         <property name="valign">start</property>
                         <child>
                           <object class="GtkTable" id="tabela_reator">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
+                            <property name="halign">start</property>
                             <property name="valign">start</property>
                             <property name="n-rows">2</property>
                             <property name="n-columns">9</property>
@@ -3152,6 +3304,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                             </child>
                             <child>
                               <object class="GtkEntry" id="reator_entry_cod_1">
+                                <property name="name">reator_entry_cod_1</property>
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="valign">center</property>
@@ -3441,7 +3594,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkEntry" id="acesso_entry_lt_remota_1">
+                              <object class="GtkEntry" id="acesso_entry_ltremota_1">
                                 <property name="name">acesso_entry_lt_remota_1</property>
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
@@ -3472,7 +3625,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkEntry" id="acesso_entry_mm_ate_1">
+                              <object class="GtkEntry" id="acesso_entry_mm-ate_1">
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="valign">center</property>
@@ -3503,7 +3656,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkEntry" id="acesso_entry_mm_de_1">
+                              <object class="GtkEntry" id="acesso_entry_mm-de_1">
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="valign">center</property>
@@ -3565,7 +3718,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkEntry" id="acesso_entry_redbox_ate_1">
+                              <object class="GtkEntry" id="acesso_entry_redbox-ate_1">
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="valign">center</property>
@@ -3596,7 +3749,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkEntry" id="acesso_entry_redbox_de_1">
+                              <object class="GtkEntry" id="acesso_entry_redbox-de_1">
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="valign">center</property>
@@ -3691,7 +3844,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkEntry" id="acesso_entry_ts_ate_1">
+                              <object class="GtkEntry" id="acesso_entry_ts-ate_1">
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="valign">center</property>
@@ -3705,7 +3858,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkEntry" id="acesso_entry_ts_de_1">
+                              <object class="GtkEntry" id="acesso_entry_ts-de_1">
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="valign">center</property>
@@ -3792,7 +3945,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkEntry" id="acesso_entry_num_uc_acessante_1">
+                              <object class="GtkEntry" id="acesso_entry_num-uc-acessante_1">
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="valign">center</property>
@@ -3827,7 +3980,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkEntry" id="acesso_entry_num_uc_chesf_1">
+                              <object class="GtkEntry" id="acesso_entry_num-uc-chesf_1">
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="valign">center</property>
@@ -3933,8 +4086,10 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                             </child>
                             <child>
                               <object class="GtkEntry" id="acesso_entry_codvao_1">
+                                <property name="name">acesso_entry_codvao_1</property>
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
+                                <property name="input-hints">GTK_INPUT_HINT_UPPERCASE_CHARS | GTK_INPUT_HINT_UPPERCASE_WORDS | GTK_INPUT_HINT_NONE</property>
                               </object>
                               <packing>
                                 <property name="left-attach">1</property>
@@ -4084,7 +4239,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                           <object class="GtkTable" id="tabela_tterra">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
-                            <property name="halign">center</property>
+                            <property name="halign">start</property>
                             <property name="valign">start</property>
                             <property name="n-rows">2</property>
                             <property name="n-columns">5</property>
@@ -4157,6 +4312,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                             </child>
                             <child>
                               <object class="GtkEntry" id="tterra_entry_codigo_1">
+                                <property name="name">tterra_entry_codigo_1</property>
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="valign">center</property>
@@ -4361,7 +4517,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                           <object class="GtkTable" id="tabela_protbarra">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
-                            <property name="halign">center</property>
+                            <property name="halign">start</property>
                             <property name="valign">start</property>
                             <property name="n-rows">2</property>
                             <property name="n-columns">6</property>
@@ -4450,6 +4606,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                             </child>
                             <child>
                               <object class="GtkEntry" id="protbarra_entry_painel_1">
+                                <property name="name">protbarra_entry_painel_1</property>
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="valign">center</property>
@@ -4510,7 +4667,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkCheckButton" id="protbarra_checkbtt_bu_no_painel_1">
+                              <object class="GtkCheckButton" id="protbarra_checkbtt_bu-no-painel_1">
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="receives-default">False</property>
@@ -4678,7 +4835,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                           <object class="GtkTable" id="tabela_bcapshunt">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
-                            <property name="halign">center</property>
+                            <property name="halign">start</property>
                             <property name="valign">start</property>
                             <property name="n-rows">2</property>
                             <property name="n-columns">6</property>
@@ -4773,6 +4930,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                             </child>
                             <child>
                               <object class="GtkEntry" id="bcapshunt_entry_codigo_1">
+                                <property name="name">bcapshunt_entry_codigo_1</property>
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="valign">center</property>
@@ -5001,7 +5159,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                           <object class="GtkTable" id="tabela_bcapserie">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
-                            <property name="halign">center</property>
+                            <property name="halign">start</property>
                             <property name="valign">start</property>
                             <property name="n-rows">2</property>
                             <property name="n-columns">3</property>
@@ -5039,6 +5197,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                             </child>
                             <child>
                               <object class="GtkEntry" id="bcapserie_entry_codigo_1">
+                                <property name="name">bcapserie_entry_codigo_1</property>
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="valign">center</property>
@@ -5218,7 +5377,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                           <object class="GtkTable" id="tabela_ece">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
-                            <property name="halign">center</property>
+                            <property name="halign">start</property>
                             <property name="valign">start</property>
                             <property name="n-rows">2</property>
                             <property name="n-columns">3</property>
@@ -5256,6 +5415,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                             </child>
                             <child>
                               <object class="GtkEntry" id="ece_entry_codigo_1">
+                                <property name="name">ece_entry_codigo_1</property>
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="valign">center</property>
@@ -5435,7 +5595,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                           <object class="GtkTable" id="tabela_sist_reg">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
-                            <property name="halign">center</property>
+                            <property name="halign">start</property>
                             <property name="valign">start</property>
                             <property name="n-rows">2</property>
                             <property name="n-columns">4</property>
@@ -5504,6 +5664,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                             </child>
                             <child>
                               <object class="GtkComboBoxText" id="sistreg_combobox_nome_1">
+                                <property name="name">sistreg_combobox_nome_1</property>
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
                                 <items>
@@ -5521,7 +5682,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkComboBoxText" id="sistreg_combobox_tesao_reg_1">
+                              <object class="GtkComboBoxText" id="sistreg_combobox_tesao-reg_1">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
                                 <items>
@@ -5693,7 +5854,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                           <object class="GtkTable" id="tabela_prepreen">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
-                            <property name="halign">center</property>
+                            <property name="halign">start</property>
                             <property name="valign">start</property>
                             <property name="n-rows">2</property>
                             <property name="n-columns">2</property>
@@ -5715,6 +5876,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                             </child>
                             <child>
                               <object class="GtkEntry" id="prepreen_entry_sistema_1">
+                                <property name="name">prepreen_entry_sistema_1</property>
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="valign">center</property>
@@ -5881,7 +6043,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                           <object class="GtkTable" id="tabela_compsinc">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
-                            <property name="halign">center</property>
+                            <property name="halign">start</property>
                             <property name="valign">start</property>
                             <property name="n-rows">2</property>
                             <property name="n-columns">3</property>
@@ -5919,6 +6081,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                             </child>
                             <child>
                               <object class="GtkEntry" id="compsinc_entry_codigo_1">
+                                <property name="name">compsinc_entry_codigo_1</property>
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="valign">center</property>
@@ -6211,7 +6374,8 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="saux_entry_nome_painel_ua1">
+                  <object class="GtkEntry" id="saux_entry_nome-painel-ua_1">
+                    <property name="name">saux_entry_nome-painel-ua1</property>
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                   </object>
@@ -6221,7 +6385,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="saux_entry_nome_painel_saux1">
+                  <object class="GtkEntry" id="saux_entry_nome-painel-saux_1">
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="text" translatable="yes">PT1/PT1EA/PT1EB</property>
@@ -6232,7 +6396,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="saux_entry_barras_sup_ca1">
+                  <object class="GtkEntry" id="saux_entry_barras-sup-ca_1">
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="text" translatable="yes">B1</property>
@@ -6243,7 +6407,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="saux_entry_barras_sup_cc1">
+                  <object class="GtkEntry" id="saux_entry_barras-sup-cc_1">
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="text" translatable="yes">B1/B2</property>
@@ -6254,7 +6418,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="saux_entry_disj_sup_ca1">
+                  <object class="GtkEntry" id="saux_entry_disj-sup-ca_1">
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="text" translatable="yes">T7/T8/G1/B2/R1/R2</property>
@@ -6265,7 +6429,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="saux_entry_disj_sup_cc1">
+                  <object class="GtkEntry" id="saux_entry_disj-sup-cc_1">
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="text" translatable="yes">A1A/A2B/A2A/A1B</property>
@@ -6276,7 +6440,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkComboBoxText" id="saux_combobox_tensao_ca1">
+                  <object class="GtkComboBoxText" id="saux_combobox_tensao-ca_1">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <items>
@@ -6290,7 +6454,8 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkComboBoxText" id="saux_combobox_tensao_cc1">
+                  <object class="GtkComboBoxText" id="saux_combobox_tensao-cc_1">
+                    <property name="name">saux_combobox_tensao-cc_1</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <items>
@@ -6376,6 +6541,7 @@ Paulo Roberto de Freitas (Contribuinte)
   <object class="GtkMessageDialog" id="message_aviso">
     <property name="can-focus">False</property>
     <property name="title" translatable="yes">Atenção!</property>
+    <property name="modal">True</property>
     <property name="window-position">center</property>
     <property name="type-hint">dialog</property>
     <property name="urgency-hint">True</property>
@@ -6403,6 +6569,7 @@ Paulo Roberto de Freitas (Contribuinte)
   </object>
   <object class="GtkMessageDialog" id="message_erro">
     <property name="can-focus">False</property>
+    <property name="modal">True</property>
     <property name="window-position">center</property>
     <property name="type-hint">dialog</property>
     <property name="urgency-hint">True</property>

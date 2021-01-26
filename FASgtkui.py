@@ -4,6 +4,7 @@ import threading
 from xml.etree.ElementTree import Element, SubElement, Comment, tostring, ElementTree
 from xml.dom import minidom
 from datetime import date
+import os
 import xml.dom.minidom
 
 gi.require_version("Gtk", "3.0")
@@ -91,6 +92,8 @@ class Manipulador(object):
         self.pathchecar = getcwd
         self.versao = '2.0.12'
         self.data = '10/11/2020'
+        self.window: Gtk.Window = builder.get_object('janela_principal')  # Pega o Objeto da janela princial
+        self.window.show_all()  # Mostra a janela principal
 
         # Arrays com os nomes padrão dos objetos de cada linha
         self.NotbkLT_Linha = ['selec_linha_LT_', 'LT_entry_codlinha_', 'LT_entry_codpainel_', 'LT_entry_ltremota_',
@@ -110,10 +113,10 @@ class Manipulador(object):
                                     'vaotrans_entry_conjsecc_']
 
         self.NotbkPaisage_Linha = ['selec_linha_paisage_', 'paisage_entry_painel_', 'paisage_combobox_sagebastidor_',
-                                   'paisage_entry_sw_de_', 'paisage_entry_sw_ate_', 'paisage_entry_nportas_sw_',
-                                   'paisage_checkbtt_fw_', 'paisage_entry_nporta_fw_', 'paisage_checkbtt_rb_',
-                                   'paisage_entry_rb_de_',
-                                   'paisage_entry_rb_ate_', 'paisage_entry_nporta_rb_']
+                                   'paisage_entry_sw-de_', 'paisage_entry_sw-ate_', 'paisage_entry_nportas-sw_',
+                                   'paisage_checkbtt_fw_', 'paisage_entry_nporta-fw_', 'paisage_checkbtt_rb_',
+                                   'paisage_entry_rb-de_',
+                                   'paisage_entry_rb-ate_', 'paisage_entry_nporta-rb_']
 
         self.NotbkReator_Linha = ['selec_linha_reator_', 'reator_entry_cod_', 'reator_entry_painel_',
                                   'reator_checkbtt_manob_', 'reator_combobox_equip_', 'reator_checkbtt_rdp_',
@@ -122,18 +125,19 @@ class Manipulador(object):
 
         self.NotbkAcesso_Linha = ['selec_linha_acesso_', 'acesso_entry_codvao_', 'acesso_entry_painelacess_',
                                   'acesso_checkbtt_painelexist_',
-                                  'acesso_entry_num_uc_chesf_', 'acesso_entry_num_uc_acessante_',
+                                  'acesso_entry_num-uc-chesf_', 'acesso_entry_num-uc-acessante_',
                                   'acesso_combobox_arranjo_', 'acesso_checkbtt_ts_',
-                                  'acesso_entry_ts_de_', 'acesso_entry_ts_ate_', 'acesso_checkbtt_rb_',
-                                  'acesso_entry_redbox_de_',
-                                  'acesso_entry_redbox_ate_', 'acesso_checkbtt_multimedidor_', 'acesso_entry_mm_de_',
-                                  'acesso_entry_mm_ate_',
-                                  'acesso_entry_lt_remota_']
+                                  'acesso_entry_ts-de_', 'acesso_entry_ts-ate_', 'acesso_checkbtt_rb_',
+                                  'acesso_entry_redbox-de_',
+                                  'acesso_entry_redbox-ate_', 'acesso_checkbtt_multimedidor_', 'acesso_entry_mm-de_',
+                                  'acesso_entry_mm-ate_',
+                                  'acesso_entry_ltremota_']
+
         self.NotbkTterra_Linha = ['selec_linha_tterra_', 'tterra_entry_codigo_', 'tterra_entry_painel_',
                                   'tterra_entry_camaraspass_', 'tterra_entry_conjuntosecc_']
         self.NotbkProtbarra_Linha = ['selec_linha_protbarra_', 'protbarra_entry_painel_', 'protbarra_entry_qtpan_',
                                      'protbarra_combobox_arranjo_',
-                                     'protbarra_checkbtt_bu_no_painel_', 'protbarra_entry_vaos_']
+                                     'protbarra_checkbtt_bu-no-painel_', 'protbarra_entry_vaos_']
 
         self.NotbkBcapshunt_Linha = ['selec_linha_bcapshunt_', 'bcapshunt_entry_codigo_', 'bcapshunt_entry_painel_',
                                      'bcapshunt_combobox_arranjo_',
@@ -143,13 +147,16 @@ class Manipulador(object):
 
         self.NotbkEce_Linha = ['selec_linha_ece_', 'ece_entry_codigo_', 'ece_entry_painel_']
 
-        self.NotbkSistreg_Linha = ['selec_linha_sistreg_', 'sistreg_combobox_nome_', 'sistreg_combobox_tesao_reg_',
+        self.NotbkSistreg_Linha = ['selec_linha_sistreg_', 'sistreg_combobox_nome_', 'sistreg_combobox_tesao-reg_',
                                    'sistreg_entry_painel_']
 
         self.NotbkPrepreen_Linha = ['selec_linha_prepreen_', 'prepreen_entry_sistema_']
 
         self.NotbkCompsinc_Linha = ['selec_linha_compsinc_', 'compsinc_entry_codigo_', 'compsinc_entry_painel_']
 
+        self.NotbkSaux_Linha = ['','saux_entry_nome-painel-ua_','saux_entry_nome-painel-saux_','saux_entry_barras-sup-ca_',
+                                'saux_entry_barras-sup-cc_','saux_entry_disj-sup-ca_','saux_entry_disj-sup-cc_',
+                                'saux_combobox_tensao-ca_','saux_combobox_tensao-cc_']
         # Variáveis Auxiliares na mecânica da tela de configuração
 
         self.NotbkLT_Linha_dic = {}  # dicionário para armazenar os objetos adicionados dinâmicamente
@@ -166,6 +173,7 @@ class Manipulador(object):
         self.NotbkSistreg_Linha_dic = {}
         self.NotbkPrepreen_Linha_dic = {}
         self.NotbkCompsinc_Linha_dic = {}
+        self.NotbkSaux_Linha_dic = {}
 
         self.Arranjos = ['DISJ E MEIO', 'BS', 'BPT', 'BD3',
                          'BD4']  # Array com os arranjos possíveis para preencher os comboboxes
@@ -184,6 +192,7 @@ class Manipulador(object):
         self.Num_de_Sistreg = [1]
         self.Num_de_Prepreen = [1]
         self.Num_de_Compsinc = [1]
+        self.Num_de_Saux = [1]
 
         self.Linhas_Removidas_LT = []  # Variável que registra as linhas que foram removidas
         self.Linhas_Removidas_Trafo = []
@@ -226,18 +235,27 @@ class Manipulador(object):
         self.codigo_se: Gtk.Entry = builder.get_object('entry_cod_se')
         self.fornecedor: Gtk.Entry = builder.get_object('entry_fornecedor')
         self.usuario: Gtk.Entry = builder.get_object('entry_usuario')
-
         self.Lppadrao: Gtk.FileChooserButton = builder.get_object('file_chooser_lppadrao')
+        self.arqconf_caminho : Gtk.FileChooserButton = builder.get_object('file_chooser_arqconf')
+        self.arqconf_salvar_dialogo: Gtk.FileChooserDialog = builder.get_object('arqconf_salvar_dialogo')
+        self.nome_arqconf: Gtk.Entry = builder.get_object('arqconf_entry_nome-arquivo')
+        self.arqconf_abrir_dialogo: Gtk.FileChooserDialog = builder.get_object('arqconf_abrir_dialogo')
+
+        self.nome_arq_saida = 'Arqconf-novo'  # Nome do arquivo de saída
+        seq_arq = 0  # Sequência do número de arquivo
+        while os.path.exists(self.nome_arq_saida + '.fas'):  # Enquanto existir na pasta um arquivo com o nome definido
+            seq_arq += 1  # Adicionar um a sequência do número do arquivo
+            self.nome_arq_saida = self.nome_arq_saida.split('_')[0] + '_' + str(seq_arq)  #
+        self.nome_arq_saida = self.nome_arq_saida + '.fas'
+        self.arqconf_caminho.set_filename(self.nome_arq_saida)
+        self.window.set_title(self.nome_arq_saida)
 
         try:
             caminho = \
                 [arq for arq in listdir('.') if arq.find('Padr') > -1 and arq.find('Planilha') > -1][-1]
             self.Lppadrao.set_filename(caminho)
-
         except:
             self.Lppadrao.set_filename('')
-
-        conf_LT_array = []  # Configuração de LT
 
     def on_janela_principal_destroy(self, window):
         Gtk.main_quit()  # Encerra a aplicação quando fechar a janela no X vermelho
@@ -489,34 +507,21 @@ class Manipulador(object):
         elif Aba == 13:  # Aba do Compensador Síncrono
             self.selecionar_todas(self.Num_de_Compsinc, self.NotbkCompsinc_Linha, self.NotbkCompsinc_Linha_dic)
 
-    def on_arqconf_menubar_arquivo_salvar_activate(self, button):
-        root = Element('Arqconf', data='{}'.format(date.today()),
-                       fornecedor = self.fornecedor.get_text(),
-                       usuario = self.usuario.get_text(),
-                       versao = self.versao)
-        eventos = SubElement(root,'Eventos', codigo_se = str(self.codigo_se.get_text().upper()), lppadrao = str(self.Lppadrao.get_filename()))
-        self.recolhe_dados(self.Num_de_LT, self.NotbkLT_Linha, self.NotbkLT_Linha_dic, eventos)
-        self.recolhe_dados(self.Num_de_Trafo, self.NotbkTrafo_Linha, self.NotbkTrafo_Linha_dic, eventos)
-        self.recolhe_dados(self.Num_de_VaoTrans, self.NotbkVaoTrans_Linha, self.NotbkVaoTrans_Linha_dic, eventos)
-
-        ElementTree(root).write('Arqconf1.fas', 'UTF-8')
-        #print(self.prettify(root))
-
+    # Função que capta os dados dos eventos e joga dentro do elemento 'evento' do arquivo xml
     def recolhe_dados(self, Numero_linhas_ativas, array_nomes_objetos, dicionario_objetos, eventos):
         for linha in Numero_linhas_ativas:  # Varre todas as linhas para achar os checkboxes selecionados
             try:  # Caso para os objetos que foram criados no botão adicionar (dinamicamente)
                 objeto = dicionario_objetos[array_nomes_objetos[1] + str(linha)]  # Resgatando o objeto checkbutton da linha
-                print(objeto.get_name())
                 if objeto.get_name().__contains__('entry'):
                     if objeto.get_text() == '':
                         pass
                     else:
-                        evento = SubElement(eventos, array_nomes_objetos[1].split('_')[0])
-                        evento.text = objeto.get_text()
+                        evento = SubElement(eventos, array_nomes_objetos[1].split('_')[0].upper())
+                        evento.text = objeto.get_text().strip().upper()
                         for i in range(2, len(array_nomes_objetos)):
                             caixa = dicionario_objetos[array_nomes_objetos[i] + str(linha)]
                             if array_nomes_objetos[i].__contains__('entry'):
-                                evento.set(array_nomes_objetos[i].split('_')[2], str(caixa.get_text()))
+                                evento.set(array_nomes_objetos[i].split('_')[2], str(caixa.get_text()).strip().upper())
                             elif array_nomes_objetos[i].__contains__('combobox'):
                                 evento.set(array_nomes_objetos[i].split('_')[2], str(caixa.get_active_text()))
                             elif array_nomes_objetos[i].__contains__('checkbtt'):
@@ -525,46 +530,49 @@ class Manipulador(object):
                     if objeto.get_active() == -1:
                         pass
                     else:
-                        evento = SubElement(eventos, array_nomes_objetos[1].split('_')[0])
-                        evento.text = objeto.get_text()
+                        evento = SubElement(eventos, array_nomes_objetos[1].split('_')[0].upper())
+                        evento.text = objeto.get_text().strip().upper()
                         for i in range(2, len(array_nomes_objetos)):
                             caixa = dicionario_objetos[array_nomes_objetos[i] + str(linha)]
                             if array_nomes_objetos[i].__contains__('entry'):
-                                evento.set(array_nomes_objetos[i].split('_')[2], str(caixa.get_text()))
+                                evento.set(array_nomes_objetos[i].split('_')[2], str(caixa.get_text()).strip().upper())
                             elif array_nomes_objetos[i].__contains__('combobox'):
                                 evento.set(array_nomes_objetos[i].split('_')[2], str(caixa.get_active_text()))
                             elif array_nomes_objetos[i].__contains__('checkbtt'):
                                 evento.set(array_nomes_objetos[i].split('_')[2], str(caixa.get_active()))
             except:
                 objeto = builder.get_object(array_nomes_objetos[1] + str(linha))
-                print(objeto.get_name())
-
                   # Resgatando o objeto checkbutton da linha
                 if objeto.get_name().__contains__('entry'):
                     if objeto.get_text() == '':
                         pass
                     else:
-                        print(objeto.get_name())
-                        evento = SubElement(eventos, array_nomes_objetos[1].split('_')[0])
-                        evento.text = objeto.get_text()
+                        evento = SubElement(eventos, array_nomes_objetos[1].split('_')[0].upper())
+                        evento.text = objeto.get_text().strip().upper()
                         for i in range(2, len(array_nomes_objetos)) :
                             caixa = builder.get_object(array_nomes_objetos[i] + str(linha))
                             if array_nomes_objetos[i].__contains__('entry'):
-                                evento.set(array_nomes_objetos[i].split('_')[2], str(caixa.get_text()))
+                                evento.set(array_nomes_objetos[i].split('_')[2], str(caixa.get_text()).strip().upper())
                             elif array_nomes_objetos[i].__contains__('combobox'):
                                 evento.set(array_nomes_objetos[i].split('_')[2], str(caixa.get_active_text()))
                             elif array_nomes_objetos[i].__contains__('checkbtt'):
                                 evento.set(array_nomes_objetos[i].split('_')[2], str(caixa.get_active()))
+                        if array_nomes_objetos == self.NotbkPaisage_Linha:
+                            caixa = builder.get_object('paisage_entry_rdp-central-de_1')
+                            evento.set('rdp-central-de', str(caixa.get_text()))
+                            caixa = builder.get_object('paisage_entry_rdp-central-ate_1')
+                            evento.set('rdp-central-ate', str(caixa.get_text()))
+
                 elif objeto.get_name().__contains__('combobox'):
                     if objeto.get_active() == -1:
                         pass
                     else:
-                        evento = SubElement(eventos, array_nomes_objetos[1].split('_')[0])
-                        evento.text = objeto.get_text()
+                        evento = SubElement(eventos, array_nomes_objetos[1].split('_')[0].upper())
+                        evento.text = objeto.get_active_text().strip().upper()
                         for i in range(2, len(array_nomes_objetos)):
                             caixa = builder.get_object(array_nomes_objetos[i] + str(linha))
                             if array_nomes_objetos[i].__contains__('entry'):
-                                evento.set(array_nomes_objetos[i].split('_')[2], str(caixa.get_text()))
+                                evento.set(array_nomes_objetos[i].split('_')[2], str(caixa.get_text()).strip().upper())
                             elif array_nomes_objetos[i].__contains__('combobox'):
                                 evento.set(array_nomes_objetos[i].split('_')[2], str(caixa.get_active_text()))
                             elif array_nomes_objetos[i].__contains__('checkbtt'):
@@ -912,6 +920,7 @@ class Manipulador(object):
         for linha_remov in linhas_removidas_agora:  # Remove as linhas removidas do array de linhas ativas
             del Numero_linhas_ativas[Numero_linhas_ativas.index(linha_remov)]
 
+    #Função que seleciona todas as linhas
     def selecionar_todas(self, Numero_linhas_ativas, array_nomes_objetos, dicionario_objetos):
         for linha in Numero_linhas_ativas:  # Varre todas as linhas para achar os checkboxes selecionados
             try:  # Caso para os objetos que foram criados no botão adicionar (dinamicamente)
@@ -963,6 +972,8 @@ class Manipulador(object):
         else:
             return [preenchidas, linha_a_duplicar]
 
+    #Eventos ligados a função base SAGE para LP excel
+
     def on_menubar_Base_SAGE_para_LP_Excel_activate(self, menubar):
         self.dialogo_diretorio.show()
 
@@ -988,15 +999,71 @@ class Manipulador(object):
                 print_exc(file=stdout)
                 mensagem_erro('Erro', 'Erro inesperado ao tentar checar lista de pontos.')
 
+    #Eventos ligados ao salvamento do arquivo de configuração
+
+    def on_arqconf_button_salvar_clicked(self, button):
+        nome_arquivo = str(self.arqconf_salvar_dialogo.get_current_folder()+ '\\'+ self.nome_arqconf.get_text())
+        if not nome_arquivo.endswith('.fas'):
+            nome_arquivo = nome_arquivo + '.fas'
+        root = Element('Arqconf', data='{}'.format(date.today()),
+                       fornecedor=self.fornecedor.get_text(),
+                       usuario=self.usuario.get_text(),
+                       versao=self.versao)
+        eventos = SubElement(root, 'Eventos', codigo_se=str(self.codigo_se.get_text().upper()),
+                             lppadrao=str(self.Lppadrao.get_filename()).rsplit('\\',1)[1])
+
+        self.recolhe_dados(self.Num_de_LT, self.NotbkLT_Linha, self.NotbkLT_Linha_dic, eventos)
+        self.recolhe_dados(self.Num_de_Trafo, self.NotbkTrafo_Linha, self.NotbkTrafo_Linha_dic, eventos)
+        self.recolhe_dados(self.Num_de_VaoTrans, self.NotbkVaoTrans_Linha, self.NotbkVaoTrans_Linha_dic, eventos)
+        self.recolhe_dados(self.Num_de_Paisage, self.NotbkPaisage_Linha, self.NotbkPaisage_Linha_dic, eventos)
+        self.recolhe_dados(self.Num_de_Reator, self.NotbkReator_Linha, self.NotbkReator_Linha_dic, eventos)
+        self.recolhe_dados(self.Num_de_Acesso, self.NotbkAcesso_Linha, self.NotbkAcesso_Linha_dic, eventos)
+        self.recolhe_dados(self.Num_de_Tterra, self.NotbkTterra_Linha, self.NotbkTterra_Linha_dic, eventos)
+        self.recolhe_dados(self.Num_de_Protbarra, self.NotbkProtbarra_Linha, self.NotbkProtbarra_Linha_dic, eventos)
+        self.recolhe_dados(self.Num_de_Bcapshunt, self.NotbkBcapshunt_Linha, self.NotbkBcapshunt_Linha_dic, eventos)
+        self.recolhe_dados(self.Num_de_Bcapserie, self.NotbkBcapserie_Linha, self.NotbkBcapserie_Linha_dic, eventos)
+        self.recolhe_dados(self.Num_de_Ece, self.NotbkEce_Linha, self.NotbkEce_Linha_dic, eventos)
+        self.recolhe_dados(self.Num_de_Sistreg, self.NotbkSistreg_Linha, self.NotbkSistreg_Linha_dic, eventos)
+        self.recolhe_dados(self.Num_de_Prepreen, self.NotbkPrepreen_Linha, self.NotbkPrepreen_Linha_dic, eventos)
+        self.recolhe_dados(self.Num_de_Compsinc, self.NotbkCompsinc_Linha, self.NotbkCompsinc_Linha_dic, eventos)
+        self.recolhe_dados(self.Num_de_Saux, self.NotbkSaux_Linha, self.NotbkSaux_Linha_dic, eventos)
+
+
+        ElementTree(root).write(nome_arquivo, 'UTF-8')
+        self.arqconf_caminho.set_filename(nome_arquivo)
+        self.window.set_title(self.nome_arqconf.get_text())
+        self.arqconf_salvar_dialogo.hide()
+
+    def on_arqconf_button_cancelar_clicked(self, button):
+        self.arqconf_salvar_dialogo.hide()
+
+    def on_arqconf_salvar_activate(self, button):
+        self.arqconf_salvar_dialogo.show()
+        self.nome_arqconf.set_text(self.nome_arq_saida.split('.')[0])
+
     def on_arqconf_menubar_ferramentas_cepel2excel_activate(self, menubar):
         mensagem_aviso('Aviso', 'você foi avisado')
 
+    #Eventos ligados ao abrir arquivo de configuração
+    def on_arqconf_abrir_activate(self, button):
+        self.arqconf_abrir_dialogo.show()
+
+    def on_arqconf_button_abrir_clicked(self, button):
+        self.abrir_arquivo(self.arqconf_abrir_dialogo.get_file())
+        self.arqconf_abrir_dialogo.hide()
+
+    def abrir_arquivo(self, nome_arquivo):
+        tree = ElementTree.parse(source=nome_arquivo)
+        root = tree.getroot()
+        print(root.tag)
+        print(root.atrib)
+
+    #Evento da tela principal
     def on_arqconf_menubar_arquivo_sair_activate(self, button):
         Gtk.main_quit()
 
 
 if __name__ == '__main__':
     builder.connect_signals(Manipulador())  # Conecta os sinais da interface com a classe manipuladora "manipulador"
-    window = builder.get_object('janela_principal')  # Pega o Objeto da janela princial
-    window.show_all()  # Mostra a janela principal
+
     Gtk.main()
