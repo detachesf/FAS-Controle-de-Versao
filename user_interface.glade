@@ -2,6 +2,12 @@
 <!-- Generated with glade 3.38.2 -->
 <interface>
   <requires lib="gtk+" version="3.24"/>
+  <object class="GtkApplicationWindow">
+    <property name="can-focus">False</property>
+    <child>
+      <placeholder/>
+    </child>
+  </object>
   <object class="GtkFileChooserDialog" id="diretorio_dialogo">
     <property name="width-request">800</property>
     <property name="can-focus">False</property>
@@ -112,9 +118,11 @@
   </object>
   <object class="GtkFileChooserDialog" id="arqconf_abrir_dialogo">
     <property name="can-focus">False</property>
+    <property name="title" translatable="yes">Abrir arquivo de configuração</property>
+    <property name="icon">CHESF.png</property>
     <property name="type-hint">dialog</property>
+    <property name="deletable">False</property>
     <property name="filter">filefilter1</property>
-    <signal name="selection-changed" handler="on_arqconf_abrir_dialogo_selection_changed" swapped="no"/>
     <child internal-child="vbox">
       <object class="GtkBox">
         <property name="can-focus">False</property>
@@ -275,6 +283,7 @@
     <property name="can-focus">False</property>
     <property name="title" translatable="yes">Arquivo de Configuração</property>
     <property name="icon">CHESF.png</property>
+    <signal name="child-notify" handler="on_janela_principal_child_notify" swapped="no"/>
     <signal name="destroy" handler="on_janela_principal_destroy" swapped="no"/>
     <child>
       <object class="GtkBox">
@@ -302,7 +311,7 @@
                         <property name="use-underline">True</property>
                         <property name="use-stock">True</property>
                         <property name="always-show-image">True</property>
-                        <signal name="activate" handler="on_arqconf_menubar_arquivo_novo_activate" swapped="no"/>
+                        <signal name="activate" handler="on_arqconf_novo_activate" swapped="no"/>
                       </object>
                     </child>
                     <child>
@@ -335,7 +344,7 @@
                         <property name="use-underline">True</property>
                         <property name="use-stock">True</property>
                         <property name="always-show-image">True</property>
-                        <signal name="activate" handler="on_arqconf_menubar_arquivo_salvar_como_activate" swapped="no"/>
+                        <signal name="activate" handler="on_arqconf_salvar_como_activate" swapped="no"/>
                       </object>
                     </child>
                     <child>
@@ -434,7 +443,7 @@
                         <property name="can-focus">False</property>
                         <property name="label" translatable="yes">Gerar LP</property>
                         <property name="use-underline">True</property>
-                        <signal name="activate" handler="on_arqconf_menubar_ferramentas_gerar_activate" swapped="no"/>
+                        <signal name="activate" handler="on_gerarlp_clicked" swapped="no"/>
                       </object>
                     </child>
                     <child>
@@ -443,7 +452,7 @@
                         <property name="can-focus">False</property>
                         <property name="label" translatable="yes">Checar LP</property>
                         <property name="use-underline">True</property>
-                        <signal name="activate" handler="on_arqconf_menubar_ferramentas_checar_activate" swapped="no"/>
+                        <signal name="activate" handler="on_checarlp_clicked" swapped="no"/>
                       </object>
                     </child>
                     <child>
@@ -568,7 +577,7 @@
                 <property name="tooltip-text" translatable="yes">Novo</property>
                 <property name="use-underline">True</property>
                 <property name="icon-name">document-new-symbolic</property>
-                <signal name="clicked" handler="on_toolbar_novo_clicked" swapped="no"/>
+                <signal name="clicked" handler="on_arqconf_novo_activate" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -597,6 +606,20 @@
                 <property name="use-underline">True</property>
                 <property name="icon-name">document-save-symbolic</property>
                 <signal name="clicked" handler="on_arqconf_salvar_activate" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkToolButton" id="toolbar_salvar_como">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="tooltip-text" translatable="yes">Salvar como</property>
+                <property name="use-underline">True</property>
+                <property name="icon-name">document-save-as-symbolic</property>
+                <signal name="clicked" handler="on_arqconf_salvar_como_activate" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -700,6 +723,7 @@
                 <property name="tooltip-text" translatable="yes">Gerar Lista de Pontos</property>
                 <property name="use-underline">True</property>
                 <property name="icon-name">applications-engineering-symbolic</property>
+                <signal name="clicked" handler="on_gerarlp_clicked" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -713,7 +737,7 @@
                 <property name="tooltip-text" translatable="yes">Checar Lista de Pontos</property>
                 <property name="use-underline">True</property>
                 <property name="icon-name">folder-saved-search-symbolic</property>
-                <signal name="clicked" handler="on_toolbar_checar_clicked" swapped="no"/>
+                <signal name="clicked" handler="on_checarlp_clicked" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -887,7 +911,6 @@
                   <object class="GtkLabel">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="tooltip-text" translatable="yes">Ex: 04D1</property>
                     <property name="label" translatable="yes">Arquivo LP Padrão:</property>
                     <attributes>
                       <attribute name="font-desc" value="Sitka Text 10"/>
@@ -902,23 +925,6 @@
                   <object class="GtkLabel">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="tooltip-text" translatable="yes">Ex: 04D1</property>
-                    <property name="margin-start">10</property>
-                    <property name="label" translatable="yes">Arquivo de Parametrização:</property>
-                    <attributes>
-                      <attribute name="font-desc" value="Sitka Text 10"/>
-                    </attributes>
-                  </object>
-                  <packing>
-                    <property name="left-attach">2</property>
-                    <property name="top-attach">1</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkLabel">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <property name="tooltip-text" translatable="yes">Ex: 04D1</property>
                     <property name="label" translatable="yes">Arquivo LP a ser Checado:</property>
                     <attributes>
                       <attribute name="font-desc" value="Sitka Text 10"/>
@@ -926,7 +932,7 @@
                   </object>
                   <packing>
                     <property name="left-attach">2</property>
-                    <property name="top-attach">2</property>
+                    <property name="top-attach">1</property>
                   </packing>
                 </child>
                 <child>
@@ -938,17 +944,6 @@
                   <packing>
                     <property name="left-attach">3</property>
                     <property name="top-attach">0</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkFileChooserButton" id="file_chooser_arqconf">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <property name="title" translatable="yes"/>
-                  </object>
-                  <packing>
-                    <property name="left-attach">3</property>
-                    <property name="top-attach">1</property>
                   </packing>
                 </child>
                 <child>
@@ -981,6 +976,31 @@
                   </object>
                   <packing>
                     <property name="left-attach">3</property>
+                    <property name="top-attach">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label" translatable="yes">Descrição do Evento:</property>
+                    <attributes>
+                      <attribute name="font-desc" value="Sitka Text 10"/>
+                    </attributes>
+                  </object>
+                  <packing>
+                    <property name="left-attach">2</property>
+                    <property name="top-attach">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkEntry" id="entry_descricao_evento">
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="valign">center</property>
+                  </object>
+                  <packing>
+                    <property name="left-attach">3</property>
                     <property name="top-attach">2</property>
                   </packing>
                 </child>
@@ -998,13 +1018,14 @@
                 <property name="hexpand">True</property>
                 <property name="orientation">vertical</property>
                 <child>
-                  <object class="GtkButton">
+                  <object class="GtkButton" id="button_gerarlp">
                     <property name="label" translatable="yes">Gerar</property>
                     <property name="width-request">200</property>
                     <property name="height-request">50</property>
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="receives-default">True</property>
+                    <signal name="clicked" handler="on_gerarlp_clicked" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -1013,7 +1034,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkButton">
+                  <object class="GtkButton" id="button_checarlp">
                     <property name="label" translatable="yes">Checar</property>
                     <property name="width-request">200</property>
                     <property name="height-request">50</property>
@@ -1021,6 +1042,7 @@
                     <property name="can-focus">True</property>
                     <property name="receives-default">True</property>
                     <property name="halign">center</property>
+                    <signal name="clicked" handler="on_checarlp_clicked" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -1617,7 +1639,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                                 <property name="halign">start</property>
                                 <property name="valign">start</property>
                                 <child>
-                                  <object class="GtkTable" id="tabela_trafo">
+                                  <object class="GtkTable" id="tabela_Trafo">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="halign">start</property>
@@ -1983,7 +2005,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                                         <property name="visible">True</property>
                                         <property name="can-focus">False</property>
                                         <items>
-                                          <item translatable="yes">500/230</item>
+                                          <item id="&lt;Insira a ID&gt;" translatable="yes">500/230</item>
                                           <item translatable="yes">500/230/13,8</item>
                                           <item translatable="yes">230/138</item>
                                           <item translatable="yes">230/138/13,8</item>
@@ -2205,7 +2227,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                         <property name="halign">center</property>
                         <property name="valign">start</property>
                         <child>
-                          <object class="GtkTable" id="tabela_vaotransf">
+                          <object class="GtkTable" id="tabela_vaotrans">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
                             <property name="n-rows">2</property>
@@ -2376,7 +2398,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkEntry" id="vaotrans_entry_campass_1">
+                              <object class="GtkEntry" id="vaotrans_entry_camarapass_1">
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="valign">center</property>
@@ -2389,7 +2411,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkEntry" id="vaotrans_entry_conjsecc_1">
+                              <object class="GtkEntry" id="vaotrans_entry_conjuntosecc_1">
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="valign">center</property>
@@ -2628,7 +2650,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                         <property name="hexpand">True</property>
                         <property name="vexpand">True</property>
                         <child>
-                          <object class="GtkTable" id="tabela_painel_sage">
+                          <object class="GtkTable" id="tabela_paisage">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
                             <property name="valign">start</property>
@@ -3330,7 +3352,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkEntry" id="reator_entry_campass_1">
+                              <object class="GtkEntry" id="reator_entry_camarapass_1">
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="valign">center</property>
@@ -3402,7 +3424,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkCheckButton" id="reator_checkbtt_bunitf9_1">
+                              <object class="GtkCheckButton" id="reator_checkbtt_f9_1">
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="receives-default">False</property>
@@ -4338,7 +4360,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkEntry" id="tterra_entry_camaraspass_1">
+                              <object class="GtkEntry" id="tterra_entry_camarapass_1">
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="valign">center</property>
@@ -4956,7 +4978,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkCheckButton" id="bcapshunt_checkbtt_bunitf9_1">
+                              <object class="GtkCheckButton" id="bcapshunt_checkbtt_f9_1">
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="receives-default">False</property>
@@ -5592,7 +5614,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
                         <child>
-                          <object class="GtkTable" id="tabela_sist_reg">
+                          <object class="GtkTable" id="tabela_sistreg">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
                             <property name="halign">start</property>
@@ -5682,7 +5704,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkComboBoxText" id="sistreg_combobox_tesao-reg_1">
+                              <object class="GtkComboBoxText" id="sistreg_combobox_tensao-reg_1">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
                                 <items>
@@ -6538,6 +6560,45 @@ Paulo Roberto de Freitas (Contribuinte)
       </object>
     </child>
   </object>
+  <object class="GtkWindow" id="janela_progressbar">
+    <property name="can-focus">False</property>
+    <property name="window-position">center</property>
+    <property name="hide-titlebar-when-maximized">True</property>
+    <property name="icon">CHESF.png</property>
+    <property name="decorated">False</property>
+    <property name="deletable">False</property>
+    <child>
+      <object class="GtkBox">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="orientation">vertical</property>
+        <child>
+          <object class="GtkLabel">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="label" translatable="yes">Carregando...</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkSpinner" id="spinner">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="active">True</property>
+          </object>
+          <packing>
+            <property name="expand">True</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
   <object class="GtkMessageDialog" id="message_aviso">
     <property name="can-focus">False</property>
     <property name="title" translatable="yes">Atenção!</property>
@@ -6629,6 +6690,20 @@ Paulo Roberto de Freitas (Contribuinte)
             <property name="position">0</property>
           </packing>
         </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkTextBuffer" id="text_buffer_relatorio"/>
+  <object class="GtkWindow" id="janela_relatorio">
+    <property name="can-focus">False</property>
+    <property name="title" translatable="yes">Relatório</property>
+    <property name="icon">CHESF.png</property>
+    <child>
+      <object class="GtkTextView" id="relatorio_textview">
+        <property name="visible">True</property>
+        <property name="can-focus">True</property>
+        <property name="editable">False</property>
+        <property name="buffer">text_buffer_relatorio</property>
       </object>
     </child>
   </object>

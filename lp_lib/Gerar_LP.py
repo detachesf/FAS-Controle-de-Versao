@@ -5,39 +5,42 @@ Vers„o 2.0.4
 Atualiza‡„o do programa: 02/12/2014
 Gerar LP baseado nos m¢dulos LP e gerarPlanlhaLP
 '''
-
-from tkinter.messagebox import showerror, askyesno
+from FASgtkui import mensagem_erro, pergunta_sim_nao,mensagem_aviso,builder, Manipulador
 import os
-from tkinter import END
 import pickle
+from sys import stdout
+from traceback import print_exc
+import gi
+
+gi.require_version("Gtk", "3.0")
+from gi.repository import Gtk
+import threading
 
 try:
-    from xlrd import open_workbook
+    from bs4 import BeautifulSoup
 except:
-    showerror('Erro','Modulo xlrd n„o instalado')
+    mensagem_erro('Erro','M¢dulo BeautifulSoup n„o instalado')
 try:
     from lp_lib.LP import gerarlp
 except:
-    showerror('Erro','Arquivo "LP.py" deve estar no mesmo diret¢rio "lp_lib"')
+    mensagem_erro('Erro','Arquivo "LP.py" deve estar no mesmo diret¢rio "lp_lib"')
 
 try:
     from lp_lib.gerarPlanilhaLP import gerarPlanilha
 except:
-    showerror('Erro','Arquivo "gerarPlanilhaLP.py" deve estar no mesmo diret¢rio "lp_lib"')
+    mensagem_erro('Erro','Arquivo "gerarPlanilhaLP.py" deve estar no mesmo diret¢rio "lp_lib"')
 
 
-def gerar(LP_Padrao, relatorio, LP_Config):
+def gerar(LP_Padrao, relatorio, Arq_Conf):
 
     try:
-        arq_conf = open_workbook(LP_Config) #Abrir arquivo de configura‡„o
+        arq_conf = BeautifulSoup(open(Arq_Conf, 'r', encoding='utf-8'),'html.parser')  # Abrir arquivo de cofigura‡„o
     except:
-        showerror('Erro','Arquivo de parametriza‡„o n„o encontrado')
-        print(LP_Config)
+        mensagem_erro('Erro','Arquivo de parametriza‡„o n„o encontrado')
     try:
-        sheet = arq_conf.sheet_by_index(0)           #Abrir planilha "Configura‡”es" do arquivo LP_config.xls
-        Codigo_SE = sheet.cell(4,1).value.upper()    #Ler defini‡„o do c¢digo da SE
+        Codigo_SE = arq_conf.eventos['codigo_se']    #Ler defini‡„o do c¢digo da SE
     except:
-        showerror('Erro','Arquivo indicado n„o corresponde a arquivo de parametriza‡„o v lido')
+        mensagem_erro('Erro','Arquivo indicado n„o corresponde a arquivo de parametriza‡„o v lido, c¢digo da SE n„o encontrado')
 
 
     nome_arq_saida = './LP_gerada_%s.xlsx'%(Codigo_SE)       #Nome do arquivo de sa¡da
@@ -46,9 +49,9 @@ def gerar(LP_Padrao, relatorio, LP_Config):
         seq_arq += 1                          #Adicionar um a sequˆncia do n£mero do arquivo
         nome_arq_saida = nome_arq_saida[0:11]+'_'+Codigo_SE+'_'+str(seq_arq)+'.xlsx' #Definir novo nome de arquivo (Ex './LP_gerada_JRM_1.xls)
     #arq_LP.save(nome_arq_saida[2:])         #Gravar o nome do arquivo excluindo './' do nome
- 
-    
-    saida = gerarlp(LP_Padrao,LP_Config)
+
+
+    saida = gerarlp(LP_Padrao, Arq_Conf)
 
     arq_LP = gerarPlanilha(nome_arq_saida)                    # Gera um arquivo Excel com uma planilha com formata‡„o da Lista de Pontos Padr„o
     planilha_LP = arq_LP.worksheets()[0]
@@ -91,7 +94,7 @@ def gerar(LP_Padrao, relatorio, LP_Config):
         linha += 1                                          # incrementa a linha
 
     arq_LP.close()
-    
+
     #----------Relat¢rio de Gera‡„o de Pontos----------#
     total = 0
     nome_arq_log = './log_{}_GER.txt'.format(Codigo_SE)            # Nome do arquivo de log
@@ -101,9 +104,10 @@ def gerar(LP_Padrao, relatorio, LP_Config):
         nome_arq_log = 'log_{}_GER_{}.txt'.format(Codigo_SE, seq_arq) #Definir novo nome de arquivo
     arq_log = open(nome_arq_log,'w')
 
-    relatorio.insert(END,'-----Pontos Gerados-----')
+    #relatorio.set_text()
+    texto ='-----Pontos Gerados-----'
     arq_log.write('-----Pontos Gerados-----\n\n')
-    relatorio.insert(END,'')
+    texto = texto + '\n '
     for k,evento in ([7,'SAGE/REDE'],
                      [0,'LT'],
                      [3,'Trafo'],
@@ -122,23 +126,33 @@ def gerar(LP_Padrao, relatorio, LP_Config):
                      [15, 'Sistema Regulacao'],
                      [16, 'Painel de Interface']):
 
-        if saida[1][k]>0: 
-            relatorio.insert(END,evento.ljust(30,'_')+str(saida[1][k]).rjust(3)+' pontos')
+        if saida[1][k]>0:
+            texto = texto + '\n ' + evento.ljust(30,'_')+str(saida[1][k]).rjust(3)+ ' pontos'
+            #relatorio.insert(END,evento.ljust(30,'_')+str(saida[1][k]).rjust(3)+' pontos')
             arq_log.write(evento.ljust(30,'_')+str(saida[1][k]).rjust(3)+' pontos\n')
         total += saida[1][k]
-
-    relatorio.insert(END,'')
+    texto = texto + '\n '
+    #relatorio.insert(END,'')
     arq_log.write('\n')
-    relatorio.insert(END,'Total: '+str(total))
+    texto = texto + '\n Total: '+str(total)
+    #relatorio.insert(END,'Total: '+str(total))
+    relatorio_buffer : Gtk.TextBuffer = builder.get_object('text_buffer_relatorio')
+    relatorio = texto
+    relatorio_buffer.set_text(relatorio)
+    relatorio_janela : Gtk.Window = builder.get_object('janela_relatorio')
+    relatorio_janela.show_all()
     arq_log.write('Total: '+str(total))
     arq_log.close()
-    #showinfo('Aviso','Arquivo \"'+nome_arq_saida[2:]+'\" gerado em '+os.getcwd().decode('latin_1'))
-    
-    abrirarquivo = askyesno('Aviso', 'Arquivo \"'+nome_arq_saida[2:]+'\" gerado em ' + os.getcwd()+'\n\n Deseja abrir o arquivo gerado agora?')
+
+    janela: Gtk.Window = builder.get_object('janela_progressbar')
+    janela.hide()
+
+    mensagem_aviso('Aviso','Arquivo \"'+ nome_arq_saida[2:] +'\" gerado em '+ os.getcwd())
+    abrirarquivo = pergunta_sim_nao('Aviso', 'Arquivo \"'+nome_arq_saida[2:]+'\" gerado em ' + os.getcwd()+'\n\n Deseja abrir o arquivo gerado agora?')
     if abrirarquivo : os.startfile(os.getcwd() + '\\' + nome_arq_saida[2:])
-      
+
     nomearquivo = nome_arq_saida[2:]
-        
     conf = {'arquivo':nomearquivo}
     pickle.dump(conf, open('fas.p','wb'),-1) #-1 para gravar em Bin rio
-    
+
+

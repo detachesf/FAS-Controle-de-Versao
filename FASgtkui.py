@@ -4,7 +4,10 @@ import threading
 from xml.etree.ElementTree import Element, SubElement, Comment, tostring, ElementTree
 from xml.dom import minidom
 from datetime import date
+
 import os
+
+from bs4 import BeautifulSoup
 import xml.dom.minidom
 
 gi.require_version("Gtk", "3.0")
@@ -20,7 +23,7 @@ import pickle  # serve para armazenar objetos e variáveis em arquivos
 import re
 
 
-# Caixa de diálogo
+# Caixas de diálogo
 
 def mensagem_erro(titulo, msg):
     mensagem_erro: Gtk.MessageDialog = builder.get_object('message_erro')
@@ -55,16 +58,10 @@ def pergunta_sim_nao(titulo, msg):
         return True
     elif resposta == Gtk.ResponseType.NO:
         return False
-
-
-try:
-    from xlrd import open_workbook
-except:
-    mensagem_erro('Erro', 'Módulo xlrd não instalado')
-
 try:
     from lp_lib.Gerar_LP import gerar
 except:
+    print_exc(file=stdout)
     mensagem_erro('Erro', 'Módulo Gerar_LP não instalado')
 
 try:
@@ -90,124 +87,95 @@ class Manipulador(object):
         # Vairáveis Gerais
         self.arqconf_novo = True
         self.pathchecar = getcwd
-        self.versao = '2.0.12'
+        self.versao = '2.0.13'
         self.data = '10/11/2020'
         self.window: Gtk.Window = builder.get_object('janela_principal')  # Pega o Objeto da janela princial
         self.window.show_all()  # Mostra a janela principal
-
+        self.lp_de_saida =''
         # Arrays com os nomes padrão dos objetos de cada linha
-        self.NotbkLT_Linha = ['selec_linha_LT_', 'LT_entry_codlinha_', 'LT_entry_codpainel_', 'LT_entry_ltremota_',
-                              'LT_entry_camarapass_',
-                              'LT_entry_conjuntosecc_', 'LT_combobox_arranjo_', 'LT_combobox_religamento_',
-                              'LT_checkbtt_rdp_', 'LT_checkbtt_painelteleprot_', 'LT_checkbtt_f9_', 'LT_checkbtt_87l_']
+        self.dicionario_nomes_objetos=[['selec_linha_LT_', 'LT_entry_codlinha_', 'LT_entry_codpainel_', 'LT_entry_ltremota_',
+                                          'LT_entry_camarapass_',
+                                          'LT_entry_conjuntosecc_', 'LT_combobox_arranjo_', 'LT_combobox_religamento_',
+                                          'LT_checkbtt_rdp_', 'LT_checkbtt_painelteleprot_', 'LT_checkbtt_f9_', 'LT_checkbtt_87l_'],
 
-        self.NotbkTrafo_Linha = ['selec_linha_Trafo_', 'Trafo_entry_codtrafo_', 'Trafo_entry_codpainelH_',
-                                 'Trafo_entry_codpainelX_',
-                                 'Trafo_entry_camarapass_',
-                                 'Trafo_entry_conjuntosecc_', 'Trafo_combobox_arranjoH_', 'Trafo_combobox_arranjoX_',
-                                 'Trafo_checkbtt_rdp_', 'Trafo_checkbtt_regapp_', 'Trafo_checkbtt_f9_',
-                                 'Trafo_combobox_equip_', 'Trafo_combobox_relacao_', 'Trafo_combobox_prot_',
-                                 ]
-        self.NotbkVaoTrans_Linha = ['selec_linha_vaotrans_', 'vaotrans_entry_cod_', 'vaotrans_entry_painel_',
-                                    'vaotrans_checkbtt_87B_', 'vaotrans_combobox_arranjo_', 'vaotrans_entry_campass_',
-                                    'vaotrans_entry_conjsecc_']
+                                      ['selec_linha_Trafo_', 'Trafo_entry_codtrafo_', 'Trafo_entry_codpainelH_',
+                                       'Trafo_entry_codpainelX_',
+                                       'Trafo_entry_camarapass_',
+                                       'Trafo_entry_conjuntosecc_', 'Trafo_combobox_arranjoH_',
+                                       'Trafo_combobox_arranjoX_',
+                                       'Trafo_checkbtt_rdp_', 'Trafo_checkbtt_regapp_', 'Trafo_checkbtt_f9_',
+                                       'Trafo_combobox_equip_', 'Trafo_combobox_relacao_', 'Trafo_combobox_prot_',
+                                       ],
 
-        self.NotbkPaisage_Linha = ['selec_linha_paisage_', 'paisage_entry_painel_', 'paisage_combobox_sagebastidor_',
-                                   'paisage_entry_sw-de_', 'paisage_entry_sw-ate_', 'paisage_entry_nportas-sw_',
-                                   'paisage_checkbtt_fw_', 'paisage_entry_nporta-fw_', 'paisage_checkbtt_rb_',
-                                   'paisage_entry_rb-de_',
-                                   'paisage_entry_rb-ate_', 'paisage_entry_nporta-rb_']
+                                      ['selec_linha_vaotrans_', 'vaotrans_entry_cod_', 'vaotrans_entry_painel_',
+                                       'vaotrans_checkbtt_87B_', 'vaotrans_combobox_arranjo_', 'vaotrans_entry_camarapass_',
+                                       'vaotrans_entry_conjuntosecc_'],
 
-        self.NotbkReator_Linha = ['selec_linha_reator_', 'reator_entry_cod_', 'reator_entry_painel_',
-                                  'reator_checkbtt_manob_', 'reator_combobox_equip_', 'reator_checkbtt_rdp_',
-                                  'reator_checkbtt_bunitf9_',
-                                  'reator_entry_campass_', 'reator_entry_conjuntosecc_']
+                                      ['selec_linha_paisage_', 'paisage_entry_painel_',
+                                       'paisage_combobox_sagebastidor_',
+                                       'paisage_entry_sw-de_', 'paisage_entry_sw-ate_', 'paisage_entry_nportas-sw_',
+                                       'paisage_checkbtt_fw_', 'paisage_entry_nporta-fw_', 'paisage_checkbtt_rb_',
+                                       'paisage_entry_rb-de_',
+                                       'paisage_entry_rb-ate_', 'paisage_entry_nporta-rb_'],
 
-        self.NotbkAcesso_Linha = ['selec_linha_acesso_', 'acesso_entry_codvao_', 'acesso_entry_painelacess_',
-                                  'acesso_checkbtt_painelexist_',
-                                  'acesso_entry_num-uc-chesf_', 'acesso_entry_num-uc-acessante_',
-                                  'acesso_combobox_arranjo_', 'acesso_checkbtt_ts_',
-                                  'acesso_entry_ts-de_', 'acesso_entry_ts-ate_', 'acesso_checkbtt_rb_',
-                                  'acesso_entry_redbox-de_',
-                                  'acesso_entry_redbox-ate_', 'acesso_checkbtt_multimedidor_', 'acesso_entry_mm-de_',
-                                  'acesso_entry_mm-ate_',
-                                  'acesso_entry_ltremota_']
+                                      ['selec_linha_reator_', 'reator_entry_cod_', 'reator_entry_painel_',
+                                       'reator_checkbtt_manob_', 'reator_combobox_equip_', 'reator_checkbtt_rdp_',
+                                       'reator_checkbtt_f9_',
+                                       'reator_entry_camarapass_', 'reator_entry_conjuntosecc_'],
 
-        self.NotbkTterra_Linha = ['selec_linha_tterra_', 'tterra_entry_codigo_', 'tterra_entry_painel_',
-                                  'tterra_entry_camaraspass_', 'tterra_entry_conjuntosecc_']
-        self.NotbkProtbarra_Linha = ['selec_linha_protbarra_', 'protbarra_entry_painel_', 'protbarra_entry_qtpan_',
-                                     'protbarra_combobox_arranjo_',
-                                     'protbarra_checkbtt_bu-no-painel_', 'protbarra_entry_vaos_']
+                                      ['selec_linha_acesso_', 'acesso_entry_codvao_', 'acesso_entry_painelacess_',
+                                       'acesso_checkbtt_painelexist_',
+                                       'acesso_entry_num-uc-chesf_', 'acesso_entry_num-uc-acessante_',
+                                       'acesso_combobox_arranjo_', 'acesso_checkbtt_ts_',
+                                       'acesso_entry_ts-de_', 'acesso_entry_ts-ate_', 'acesso_checkbtt_rb_',
+                                       'acesso_entry_redbox-de_',
+                                       'acesso_entry_redbox-ate_', 'acesso_checkbtt_multimedidor_', 'acesso_entry_mm-de_',
+                                       'acesso_entry_mm-ate_',
+                                       'acesso_entry_ltremota_'],
 
-        self.NotbkBcapshunt_Linha = ['selec_linha_bcapshunt_', 'bcapshunt_entry_codigo_', 'bcapshunt_entry_painel_',
-                                     'bcapshunt_combobox_arranjo_',
-                                     'bcapshunt_checkbtt_rdp_', 'bcapshunt_checkbtt_bunitf9_']
+                                      ['selec_linha_tterra_', 'tterra_entry_codigo_', 'tterra_entry_painel_',
+                                       'tterra_entry_camarapass_', 'tterra_entry_conjuntosecc_'],
 
-        self.NotbkBcapserie_Linha = ['selec_linha_bcapserie_', 'bcapserie_entry_codigo_', 'bcapserie_entry_painel_']
+                                      ['selec_linha_protbarra_', 'protbarra_entry_painel_', 'protbarra_entry_qtpan_',
+                                       'protbarra_combobox_arranjo_',
+                                       'protbarra_checkbtt_bu-no-painel_', 'protbarra_entry_vaos_'],
 
-        self.NotbkEce_Linha = ['selec_linha_ece_', 'ece_entry_codigo_', 'ece_entry_painel_']
+                                      ['selec_linha_bcapshunt_', 'bcapshunt_entry_codigo_', 'bcapshunt_entry_painel_',
+                                       'bcapshunt_combobox_arranjo_',
+                                       'bcapshunt_checkbtt_rdp_', 'bcapshunt_checkbtt_f9_'],
 
-        self.NotbkSistreg_Linha = ['selec_linha_sistreg_', 'sistreg_combobox_nome_', 'sistreg_combobox_tesao-reg_',
-                                   'sistreg_entry_painel_']
+                                      ['selec_linha_bcapserie_', 'bcapserie_entry_codigo_', 'bcapserie_entry_painel_'],
 
-        self.NotbkPrepreen_Linha = ['selec_linha_prepreen_', 'prepreen_entry_sistema_']
+                                      ['selec_linha_ece_', 'ece_entry_codigo_', 'ece_entry_painel_'],
 
-        self.NotbkCompsinc_Linha = ['selec_linha_compsinc_', 'compsinc_entry_codigo_', 'compsinc_entry_painel_']
+                                      ['selec_linha_sistreg_', 'sistreg_combobox_nome_', 'sistreg_combobox_tensao-reg_',
+                                       'sistreg_entry_painel_'],
 
-        self.NotbkSaux_Linha = ['','saux_entry_nome-painel-ua_','saux_entry_nome-painel-saux_','saux_entry_barras-sup-ca_',
-                                'saux_entry_barras-sup-cc_','saux_entry_disj-sup-ca_','saux_entry_disj-sup-cc_',
-                                'saux_combobox_tensao-ca_','saux_combobox_tensao-cc_']
+                                      ['selec_linha_prepreen_', 'prepreen_entry_sistema_'],
+
+                                      ['selec_linha_compsinc_', 'compsinc_entry_codigo_', 'compsinc_entry_painel_'],
+
+                                      ['', 'saux_entry_nome-painel-ua_', 'saux_entry_nome-painel-saux_',
+                                       'saux_entry_barras-sup-ca_',
+                                       'saux_entry_barras-sup-cc_', 'saux_entry_disj-sup-ca_',
+                                       'saux_entry_disj-sup-cc_',
+                                       'saux_combobox_tensao-ca_', 'saux_combobox_tensao-cc_']]
+
         # Variáveis Auxiliares na mecânica da tela de configuração
 
-        self.NotbkLT_Linha_dic = {}  # dicionário para armazenar os objetos adicionados dinâmicamente
-        self.NotbkTrafo_Linha_dic = {}
-        self.NotbkVaoTrans_Linha_dic = {}
-        self.NotbkPaisage_Linha_dic = {}
-        self.NotbkReator_Linha_dic = {}
-        self.NotbkAcesso_Linha_dic = {}
-        self.NotbkTterra_Linha_dic = {}
-        self.NotbkProtbarra_Linha_dic = {}
-        self.NotbkBcapshunt_Linha_dic = {}
-        self.NotbkBcapserie_Linha_dic = {}
-        self.NotbkEce_Linha_dic = {}
-        self.NotbkSistreg_Linha_dic = {}
-        self.NotbkPrepreen_Linha_dic = {}
-        self.NotbkCompsinc_Linha_dic = {}
-        self.NotbkSaux_Linha_dic = {}
+        self.dicionario_geral_objetos_dinamicos = {} # dicionário para armazenar os objetos adicionados dinâmicamente
+        self.dicionario_gera_num_de_linhas_ativas = {} # dicionário que armazena o número das linhas ativas de cada evento
+        self.dicionario_geral_linhas_removidas = {} # Dicionáriio que registra o índice das linhas que foram removidas de todos eventos
+        self.dicionario_geral_tabelas = {} #Dicionário que guarda as tabelas de cada evento
+
+        for i in range(0, 14):
+            self.dicionario_geral_tabelas[self.dicionario_nomes_objetos[i][1].split('_')[0]] = builder.get_object('tabela_'+self.dicionario_nomes_objetos[i][1].split('_')[0])
+            self.dicionario_geral_objetos_dinamicos[self.dicionario_nomes_objetos[i][1].split('_')[0]] = {}
+            self.dicionario_gera_num_de_linhas_ativas[self.dicionario_nomes_objetos[i][1].split('_')[0]] = [1]
+            self.dicionario_geral_linhas_removidas[self.dicionario_nomes_objetos[i][1].split('_')[0]] = []
 
         self.Arranjos = ['DISJ E MEIO', 'BS', 'BPT', 'BD3',
                          'BD4']  # Array com os arranjos possíveis para preencher os comboboxes
-
-        self.Num_de_LT = [1]  # Variável que armazena o número das linhas ativas
-        self.Num_de_Trafo = [1]
-        self.Num_de_VaoTrans = [1]
-        self.Num_de_Paisage = [1]
-        self.Num_de_Reator = [1]
-        self.Num_de_Acesso = [1]
-        self.Num_de_Tterra = [1]
-        self.Num_de_Protbarra = [1]
-        self.Num_de_Bcapshunt = [1]
-        self.Num_de_Bcapserie = [1]
-        self.Num_de_Ece = [1]
-        self.Num_de_Sistreg = [1]
-        self.Num_de_Prepreen = [1]
-        self.Num_de_Compsinc = [1]
-        self.Num_de_Saux = [1]
-
-        self.Linhas_Removidas_LT = []  # Variável que registra as linhas que foram removidas
-        self.Linhas_Removidas_Trafo = []
-        self.Linhas_Removidas_VaoTrans = []
-        self.Linhas_Removidas_Paisage = []
-        self.Linhas_Removidas_Reator = []
-        self.Linhas_Removidas_Acesso = []
-        self.Linhas_Removidas_Tterra = []
-        self.Linhas_Removidas_Protbarra = []
-        self.Linhas_Removidas_Bcapshunt = []
-        self.Linhas_Removidas_Bcapserie = []
-        self.Linhas_Removidas_Ece = []
-        self.Linhas_Removidas_Sistreg = []
-        self.Linhas_Removidas_Prepreen = []
-        self.Linhas_Removidas_Compsinc = []
 
         # Carregando objetos
 
@@ -215,31 +183,19 @@ class Manipulador(object):
         self.dialogo_diretorio: Gtk.FileChooserDialog = builder.get_object('diretorio_dialogo')
         self.diretorio_dialogo_pasta_entry: Gtk.Entry = builder.get_object('diretorio_dialogo_pasta_entry')
 
-        self.tabela_LT: Gtk.Table = builder.get_object('tabela_LT')
-        self.tabela_Trafo: Gtk.Table = builder.get_object('tabela_trafo')
-        self.tabela_VaoTrans: Gtk.Table = builder.get_object('tabela_vaotransf')
-        self.tabela_Paisage: Gtk.Table = builder.get_object('tabela_painel_sage')
-        self.tabela_Reator: Gtk.Table = builder.get_object('tabela_reator')
-        self.tabela_Acesso: Gtk.Table = builder.get_object('tabela_acesso')
-        self.tabela_Tterra: Gtk.Table = builder.get_object('tabela_tterra')
-        self.tabela_Protbarra: Gtk.Table = builder.get_object('tabela_protbarra')
-        self.tabela_Bcapshunt: Gtk.Table = builder.get_object('tabela_bcapshunt')
-        self.tabela_Bcapserie: Gtk.Table = builder.get_object('tabela_bcapserie')
-        self.tabela_Ece: Gtk.Table = builder.get_object('tabela_ece')
-        self.tabela_Sistreg: Gtk.Table = builder.get_object('tabela_sist_reg')
-        self.tabela_Prepreen: Gtk.Table = builder.get_object('tabela_prepreen')
-        self.tabela_Compsinc: Gtk.Table = builder.get_object('tabela_compsinc')
 
         self.notebook: Gtk.Notebook = builder.get_object('notebook1')
-
+#
         self.codigo_se: Gtk.Entry = builder.get_object('entry_cod_se')
         self.fornecedor: Gtk.Entry = builder.get_object('entry_fornecedor')
         self.usuario: Gtk.Entry = builder.get_object('entry_usuario')
+        self.descricao: Gtk.Entry = builder.get_object('entry_descricao_evento')
         self.Lppadrao: Gtk.FileChooserButton = builder.get_object('file_chooser_lppadrao')
-        self.arqconf_caminho : Gtk.FileChooserButton = builder.get_object('file_chooser_arqconf')
         self.arqconf_salvar_dialogo: Gtk.FileChooserDialog = builder.get_object('arqconf_salvar_dialogo')
         self.nome_arqconf: Gtk.Entry = builder.get_object('arqconf_entry_nome-arquivo')
         self.arqconf_abrir_dialogo: Gtk.FileChooserDialog = builder.get_object('arqconf_abrir_dialogo')
+
+        self.Lb = ""
 
         self.nome_arq_saida = 'Arqconf-novo'  # Nome do arquivo de saída
         seq_arq = 0  # Sequência do número de arquivo
@@ -247,20 +203,16 @@ class Manipulador(object):
             seq_arq += 1  # Adicionar um a sequência do número do arquivo
             self.nome_arq_saida = self.nome_arq_saida.split('_')[0] + '_' + str(seq_arq)  #
         self.nome_arq_saida = self.nome_arq_saida + '.fas'
-        self.arqconf_caminho.set_filename(self.nome_arq_saida)
         self.window.set_title(self.nome_arq_saida)
 
         try:
             caminho = \
-                [arq for arq in listdir('.') if arq.find('Padr') > -1 and arq.find('Planilha') > -1][-1]
+                [arq for arq in listdir(os.getcwd() + '\\'+ 'Planilhas Padrão') if arq.find('Padr') > -1 and arq.find('Planilha') > -1 and arq.find('rev1P') > -1 ][-1]
             self.Lppadrao.set_filename(caminho)
         except:
             self.Lppadrao.set_filename('')
 
-    def on_janela_principal_destroy(self, window):
-        Gtk.main_quit()  # Encerra a aplicação quando fechar a janela no X vermelho
-
-    # Sinais de navegação entre páginas
+# Sinais de navegação entre páginas
 
     # Janela de Sobre
     def on_arqconf_menubar_ajuda_sobre_activate(self, window):
@@ -271,250 +223,79 @@ class Manipulador(object):
         if resposta == -4:
             self.janela_sobre.hide()
 
-    # Sinais de lógica na tela
+# Sinais de lógica na tela
 
     # Ações executadas quando o botão adicionar for clicado
     def on_button_add_linha_clicked(self, button):
 
         Aba = self.notebook.get_current_page()  # captura a aba ativa
-
-        if Aba == 0:  # Aba da LT
-            self.adicionar_linha(self.Linhas_Removidas_LT, self.Num_de_LT, 'LT', self.NotbkLT_Linha,
-                                 self.NotbkLT_Linha_dic,
-                                 self.tabela_LT)
-        elif Aba == 1:  # Aba do Trafo
-            self.adicionar_linha(self.Linhas_Removidas_Trafo, self.Num_de_Trafo, 'Trafo', self.NotbkTrafo_Linha,
-                                 self.NotbkTrafo_Linha_dic, self.tabela_Trafo)
-        elif Aba == 2:  # Aba do Vão de Transferência
-            self.adicionar_linha(self.Linhas_Removidas_VaoTrans, self.Num_de_VaoTrans, 'VaoTrans',
-                                 self.NotbkVaoTrans_Linha, self.NotbkVaoTrans_Linha_dic, self.tabela_VaoTrans)
-        elif Aba == 3:  # Aba do Painel Sage e Bastidor de Rede
-            self.adicionar_linha(self.Linhas_Removidas_Paisage, self.Num_de_Paisage, 'Paisage',
-                                 self.NotbkPaisage_Linha, self.NotbkPaisage_Linha_dic, self.tabela_Paisage)
-        elif Aba == 4:  # Aba do Reator
-            self.adicionar_linha(self.Linhas_Removidas_Reator, self.Num_de_Reator, 'Reator',
-                                 self.NotbkReator_Linha, self.NotbkReator_Linha_dic, self.tabela_Reator)
-        elif Aba == 5:  # Aba do Acesso Segregado
-            self.adicionar_linha(self.Linhas_Removidas_Acesso, self.Num_de_Acesso, 'Acesso',
-                                 self.NotbkAcesso_Linha, self.NotbkAcesso_Linha_dic, self.tabela_Acesso)
-        elif Aba == 6:  # Aba do Trafo Terra
-            self.adicionar_linha(self.Linhas_Removidas_Tterra, self.Num_de_Tterra, 'Tterra',
-                                 self.NotbkTterra_Linha, self.NotbkTterra_Linha_dic, self.tabela_Tterra)
-        elif Aba == 7:  # Aba de Proteção de Barra
-            self.adicionar_linha(self.Linhas_Removidas_Protbarra, self.Num_de_Protbarra, 'Protbarra',
-                                 self.NotbkProtbarra_Linha, self.NotbkProtbarra_Linha_dic, self.tabela_Protbarra)
-        elif Aba == 8:  # Aba do Banco de Capacitores shunt
-            self.adicionar_linha(self.Linhas_Removidas_Bcapshunt, self.Num_de_Bcapshunt, 'Bcapshunt',
-                                 self.NotbkBcapshunt_Linha, self.NotbkBcapshunt_Linha_dic, self.tabela_Bcapshunt)
-        elif Aba == 9:  # Aba do Banco de Capacitores série
-            self.adicionar_linha(self.Linhas_Removidas_Bcapserie, self.Num_de_Bcapserie, 'Bcapserie',
-                                 self.NotbkBcapserie_Linha, self.NotbkBcapserie_Linha_dic, self.tabela_Bcapserie)
-        elif Aba == 10:  # Aba do ECE
-            self.adicionar_linha(self.Linhas_Removidas_Ece, self.Num_de_Ece, 'Ece',
-                                 self.NotbkEce_Linha, self.NotbkEce_Linha_dic, self.tabela_Ece)
-        elif Aba == 11:  # Aba do Sistema de Regulação
-            self.adicionar_linha(self.Linhas_Removidas_Sistreg, self.Num_de_Sistreg, 'Sistreg',
-                                 self.NotbkSistreg_Linha, self.NotbkSistreg_Linha_dic, self.tabela_Sistreg)
-        elif Aba == 12:  # Aba de Preparação para Reenergização
-            self.adicionar_linha(self.Linhas_Removidas_Prepreen, self.Num_de_Prepreen, 'Prepreen',
-                                 self.NotbkPrepreen_Linha, self.NotbkPrepreen_Linha_dic, self.tabela_Prepreen)
-        elif Aba == 13:  # Aba do Compensador Síncrono
-            self.adicionar_linha(self.Linhas_Removidas_Compsinc, self.Num_de_Compsinc, 'Compsinc',
-                                 self.NotbkCompsinc_Linha, self.NotbkCompsinc_Linha_dic, self.tabela_Compsinc)
+        Nome_Aba = self.dicionario_nomes_objetos[Aba][1].split('_')[0] #Pega o nome do evento no dicionario de nomes
+        if Aba <14:
+            self.adicionar_linha(self.dicionario_geral_linhas_removidas[Nome_Aba],
+                                 self.dicionario_gera_num_de_linhas_ativas[Nome_Aba],
+                                 Nome_Aba,
+                                 self.dicionario_nomes_objetos[Aba],
+                                 self.dicionario_geral_objetos_dinamicos[Nome_Aba],
+                                 self.dicionario_geral_tabelas[Nome_Aba])
 
     # Ações executadas quando o botão excluir for clicado
     def on_button_Excluir_clicked(self, button):
 
         Aba = self.notebook.get_current_page()  # captura a aba ativa
-
-        if Aba == 0:  # Aba da LT
-            self.exclui_linha(self.Linhas_Removidas_LT, self.Num_de_LT, self.NotbkLT_Linha, self.NotbkLT_Linha_dic)
-        elif Aba == 1:  # Aba do Trafo
-            self.exclui_linha(self.Linhas_Removidas_Trafo, self.Num_de_Trafo, self.NotbkTrafo_Linha,
-                              self.NotbkTrafo_Linha_dic)
-        elif Aba == 2:  # Aba do Vão de Transferência
-            self.exclui_linha(self.Linhas_Removidas_VaoTrans, self.Num_de_VaoTrans,
-                              self.NotbkVaoTrans_Linha, self.NotbkVaoTrans_Linha_dic)
-        elif Aba == 3:  # Aba do Painel Sage e Bastidor de Rede
-            self.exclui_linha(self.Linhas_Removidas_Paisage, self.Num_de_Paisage,
-                              self.NotbkPaisage_Linha, self.NotbkPaisage_Linha_dic)
-        elif Aba == 4:  # Aba do Reator
-            self.exclui_linha(self.Linhas_Removidas_Reator, self.Num_de_Reator,
-                              self.NotbkReator_Linha, self.NotbkReator_Linha_dic)
-        elif Aba == 5:  # Aba do Acesso Segregado
-            self.exclui_linha(self.Linhas_Removidas_Acesso, self.Num_de_Acesso,
-                              self.NotbkAcesso_Linha, self.NotbkAcesso_Linha_dic)
-        elif Aba == 6:  # Aba do Trafo Terra
-            self.exclui_linha(self.Linhas_Removidas_Tterra, self.Num_de_Tterra,
-                              self.NotbkTterra_Linha, self.NotbkTterra_Linha_dic)
-        elif Aba == 7:  # Aba de Proteção de Barra
-            self.exclui_linha(self.Linhas_Removidas_Protbarra, self.Num_de_Protbarra,
-                              self.NotbkProtbarra_Linha, self.NotbkProtbarra_Linha_dic)
-        elif Aba == 8:  # Aba do Banco de Capacitores shunt
-            self.exclui_linha(self.Linhas_Removidas_Bcapshunt, self.Num_de_Bcapshunt,
-                              self.NotbkBcapshunt_Linha, self.NotbkBcapshunt_Linha_dic)
-        elif Aba == 9:  # Aba do Banco de Capacitores série
-            self.exclui_linha(self.Linhas_Removidas_Bcapserie, self.Num_de_Bcapserie,
-                              self.NotbkBcapserie_Linha, self.NotbkBcapserie_Linha_dic)
-
-        elif Aba == 10:  # Aba do ECE
-            self.exclui_linha(self.Linhas_Removidas_Ece, self.Num_de_Ece,
-                              self.NotbkEce_Linha, self.NotbkEce_Linha_dic)
-
-        elif Aba == 11:  # Aba do Sistema de Regulação
-            self.exclui_linha(self.Linhas_Removidas_Sistreg, self.Num_de_Sistreg,
-                              self.NotbkSistreg_Linha, self.NotbkSistreg_Linha_dic)
-
-        elif Aba == 12:  # Aba de Preparação para Reenergização
-            self.exclui_linha(self.Linhas_Removidas_Prepreen, self.Num_de_Prepreen,
-                              self.NotbkPrepreen_Linha, self.NotbkPrepreen_Linha_dic)
-        elif Aba == 13:  # Aba do Compensador Síncrono
-            self.exclui_linha(self.Linhas_Removidas_Compsinc, self.Num_de_Compsinc,
-                              self.NotbkCompsinc_Linha, self.NotbkCompsinc_Linha_dic)
+        Nome_Aba = self.dicionario_nomes_objetos[Aba][1].split('_')[0] #Pega o nome do evento no dicionario de nomes
+        if Aba <14:
+            self.exclui_linha(self.dicionario_geral_linhas_removidas[Nome_Aba],
+                                 self.dicionario_gera_num_de_linhas_ativas[Nome_Aba],
+                                 self.dicionario_nomes_objetos[Aba],
+                                 self.dicionario_geral_objetos_dinamicos[Nome_Aba],Nome_Aba)
 
     # Ações executadas quando o botão duplicar for clicado
     def on_button_duplicar_clicked(self, button):
 
         Aba = self.notebook.get_current_page()  # captura a aba ativa
-
-        if Aba == 0:  # Aba da LT
-            self.prepara_para_duplicar(self.Linhas_Removidas_LT, self.Num_de_LT, 'LT', self.NotbkLT_Linha,
-                                       self.NotbkLT_Linha_dic, self.tabela_LT)
-        elif Aba == 1:  # Aba do Trafo
-            self.prepara_para_duplicar(self.Linhas_Removidas_Trafo, self.Num_de_Trafo, 'Trafo', self.NotbkTrafo_Linha,
-                                       self.NotbkTrafo_Linha_dic, self.tabela_Trafo)
-        elif Aba == 2:  # Aba do Vão de Transferência
-            self.prepara_para_duplicar(self.Linhas_Removidas_VaoTrans, self.Num_de_VaoTrans, 'VaoTrans',
-                                       self.NotbkVaoTrans_Linha, self.NotbkVaoTrans_Linha_dic, self.tabela_VaoTrans)
-        elif Aba == 3:  # Aba do Painel Sage e Bastidor de Rede
-            self.prepara_para_duplicar(self.Linhas_Removidas_Paisage, self.Num_de_Paisage, 'Paisage',
-                                       self.NotbkPaisage_Linha, self.NotbkPaisage_Linha_dic, self.tabela_Paisage)
-        elif Aba == 4:  # Aba do Reator
-            self.prepara_para_duplicar(self.Linhas_Removidas_Reator, self.Num_de_Reator, 'Reator',
-                                       self.NotbkReator_Linha, self.NotbkReator_Linha_dic, self.tabela_Reator)
-        elif Aba == 5:  # Aba do Acesso Segregado
-            self.prepara_para_duplicar(self.Linhas_Removidas_Acesso, self.Num_de_Acesso, 'Acesso',
-                                       self.NotbkAcesso_Linha, self.NotbkAcesso_Linha_dic, self.tabela_Acesso)
-        elif Aba == 6:  # Aba do Trafo Terra
-            self.prepara_para_duplicar(self.Linhas_Removidas_Tterra, self.Num_de_Tterra, 'Tterra',
-                                       self.NotbkTterra_Linha, self.NotbkTterra_Linha_dic, self.tabela_Tterra)
-        elif Aba == 7:  # Aba de Proteção de Barra
-            self.prepara_para_duplicar(self.Linhas_Removidas_Protbarra, self.Num_de_Protbarra, 'Protbarra',
-                                       self.NotbkProtbarra_Linha, self.NotbkProtbarra_Linha_dic, self.tabela_Protbarra)
-        elif Aba == 8:  # Aba do Banco de Capacitores shunt
-            self.prepara_para_duplicar(self.Linhas_Removidas_Bcapshunt, self.Num_de_Bcapshunt, 'Bcapshunt',
-                                       self.NotbkBcapshunt_Linha, self.NotbkBcapshunt_Linha_dic, self.tabela_Bcapshunt)
-        elif Aba == 9:  # Aba do Banco de Capacitores série
-            self.prepara_para_duplicar(self.Linhas_Removidas_Bcapserie, self.Num_de_Bcapserie, 'Bcapserie',
-                                       self.NotbkBcapserie_Linha, self.NotbkBcapserie_Linha_dic, self.tabela_Bcapserie)
-        elif Aba == 10:  # Aba do ECE
-            self.prepara_para_duplicar(self.Linhas_Removidas_Ece, self.Num_de_Ece, 'Ece',
-                                       self.NotbkEce_Linha, self.NotbkEce_Linha_dic, self.tabela_Ece)
-        elif Aba == 11:  # Aba do Sistema de Regulação
-            self.prepara_para_duplicar(self.Linhas_Removidas_Sistreg, self.Num_de_Sistreg, 'Sistreg',
-                                       self.NotbkSistreg_Linha, self.NotbkSistreg_Linha_dic, self.tabela_Sistreg)
-        elif Aba == 12:  # Aba de Preparação para Reenergização
-            self.prepara_para_duplicar(self.Linhas_Removidas_Prepreen, self.Num_de_Prepreen, 'Prepreen',
-                                       self.NotbkPrepreen_Linha, self.NotbkPrepreen_Linha_dic, self.tabela_Prepreen)
-        elif Aba == 13:  # Aba do Compensador Síncrono
-            self.prepara_para_duplicar(self.Linhas_Removidas_Compsinc, self.Num_de_Compsinc, 'Compsinc',
-                                       self.NotbkCompsinc_Linha, self.NotbkCompsinc_Linha_dic, self.tabela_Compsinc)
+        Nome_Aba = self.dicionario_nomes_objetos[Aba][1].split('_')[0] #Pega o nome do evento no dicionario de nomes
+        if Aba <14:
+            self.prepara_para_duplicar(self.dicionario_geral_linhas_removidas[Nome_Aba],
+                                 self.dicionario_gera_num_de_linhas_ativas[Nome_Aba],
+                                 Nome_Aba,
+                                 self.dicionario_nomes_objetos[Aba],
+                                 self.dicionario_geral_objetos_dinamicos[Nome_Aba],
+                                 self.dicionario_geral_tabelas[Nome_Aba])
 
     # Ações executadas quando o botão limpar for clicado
 
     def on_button_limpar_clicked(self, button):
 
         Aba = self.notebook.get_current_page()  # captura a aba ativa
-
-        if Aba == 0:  # Aba da LT
-            self.limpar_linha(self.Num_de_LT, self.NotbkLT_Linha, self.NotbkLT_Linha_dic)
-
-        elif Aba == 1:  # Aba do Trafo
-            self.limpar_linha(self.Num_de_Trafo, self.NotbkTrafo_Linha, self.NotbkTrafo_Linha_dic)
-
-        elif Aba == 2:  # Aba do Vão de Transferência
-            self.limpar_linha(self.Num_de_VaoTrans, self.NotbkVaoTrans_Linha, self.NotbkVaoTrans_Linha_dic)
-
-        elif Aba == 3:  # Aba do Painel Sage e Bastidor de Rede
-            self.limpar_linha(self.Num_de_Paisage, self.NotbkPaisage_Linha, self.NotbkPaisage_Linha_dic)
-
-        elif Aba == 4:  # Aba do Reator
-            self.limpar_linha(self.Num_de_Reator, self.NotbkReator_Linha, self.NotbkReator_Linha_dic)
-
-        elif Aba == 5:  # Aba do Acesso Segregado
-            self.limpar_linha(self.Num_de_Acesso, self.NotbkAcesso_Linha, self.NotbkAcesso_Linha_dic)
-
-        elif Aba == 6:  # Aba do Trafo Terra
-            self.limpar_linha(self.Num_de_Tterra, self.NotbkTterra_Linha, self.NotbkTterra_Linha_dic)
-
-        elif Aba == 7:  # Aba de Proteção de Barra
-            self.limpar_linha(self.Num_de_Protbarra, self.NotbkProtbarra_Linha, self.NotbkProtbarra_Linha_dic)
-
-        elif Aba == 8:  # Aba do Banco de Capacitores shunt
-            self.limpar_linha(self.Num_de_Bcapshunt, self.NotbkBcapshunt_Linha, self.NotbkBcapshunt_Linha_dic)
-
-        elif Aba == 9:  # Aba do Banco de Capacitores série
-            self.limpar_linha(self.Num_de_Bcapserie, self.NotbkBcapserie_Linha, self.NotbkBcapserie_Linha_dic)
-        elif Aba == 10:  # Aba do ECE
-            self.limpar_linha(self.Num_de_Ece, self.NotbkEce_Linha, self.NotbkEce_Linha_dic)
-        elif Aba == 11:  # Aba do Sistema de Regulação
-            self.limpar_linha(self.Num_de_Sistreg, self.NotbkSistreg_Linha, self.NotbkSistreg_Linha_dic)
-        elif Aba == 12:  # Aba de Preparação para Reenergização
-            self.limpar_linha(self.Num_de_Prepreen, self.NotbkPrepreen_Linha, self.NotbkPrepreen_Linha_dic)
-        elif Aba == 13:  # Aba do Compensador Síncrono
-            self.limpar_linha(self.Num_de_Compsinc, self.NotbkCompsinc_Linha, self.NotbkCompsinc_Linha_dic)
-
+        Nome_Aba = self.dicionario_nomes_objetos[Aba][1].split('_')[0] #Pega o nome do evento no dicionario de nomes
+        if Aba <14:
+            self.limpar_linha(self.dicionario_gera_num_de_linhas_ativas[Nome_Aba],
+                                 self.dicionario_nomes_objetos[Aba],
+                                 self.dicionario_geral_objetos_dinamicos[Nome_Aba])
     # Ações executadas quando o botão selecionar todas for clicado
 
     def on_selecionar_todas_clicked(self, button):
         Aba = self.notebook.get_current_page()  # captura a aba ativa
+        Nome_Aba = self.dicionario_nomes_objetos[Aba][1].split('_')[0] #Pega o nome do evento no dicionario de nomes
+        if Aba <14:
+            self.selecionar_todas(self.dicionario_gera_num_de_linhas_ativas[Nome_Aba],
+                                 self.dicionario_nomes_objetos[Aba],
+                                 self.dicionario_geral_objetos_dinamicos[Nome_Aba])
 
-        if Aba == 0:  # Aba da LT
-            self.selecionar_todas(self.Num_de_LT, self.NotbkLT_Linha, self.NotbkLT_Linha_dic)
-
-        elif Aba == 1:  # Aba do Trafo
-            self.selecionar_todas(self.Num_de_Trafo, self.NotbkTrafo_Linha, self.NotbkTrafo_Linha_dic)
-
-        elif Aba == 2:  # Aba do Vão de Transferência
-            self.selecionar_todas(self.Num_de_VaoTrans, self.NotbkVaoTrans_Linha, self.NotbkVaoTrans_Linha_dic)
-
-        elif Aba == 3:  # Aba do Painel Sage e Bastidor de Rede
-            self.selecionar_todas(self.Num_de_Paisage, self.NotbkPaisage_Linha, self.NotbkPaisage_Linha_dic)
-
-        elif Aba == 4:  # Aba do Reator
-            self.selecionar_todas(self.Num_de_Reator, self.NotbkReator_Linha, self.NotbkReator_Linha_dic)
-
-        elif Aba == 5:  # Aba do Acesso Segregado
-            self.selecionar_todas(self.Num_de_Acesso, self.NotbkAcesso_Linha, self.NotbkAcesso_Linha_dic)
-
-        elif Aba == 6:  # Aba do Trafo Terra
-            self.selecionar_todas(self.Num_de_Tterra, self.NotbkTterra_Linha, self.NotbkTterra_Linha_dic)
-
-        elif Aba == 7:  # Aba de Proteção de Barra
-            self.selecionar_todas(self.Num_de_Protbarra, self.NotbkProtbarra_Linha, self.NotbkProtbarra_Linha_dic)
-
-        elif Aba == 8:  # Aba do Banco de Capacitores shunt
-            self.selecionar_todas(self.Num_de_Bcapshunt, self.NotbkBcapshunt_Linha, self.NotbkBcapshunt_Linha_dic)
-
-        elif Aba == 9:  # Aba do Banco de Capacitores série
-            self.selecionar_todas(self.Num_de_Bcapserie, self.NotbkBcapserie_Linha, self.NotbkBcapserie_Linha_dic)
-        elif Aba == 10:  # Aba do ECE
-            self.selecionar_todas(self.Num_de_Ece, self.NotbkEce_Linha, self.NotbkEce_Linha_dic)
-        elif Aba == 11:  # Aba do Sistema de Regulação
-            self.selecionar_todas(self.Num_de_Sistreg, self.NotbkSistreg_Linha, self.NotbkSistreg_Linha_dic)
-        elif Aba == 12:  # Aba de Preparação para Reenergização
-            self.selecionar_todas(self.Num_de_Prepreen, self.NotbkPrepreen_Linha, self.NotbkPrepreen_Linha_dic)
-        elif Aba == 13:  # Aba do Compensador Síncrono
-            self.selecionar_todas(self.Num_de_Compsinc, self.NotbkCompsinc_Linha, self.NotbkCompsinc_Linha_dic)
+    # Ações executadas quando os botões de novo forem clicados
+    def on_arqconf_novo_activate(self, button):
+        self.restaurar_tela()
+        self.arqconf_novo = True
+        self.notebook.set_current_page(0)
 
     # Função que capta os dados dos eventos e joga dentro do elemento 'evento' do arquivo xml
     def recolhe_dados(self, Numero_linhas_ativas, array_nomes_objetos, dicionario_objetos, eventos):
         for linha in Numero_linhas_ativas:  # Varre todas as linhas para achar os checkboxes selecionados
             try:  # Caso para os objetos que foram criados no botão adicionar (dinamicamente)
-                objeto = dicionario_objetos[array_nomes_objetos[1] + str(linha)]  # Resgatando o objeto checkbutton da linha
+                objeto = dicionario_objetos[array_nomes_objetos[1] + str(linha)]  # Resgatando o objeto que identifica evento (código ou painel)
                 if objeto.get_name().__contains__('entry'):
                     if objeto.get_text() == '':
-                        pass
+                        continue
                     else:
                         evento = SubElement(eventos, array_nomes_objetos[1].split('_')[0].upper())
                         evento.text = objeto.get_text().strip().upper()
@@ -528,10 +309,10 @@ class Manipulador(object):
                                 evento.set(array_nomes_objetos[i].split('_')[2], str(caixa.get_active()))
                 elif objeto.get_name().__contains__('combobox'):
                     if objeto.get_active() == -1:
-                        pass
+                        continue
                     else:
                         evento = SubElement(eventos, array_nomes_objetos[1].split('_')[0].upper())
-                        evento.text = objeto.get_text().strip().upper()
+                        evento.text = objeto.get_active_text().strip().upper()
                         for i in range(2, len(array_nomes_objetos)):
                             caixa = dicionario_objetos[array_nomes_objetos[i] + str(linha)]
                             if array_nomes_objetos[i].__contains__('entry'):
@@ -542,10 +323,9 @@ class Manipulador(object):
                                 evento.set(array_nomes_objetos[i].split('_')[2], str(caixa.get_active()))
             except:
                 objeto = builder.get_object(array_nomes_objetos[1] + str(linha))
-                  # Resgatando o objeto checkbutton da linha
                 if objeto.get_name().__contains__('entry'):
                     if objeto.get_text() == '':
-                        pass
+                        continue
                     else:
                         evento = SubElement(eventos, array_nomes_objetos[1].split('_')[0].upper())
                         evento.text = objeto.get_text().strip().upper()
@@ -557,15 +337,14 @@ class Manipulador(object):
                                 evento.set(array_nomes_objetos[i].split('_')[2], str(caixa.get_active_text()))
                             elif array_nomes_objetos[i].__contains__('checkbtt'):
                                 evento.set(array_nomes_objetos[i].split('_')[2], str(caixa.get_active()))
-                        if array_nomes_objetos == self.NotbkPaisage_Linha:
+                        if array_nomes_objetos == self.dicionario_nomes_objetos[3]:
                             caixa = builder.get_object('paisage_entry_rdp-central-de_1')
                             evento.set('rdp-central-de', str(caixa.get_text()))
                             caixa = builder.get_object('paisage_entry_rdp-central-ate_1')
                             evento.set('rdp-central-ate', str(caixa.get_text()))
-
                 elif objeto.get_name().__contains__('combobox'):
                     if objeto.get_active() == -1:
-                        pass
+                        continue
                     else:
                         evento = SubElement(eventos, array_nomes_objetos[1].split('_')[0].upper())
                         evento.text = objeto.get_active_text().strip().upper()
@@ -577,8 +356,6 @@ class Manipulador(object):
                                 evento.set(array_nomes_objetos[i].split('_')[2], str(caixa.get_active_text()))
                             elif array_nomes_objetos[i].__contains__('checkbtt'):
                                 evento.set(array_nomes_objetos[i].split('_')[2], str(caixa.get_active()))
-
-
         # Funções de ação gerais
 
     # Função para adicionar uma linha
@@ -612,7 +389,7 @@ class Manipulador(object):
                              Gtk.ComboBoxText(),
                              Gtk.ComboBoxText(),
                              Gtk.ComboBoxText()]
-        elif tipo_evento == 'VaoTrans':
+        elif tipo_evento == 'vaotrans':
             array_objetos = [Gtk.CheckButton(),
                              Gtk.Entry(),
                              Gtk.Entry(),
@@ -621,7 +398,7 @@ class Manipulador(object):
                              Gtk.Entry(),
                              Gtk.Entry(),
                              ]
-        elif tipo_evento == 'Paisage':
+        elif tipo_evento == 'paisage':
             array_objetos = [Gtk.CheckButton(),
                              Gtk.Entry(),
                              Gtk.ComboBoxText(),
@@ -634,7 +411,7 @@ class Manipulador(object):
                              Gtk.Entry(),
                              Gtk.Entry(),
                              Gtk.Entry()]
-        elif tipo_evento == 'Reator':
+        elif tipo_evento == 'reator':
             array_objetos = [Gtk.CheckButton(),
                              Gtk.Entry(),
                              Gtk.Entry(),
@@ -645,7 +422,7 @@ class Manipulador(object):
                              Gtk.Entry(),
                              Gtk.Entry()]
 
-        elif tipo_evento == 'Acesso':
+        elif tipo_evento == 'acesso':
             array_objetos = [Gtk.CheckButton(),
                              Gtk.Entry(),
                              Gtk.Entry(),
@@ -663,13 +440,13 @@ class Manipulador(object):
                              Gtk.Entry(),
                              Gtk.Entry(),
                              Gtk.Entry()]
-        elif tipo_evento == 'Tterra':
+        elif tipo_evento == 'tterra':
             array_objetos = [Gtk.CheckButton(),
                              Gtk.Entry(),
                              Gtk.Entry(),
                              Gtk.Entry(),
                              Gtk.Entry()]
-        elif tipo_evento == 'Protbarra':
+        elif tipo_evento == 'protbarra':
             array_objetos = [Gtk.CheckButton(),
                              Gtk.Entry(),
                              Gtk.Entry(),
@@ -677,7 +454,7 @@ class Manipulador(object):
                              Gtk.CheckButton(),
                              Gtk.Entry()]
 
-        elif tipo_evento == 'Bcapshunt':
+        elif tipo_evento == 'bcapshunt':
             array_objetos = [Gtk.CheckButton(),
                              Gtk.Entry(),
                              Gtk.Entry(),
@@ -685,27 +462,27 @@ class Manipulador(object):
                              Gtk.CheckButton(),
                              Gtk.CheckButton()]
 
-        elif tipo_evento == 'Bcapserie':
+        elif tipo_evento == 'bcapserie':
             array_objetos = [Gtk.CheckButton(),
                              Gtk.Entry(),
                              Gtk.Entry()]
 
-        elif tipo_evento == 'Ece':
+        elif tipo_evento == 'ece':
             array_objetos = [Gtk.CheckButton(),
                              Gtk.Entry(),
                              Gtk.Entry()]
 
-        elif tipo_evento == 'Sistreg':
+        elif tipo_evento == 'sistreg':
             array_objetos = [Gtk.CheckButton(),
                              Gtk.ComboBoxText(),
                              Gtk.ComboBoxText(),
                              Gtk.Entry()]
 
-        elif tipo_evento == 'Prepreen':
+        elif tipo_evento == 'prepreen':
             array_objetos = [Gtk.CheckButton(),
                              Gtk.Entry()]
 
-        elif tipo_evento == 'Compsinc':
+        elif tipo_evento == 'compsinc':
             array_objetos = [Gtk.CheckButton(),
                              Gtk.Entry(),
                              Gtk.Entry()]
@@ -718,6 +495,8 @@ class Manipulador(object):
             # Caso já tenha sido removida alguma linha, a linha a adicionar será a de índice menor dentre as removidas
             indice_a_adicionar = min(Linhas_Removidas, key=int)
             Numero_linhas_ativas.append(indice_a_adicionar)
+            if indice_a_adicionar == 1 and 0 in Numero_linhas_ativas:
+                del Numero_linhas_ativas[Numero_linhas_ativas.index(0)]
             del Linhas_Removidas[Linhas_Removidas.index(indice_a_adicionar)]
         for i in range(0, len(array_nomes_objetos)):  # For para tratar cada objeto da linha
             objeto = array_objetos[i]
@@ -766,28 +545,32 @@ class Manipulador(object):
                 if objeto.get_name().__contains__('f9'):
                     objeto.set_property('margin-start', 10)
                     objeto.set_property('margin-end', 10)
-            if tipo_evento == 'Paisage':
+            if tipo_evento == 'paisage':
                 if objeto.get_name().__contains__('sagebastidor'):
                     objeto.append_text('SAGE')
                     objeto.append_text('BASTIDOR')
-                if objeto.get_name().__contains__('nporta_fw'):
+                if objeto.get_name().__contains__('nporta-fw'):
                     objeto.set_halign(Gtk.Align.CENTER)
                     objeto.set_valign(Gtk.Align.CENTER)
-            if tipo_evento == 'Reator':
+            if tipo_evento == 'reator':
                 if objeto.get_name().__contains__('equip'):
                     objeto.append_text('Banco Monof.')
                     objeto.append_text('Trifásico')
-            if tipo_evento == 'Sistreg':
+            if tipo_evento == 'sistreg':
                 if objeto.get_name().__contains__('nome'):
                     objeto.append_text('SAGE')
                     objeto.append_text('UTR-')
                     objeto.append_text('PCPG')
                     objeto.append_text('SART')
-                if objeto.get_name().__contains__('tesao_reg'):
+                if objeto.get_name().__contains__('tensao-reg'):
                     objeto.append_text('230kV')
                     objeto.append_text('138kV')
                     objeto.append_text('69kV')
                     objeto.append_text('13,8kV')
+
+        self.dicionario_geral_objetos_dinamicos[tipo_evento] = dicionario_objetos
+        self.dicionario_gera_num_de_linhas_ativas[tipo_evento] = Numero_linhas_ativas
+        self.dicionario_geral_linhas_removidas[tipo_evento] = Linhas_Removidas
         return indice_a_adicionar
 
     # Função principal para realizar a cópia das linhas selecionadas
@@ -894,7 +677,7 @@ class Manipulador(object):
                                 objeto_selecionado.set_active(False)
 
     # Função que exclui a(s) linha(s) selecionada(s)
-    def exclui_linha(self, Linhas_Removidas, Numero_linhas_ativas, array_nomes_objetos, dicionario_objetos):
+    def exclui_linha(self, Linhas_Removidas, Numero_linhas_ativas, array_nomes_objetos, dicionario_objetos, Nome_evento):
         linhas_removidas_agora = []
         for linha in Numero_linhas_ativas:  # Varre todas as linhas para achar os checkboxes selecionados
             try:  # Caso para os objetos que foram criados no botão adicionar (dinamicamente)
@@ -913,12 +696,19 @@ class Manipulador(object):
                 check_select: Gtk.CheckButton = builder.get_object(array_nomes_objetos[0] + str(linha))
                 if check_select.get_active():
                     Linhas_Removidas.append(linha)
+                    linhas_removidas_agora.append(linha)
                     for item in array_nomes_objetos:
                         objeto = builder.get_object(item + str(1))
                         objeto.destroy()
 
         for linha_remov in linhas_removidas_agora:  # Remove as linhas removidas do array de linhas ativas
-            del Numero_linhas_ativas[Numero_linhas_ativas.index(linha_remov)]
+            if linha_remov == 1:
+                Numero_linhas_ativas[Numero_linhas_ativas.index(linha_remov)]=0
+            else:
+                del Numero_linhas_ativas[Numero_linhas_ativas.index(linha_remov)]
+        self.dicionario_geral_linhas_removidas[Nome_evento] = Linhas_Removidas
+        self.dicionario_gera_num_de_linhas_ativas[Nome_evento] = Numero_linhas_ativas
+        self.dicionario_geral_objetos_dinamicos[Nome_evento] = dicionario_objetos
 
     #Função que seleciona todas as linhas
     def selecionar_todas(self, Numero_linhas_ativas, array_nomes_objetos, dicionario_objetos):
@@ -933,19 +723,69 @@ class Manipulador(object):
                 if not check_select.get_active():
                     check_select.set_active(True)
 
-    # Funções Adicionais Auxiliares
+    # Função para retornar a tela ao estado inicial
+    def restaurar_tela(self):  # Função que retorna os objetos para o estado inicial do programa (arquivo novo)
+            for i in range(0, 14):
+                nome_evento = self.dicionario_nomes_objetos[i][1].split('_')[0]
+                array_num_linhas_ativas = self.dicionario_gera_num_de_linhas_ativas[nome_evento]
+                if len(array_num_linhas_ativas) >= 1:
+                    self.selecionar_todas(array_num_linhas_ativas, self.dicionario_nomes_objetos[i],
+                                          self.dicionario_geral_objetos_dinamicos[nome_evento])
+                    self.exclui_linha(self.dicionario_geral_linhas_removidas[nome_evento],
+                                      self.dicionario_gera_num_de_linhas_ativas[nome_evento],
+                                      self.dicionario_nomes_objetos[i],
+                                      self.dicionario_geral_objetos_dinamicos[nome_evento], nome_evento)
+                self.adicionar_linha(self.dicionario_geral_linhas_removidas[nome_evento],
+                                     self.dicionario_gera_num_de_linhas_ativas[nome_evento],
+                                     nome_evento, self.dicionario_nomes_objetos[i]
+                                     , self.dicionario_geral_objetos_dinamicos[nome_evento],
+                                     self.dicionario_geral_tabelas[nome_evento])
+            for nome in ['saux_entry_nome-painel-ua_', 'saux_combobox_tensao-ca_', 'saux_combobox_tensao-cc_',
+                         'paisage_entry_rdp-central-de_', 'paisage_entry_rdp-central-ate_']:
+                objeto = builder.get_object(nome + '1')
+                try:
+                    objeto.set_text('')
+                except:
+                    objeto.set_active(-1)
+            self.codigo_se.set_text('')
+            self.usuario.set_text('')
+            self.fornecedor.set_text('')
+            self.descricao.set_text('')
+            self.nome_arq_saida = 'Arqconf-novo'  # Nome do arquivo de saída
+            seq_arq = 0  # Sequência do número de arquivo
+            while os.path.exists(
+                    self.nome_arq_saida + '.fas'):  # Enquanto existir na pasta um arquivo com o nome definido
+                seq_arq += 1  # Adicionar um a sequência do número do arquivo
+                self.nome_arq_saida = self.nome_arq_saida.split('_')[0] + '_' + str(seq_arq)  #
+            self.nome_arq_saida = self.nome_arq_saida + '.fas'
+            self.window.set_title(self.nome_arq_saida)
+
+            # Lista elementos descendentes: atributos
+
+# Funções Adicionais Auxiliares
 
     def preenche_arranjo(self, objeto):
 
         for arranjo in self.Arranjos:
             objeto.append_text(arranjo)
-
+    # Função que retorna o documento xml em forma organizada para leitura humana
     def prettify(self, elem):
         """Return a pretty-printed XML string for the Element.
         """
         rough_string = tostring(elem, 'utf-8')
         reparsed = minidom.parseString(rough_string)
         return reparsed.toprettyxml(indent="  ")
+
+    # Função que retorna o índice do texto dentro do ComboboxText
+    def indice_pela_string(self, combobox, string):
+        for i in range(0, 10):
+            try:
+                combobox.set_active(i)
+                if str(combobox.get_active_text()).lower() == string.lower():
+                    return i
+                    break
+            except:
+                break
 
     # Função que identifica se todas as linhas já estão preenchidas (Usada na função de prapara_para_duplicar)
     def todas_linhas_preenchidas(self, linha, Numero_linhas_ativas, array_nomes_objetos, dicionario_objetos):
@@ -972,7 +812,7 @@ class Manipulador(object):
         else:
             return [preenchidas, linha_a_duplicar]
 
-    #Eventos ligados a função base SAGE para LP excel
+#Eventos ligados a função base SAGE para LP excel
 
     def on_menubar_Base_SAGE_para_LP_Excel_activate(self, menubar):
         self.dialogo_diretorio.show()
@@ -999,69 +839,241 @@ class Manipulador(object):
                 print_exc(file=stdout)
                 mensagem_erro('Erro', 'Erro inesperado ao tentar checar lista de pontos.')
 
-    #Eventos ligados ao salvamento do arquivo de configuração
+#Eventos ligados ao salvamento do arquivo de configuração
 
+    # Evento de clique do botão salvar do diálogo de salvamento
     def on_arqconf_button_salvar_clicked(self, button):
-        nome_arquivo = str(self.arqconf_salvar_dialogo.get_current_folder()+ '\\'+ self.nome_arqconf.get_text())
-        if not nome_arquivo.endswith('.fas'):
-            nome_arquivo = nome_arquivo + '.fas'
-        root = Element('Arqconf', data='{}'.format(date.today()),
-                       fornecedor=self.fornecedor.get_text(),
-                       usuario=self.usuario.get_text(),
-                       versao=self.versao)
-        eventos = SubElement(root, 'Eventos', codigo_se=str(self.codigo_se.get_text().upper()),
-                             lppadrao=str(self.Lppadrao.get_filename()).rsplit('\\',1)[1])
+        self.nome_arq_saida = str(self.arqconf_salvar_dialogo.get_current_folder() + '\\' + self.nome_arqconf.get_text())
+        if not self.nome_arq_saida.endswith('.fas'):
+            self.nome_arq_saida = self.nome_arq_saida + '.fas'
+        if os.path.exists(self.nome_arq_saida):
+           sobrescrever = pergunta_sim_nao('Aviso','O nome do arquivo especificado já existe, deseja sobrescrever?')
+           if sobrescrever:
+             self.salvar_arqconf()
+        else:
+             self.salvar_arqconf()
 
-        self.recolhe_dados(self.Num_de_LT, self.NotbkLT_Linha, self.NotbkLT_Linha_dic, eventos)
-        self.recolhe_dados(self.Num_de_Trafo, self.NotbkTrafo_Linha, self.NotbkTrafo_Linha_dic, eventos)
-        self.recolhe_dados(self.Num_de_VaoTrans, self.NotbkVaoTrans_Linha, self.NotbkVaoTrans_Linha_dic, eventos)
-        self.recolhe_dados(self.Num_de_Paisage, self.NotbkPaisage_Linha, self.NotbkPaisage_Linha_dic, eventos)
-        self.recolhe_dados(self.Num_de_Reator, self.NotbkReator_Linha, self.NotbkReator_Linha_dic, eventos)
-        self.recolhe_dados(self.Num_de_Acesso, self.NotbkAcesso_Linha, self.NotbkAcesso_Linha_dic, eventos)
-        self.recolhe_dados(self.Num_de_Tterra, self.NotbkTterra_Linha, self.NotbkTterra_Linha_dic, eventos)
-        self.recolhe_dados(self.Num_de_Protbarra, self.NotbkProtbarra_Linha, self.NotbkProtbarra_Linha_dic, eventos)
-        self.recolhe_dados(self.Num_de_Bcapshunt, self.NotbkBcapshunt_Linha, self.NotbkBcapshunt_Linha_dic, eventos)
-        self.recolhe_dados(self.Num_de_Bcapserie, self.NotbkBcapserie_Linha, self.NotbkBcapserie_Linha_dic, eventos)
-        self.recolhe_dados(self.Num_de_Ece, self.NotbkEce_Linha, self.NotbkEce_Linha_dic, eventos)
-        self.recolhe_dados(self.Num_de_Sistreg, self.NotbkSistreg_Linha, self.NotbkSistreg_Linha_dic, eventos)
-        self.recolhe_dados(self.Num_de_Prepreen, self.NotbkPrepreen_Linha, self.NotbkPrepreen_Linha_dic, eventos)
-        self.recolhe_dados(self.Num_de_Compsinc, self.NotbkCompsinc_Linha, self.NotbkCompsinc_Linha_dic, eventos)
-        self.recolhe_dados(self.Num_de_Saux, self.NotbkSaux_Linha, self.NotbkSaux_Linha_dic, eventos)
-
-
-        ElementTree(root).write(nome_arquivo, 'UTF-8')
-        self.arqconf_caminho.set_filename(nome_arquivo)
-        self.window.set_title(self.nome_arqconf.get_text())
-        self.arqconf_salvar_dialogo.hide()
-
+    #Evento de clique do botão cancelar do diálogo de salvamento
     def on_arqconf_button_cancelar_clicked(self, button):
         self.arqconf_salvar_dialogo.hide()
 
-    def on_arqconf_salvar_activate(self, button):
+    #Evento da ativação do widget ou menu de salvar como
+    def on_arqconf_salvar_como_activate(self, button):
         self.arqconf_salvar_dialogo.show()
-        self.nome_arqconf.set_text(self.nome_arq_saida.split('.')[0])
+        self.nome_arqconf.set_text('')
 
-    def on_arqconf_menubar_ferramentas_cepel2excel_activate(self, menubar):
-        mensagem_aviso('Aviso', 'você foi avisado')
+    #Função que realiza o salvamento
+    def salvar_arqconf(self):
+        root = Element('Arqconf', data='{}'.format(date.today()),
+                       fornecedor=self.fornecedor.get_text(),
+                       usuário=self.usuario.get_text(),
+                       versão=self.versao)
+        eventos = SubElement(root, 'Eventos', codigo_se=str(self.codigo_se.get_text().upper()),
+                             lppadrao=str(self.Lppadrao.get_filename()).rsplit('\\', 1)[1],
+                             descrição=str(self.descricao.get_text()))
+        for i in range(0, 14):
+            Nome_Aba = self.dicionario_nomes_objetos[i][1].split('_')[0]  # Pega o nome do evento no dicionario de nomes
+            self.recolhe_dados(self.dicionario_gera_num_de_linhas_ativas[Nome_Aba],
+                               self.dicionario_nomes_objetos[i],
+                               self.dicionario_geral_objetos_dinamicos[Nome_Aba],eventos)
+        self.recolhe_dados([1], self.dicionario_nomes_objetos[14], {}, eventos) #Recolhe dados do serviço auxilar
+        rdp_de = builder.get_object('paisage_entry_rdp-central-de_1')
+        if rdp_de.get_text() != "":
+            rdp_ate = builder.get_object('paisage_entry_rdp-central-ate_1')
+            Rdp_central = SubElement(eventos,'rdp_central', rdpde = str(rdp_de.get_text()), rdpate = str(rdp_ate.get_text()))
 
-    #Eventos ligados ao abrir arquivo de configuração
+
+        ElementTree(root).write(self.nome_arq_saida, 'UTF-8')
+        if str(self.descricao.get_text()):
+            self.window.set_title(self.nome_arqconf.get_text() + '-' + str(self.descricao.get_text()))
+        else:
+            self.window.set_title(self.nome_arqconf.get_text())
+        self.arqconf_salvar_dialogo.hide()
+        self.arqconf_novo = False
+
+    #Evento da ativação do widget ou menu de salvar
+    def on_arqconf_salvar_activate(self, button):
+        if self.arqconf_novo:
+            self.arqconf_salvar_dialogo.show()
+            self.nome_arqconf.set_text(self.nome_arq_saida.split('.')[0])
+        else:
+            self.salvar_arqconf()
+
+# Eventos ligados ao abrir o arquivo de configuração
+
     def on_arqconf_abrir_activate(self, button):
         self.arqconf_abrir_dialogo.show()
 
     def on_arqconf_button_abrir_clicked(self, button):
-        self.abrir_arquivo(self.arqconf_abrir_dialogo.get_file())
+        self.abrir_arquivo(self.arqconf_abrir_dialogo.get_filename())
         self.arqconf_abrir_dialogo.hide()
 
+    def on_arqconf_abrir_button_cancelar_clicked(self, button):
+        self.arqconf_abrir_dialogo.hide()
+
+    # Função que faz efetivamente o carregamento do arquivo
     def abrir_arquivo(self, nome_arquivo):
-        tree = ElementTree.parse(source=nome_arquivo)
-        root = tree.getroot()
-        print(root.tag)
-        print(root.atrib)
+        root = BeautifulSoup(open(nome_arquivo, 'r', encoding='utf-8'), 'html.parser')
+        self.restaurar_tela()  # Retorna a tela para o estado inicial
+        for i in range(0, 15):
+            nome_evento = self.dicionario_nomes_objetos[i][1].split('_')[0]
+            array_nomes_objetos = self.dicionario_nomes_objetos[i]
+            if nome_evento.lower() != 'saux':
+                dicionario_objetos = self.dicionario_geral_objetos_dinamicos[nome_evento]
+            else:
+                dicionario_objetos = []
+            nome_evento_tag = nome_evento.lower()  # o beautifulsoap reconhece os campos apenas em minúsculo
+            eventos = root.find_all(
+                nome_evento_tag)  # captura todos os eventos com aquele nome, ex: lt ou trafo ou saux...
+            if eventos:
+                self.notebook.set_current_page(i)  # Deixa ativa a ultima aba a ser alterada
+                for j in range(0, len(eventos)):
+                    if j < 1:
+                        for objeto in array_nomes_objetos:
+                            if objeto != array_nomes_objetos[0]:
+                                try:
+                                    if objeto == array_nomes_objetos[1]:
+                                        if 'entry' in objeto:
+                                            objeto_duplicado: Gtk.Entry = dicionario_objetos[objeto + str(j + 1)]
+                                            objeto_duplicado.set_text(str(eventos[j].string))
+                                        elif 'combobox' in objeto:
+                                            objeto_duplicado: Gtk.ComboBoxText = dicionario_objetos[
+                                                objeto + str(j + 1)]
+                                            objeto_duplicado.set_active(
+                                                self.indice_pela_string(objeto_duplicado, str(eventos[j].string)))
+                                    else:
+                                        if 'entry' in objeto:
+                                            objeto_duplicado: Gtk.Entry = dicionario_objetos[objeto + str(j + 1)]
+                                            objeto_duplicado.set_text(eventos[j][objeto.split('_')[2].lower()])
+
+                                        elif 'combobox' in objeto:
+                                            objeto_duplicado: Gtk.ComboBoxText = dicionario_objetos[
+                                                objeto + str(j + 1)]
+                                            objeto_duplicado.set_active(self.indice_pela_string(objeto_duplicado,
+                                                                                                eventos[j][
+                                                                                                    objeto.split(
+                                                                                                        '_')[
+                                                                                                        2].lower()]))
+                                        elif 'checkbtt' in objeto:
+                                            objeto_duplicado: Gtk.CheckButton = dicionario_objetos[
+                                                objeto + str(j + 1)]
+                                            if eventos[j][objeto.split('_')[2].lower()] == 'True':
+                                                objeto_duplicado.set_active(True)
+                                            else:
+                                                objeto_duplicado.set_active(False)
+                                except:
+                                    if objeto == array_nomes_objetos[1]:
+                                        if 'entry' in objeto:
+                                            objeto_duplicado: Gtk.Entry = builder.get_object(objeto + str(j + 1))
+                                            objeto_duplicado.set_text(str(eventos[j].string))
+                                        elif 'combobox' in objeto:
+                                            objeto_duplicado: Gtk.ComboBoxText = builder.get_object(
+                                                objeto + str(j + 1))
+                                            objeto_duplicado.set_active(
+                                                self.indice_pela_string(objeto_duplicado, str(eventos[j].string)))
+                                    else:
+                                        if 'entry' in objeto:
+                                            objeto_duplicado: Gtk.Entry = builder.get_object(objeto + str(j + 1))
+                                            objeto_duplicado.set_text(eventos[j][objeto.split('_')[2].lower()])
+
+                                        elif 'combobox' in objeto:
+                                            objeto_duplicado: Gtk.ComboBoxText = builder.get_object(
+                                                objeto + str(j + 1))
+                                            objeto_duplicado.set_active(self.indice_pela_string(objeto_duplicado,
+                                                                                                str(eventos[j][
+                                                                                                        objeto.split(
+                                                                                                            '_')[
+                                                                                                            2]])))
+                    else:
+                        self.adicionar_linha(self.dicionario_geral_linhas_removidas[nome_evento],
+                                             self.dicionario_gera_num_de_linhas_ativas[nome_evento],
+                                             nome_evento, array_nomes_objetos, dicionario_objetos,
+                                             self.dicionario_geral_tabelas[nome_evento])
+                        for objeto in array_nomes_objetos:
+                            if objeto != array_nomes_objetos[0]:
+                                if objeto == array_nomes_objetos[1]:
+                                    if 'entry' in objeto:
+                                        objeto_duplicado: Gtk.Entry = dicionario_objetos[objeto + str(j + 1)]
+                                        objeto_duplicado.set_text(str(eventos[j].string))
+                                    elif 'combobox' in objeto:
+                                        objeto_duplicado: Gtk.ComboBoxText = dicionario_objetos[
+                                            objeto + str(j + 1)]
+                                        objeto_duplicado.set_active(
+                                            self.indice_pela_string(objeto_duplicado, str(eventos[j].string)))
+                                else:
+                                    if 'entry' in objeto:
+                                        objeto_duplicado: Gtk.Entry = dicionario_objetos[objeto + str(j + 1)]
+                                        objeto_duplicado.set_text(eventos[j][objeto.split('_')[2].lower()])
+
+                                    elif 'combobox' in objeto:
+                                        objeto_duplicado: Gtk.ComboBoxText = dicionario_objetos[
+                                            objeto + str(j + 1)]
+                                        objeto_duplicado.set_active(self.indice_pela_string(objeto_duplicado,
+                                                                                            eventos[j][
+                                                                                                objeto.split('_')[
+                                                                                                    2].lower()]))
+                                    elif 'checkbtt' in objeto:
+                                        objeto_duplicado: Gtk.CheckButton = dicionario_objetos[
+                                            objeto + str(j + 1)]
+                                        if eventos[j][objeto.split('_')[2].lower()] == 'True':
+                                            objeto_duplicado.set_active(True)
+                                        else:
+                                            objeto_duplicado.set_active(False)
+        rdpcentral = root.rdp_central
+        if rdpcentral:
+            rdp_de = builder.get_object('paisage_entry_rdp-central-de_1')
+            rdp_ate = builder.get_object('paisage_entry_rdp-central-ate_1')
+            rdp_de.set_text(str(rdpcentral['rdpde']))
+            rdp_ate.set_text(str(rdpcentral['rdpate']))
+        self.usuario.set_text(root.arqconf['usuário'])
+        self.fornecedor.set_text(root.arqconf['fornecedor'])
+        self.codigo_se.set_text(root.eventos['codigo_se'])
+        self.descricao.set_text(root.eventos['descrição'])
+        self.nome_arqconf.set_text(nome_arquivo.split('\\')[len(nome_arquivo.split('\\')) - 1])
+        self.window.set_title(self.nome_arqconf.get_text())
+        self.arqconf_novo = False
+        self.arqconf_abrir_dialogo.hide()
+        self.nome_arq_saida = nome_arquivo
+        caminho_lp_padrao = os.getcwd() + '\\' + 'Planilhas Padrão' + '\\' + root.eventos['lppadrao']
+        if os.path.exists(caminho_lp_padrao):
+            self.Lppadrao.set_filename(os.getcwd() + '\\' + 'Planilhas Padrão' + '\\' + root.eventos['lppadrao'])
+        else:
+            mensagem_erro('Erro', 'Arquivo {} não encontrado na pasta Planilhas Padrão'.format(
+                caminho_lp_padrao.split('\\')[len(caminho_lp_padrao.split('\\')) - 1]))
+            self.Lppadrao.set_filename('')
 
     #Evento da tela principal
     def on_arqconf_menubar_arquivo_sair_activate(self, button):
         Gtk.main_quit()
 
+    def on_arqconf_menubar_ferramentas_cepel2excel_activate(self, menubar):
+        mensagem_aviso('Aviso', 'você foi avisado')
+
+    def on_janela_principal_destroy(self, window):
+        Gtk.main_quit()  # Encerra a aplicação quando fechar a janela no X vermelho
+#Sinais das funcionalidades
+
+    def on_gerarlp_clicked(self, button):
+        try:
+            arq_conf = BeautifulSoup(open(self.nome_arq_saida, 'r', encoding='utf-8'), 'html.parser') # Abrir arquivo de cofiguração
+        except:
+            aviso = 'Arquivo \"' + self.nome_arq_saida + u'\" não encontrado'
+            mensagem_erro('Erro', aviso)
+        try:
+            vers = arq_conf.arqconf['versão'].split('.')
+            vers = list(map(int, vers))  # Transformar array de string em array de inteiro
+            if vers < [2, 0, 12]:
+                mensagem_erro('Erro', 'Deve ser usado arquivo de configuração com versão igual ou maior a 2.0.12')
+            else:
+                try:
+                    processing(gerar, {'LP_Padrao': self.Lppadrao.get_filename(), 'relatorio': self.Lb,
+                                       'Arq_Conf': self.nome_arq_saida})
+
+                except:
+                    print_exc(file=stdout)
+                    mensagem_erro('Erro', 'Erro inesperado ao tentar gerar lista de pontos.')
+        except:
+            mensagem_erro('Erro', 'Arquivo indicado não corresponde a arquivo de parametrização válido')
 
 if __name__ == '__main__':
     builder.connect_signals(Manipulador())  # Conecta os sinais da interface com a classe manipuladora "manipulador"

@@ -1,33 +1,32 @@
 # -*- coding: cp860 -*-
-from tkinter.messagebox import showerror
 import re
+from FASgtkui import mensagem_erro
 from sys import stdout
 from traceback import print_exc
 
-
-try:
-    from xlrd import open_workbook
-except:
-    showerror('Erro', 'M¢dulo xlrd n„o instalado')
 try:
     from openpyxl import load_workbook,cell
 except:
-    showerror('Erro', 'M¢dulo openpyxl n„o instalado')
+    mensagem_erro('Erro', 'M¢dulo openpyxl n„o instalado')
 
 try:
     from lp_lib.func import painelLT69
 except:
-    showerror('Erro',
+    mensagem_erro('Erro',
               'Arquivo "func.pyc" deve estar no diret¢rio "lp_lib"')
+try:
+    from bs4 import BeautifulSoup
+except:
+    mensagem_erro('Erro','M¢dulo BeautifulSoup n„o instalado')
 
 dados = '''
-Vers„o do programa: 2.0.12
-Atualiza‡„o do programa: 03/11/2020
+Vers„o do programa: 2.0.13
+Atualiza‡„o do programa: 29/01/2021
 M¢dulo n£clea da funcionalidade de gerar planilha
 '''
 
 
-def gerarlp(lp_padrao, LP_Config):
+def gerarlp(lp_padrao, ArqConf):
     # ----------Declara‡„o de Vari veis----------#
     # Dicion rio que define de Planilha da LP padr„o vai ser lida
     evento_dic = {'LT': False, 'Trafo': False, 'T_Terra': False,
@@ -96,315 +95,303 @@ def gerarlp(lp_padrao, LP_Config):
 
     # ----------Ler Arquivo de configura‡„o----------#
     try:
-        arq_conf = open_workbook(LP_Config)  # Abrir arquivo de configura‡„o
+        arq_conf = BeautifulSoup(open(ArqConf, 'r', encoding='utf-8'),'html.parser')  # Abrir arquivo de cofigura‡„o
     except:
-        showerror('Erro', u'Arquivo de parametriza‡„o n„o encontrado')
+        mensagem_erro('Erro', u'Arquivo de parametriza‡„o n„o encontrado')
 
     try:
-        sheet = arq_conf.sheet_by_index(0)  # Abrir planilha "Configura‡”es" do arquivo LP_config.xls
-        Codigo_SE = sheet.cell(4, 1).value.upper()  # Ler defini‡„o do c¢digo da SE
+        Codigo_SE = arq_conf.eventos['codigo_se']    #Ler defini‡„o do c¢digo da SE
     except:
-        showerror('Erro', u'Arquivo indicado n„o corresponde a arquivo de parametriza‡„o v lido')
+        mensagem_erro('Erro', u'Arquivo indicado n„o corresponde a arquivo de parametriza‡„o v lido')
 
     index_linha = 9  # Linha 10 do LP_Config.xls, in¡cio de lista de Painel SAGE e Bastidores de Rede
-    while sheet.cell(index_linha, 0).value:  # Carregar dados Pain‚is enquanto existir c¢digo de Painel na linha Excel
 
-        # 0 - Nome do painel Ex. 4UA7A
-        conf_SD_array.append({'PNL': sheet.cell(index_linha, 0).value.upper(),
-                              # 1 - SAGE/BASTIDOR
-                              'SB': sheet.cell(index_linha, 1).value,
-                              # 2 - N£mero Inicial de Switch
-                              'DE_SW': sheet.cell(index_linha, 2).value,
-                              # 3 - N£mero Final de Switch
-                              'ATE_SW': sheet.cell(index_linha, 3).value,
-                              # 4 - N£mero de portas de Switch
-                              'POR_SW': sheet.cell(index_linha, 4).value,
-                              # 5 - Firewall (Sim/N„o)
-                              'FW': sheet.cell(index_linha, 5).value,
-                              # 6 - N£mero de portas do Firewall
-                              'POR_FW': sheet.cell(index_linha, 6).value,
-                              # 7 - RedBox (Sim/N„o)
-                              'RB': sheet.cell(index_linha, 7).value,
-                              # 8 - N£mero Inicial de RedBox
-                              'DE_RB': sheet.cell(index_linha, 8).value,
-                              # 9 - N£mero Final de RedBox
-                              'ATE_RB': sheet.cell(index_linha, 9).value,
-                              # 10 - N£mero de portas do RedBox
-                              'POR_RB': sheet.cell(index_linha, 10).value,
-                              # A que a parametriza‡„o se refere
-                              'TIPO': 'SD'})
-        index_linha += 1
+
+    Eventos =  arq_conf.find_all('paisage') #Pesquisa se tem eventos referentes ao SD
+    if Eventos:
+        for evento in Eventos:
+                               # 0 - Nome do painel Ex. 4UA7A
+            conf_SD_array.append({'PNL': str(evento.string),
+                                  # 1 - SAGE/BASTIDOR
+                                  'SB': str(evento['sagebastidor']),
+                                  # 2 - N£mero Inicial de Switch
+                                  'DE_SW': evento['sw-de'],
+                                  # 3 - N£mero Final de Switch
+                                  'ATE_SW': evento['sw-ate'],
+                                  # 4 - N£mero de portas de Switch
+                                  'POR_SW': evento['nportas-sw'],
+                                  # 5 - Firewall (Sim/N„o)
+                                  'FW': 'Sim' if str(evento['fw']) == 'True' else 'N„o',
+                                  # 6 - N£mero de portas do Firewall
+                                  'POR_FW': evento['nporta-fw'],
+                                  # 7 - RedBox (Sim/N„o)
+                                  'RB':'Sim' if str(evento['rb']) == 'True' else 'N„o',
+                                  # 8 - N£mero Inicial de RedBox
+                                  'DE_RB': evento['rb-de'],
+                                  # 9 - N£mero Final de RedBox
+                                  'ATE_RB': evento['rb-ate'],
+                                  # 10 - N£mero de portas do RedBox
+                                  'POR_RB': evento['nporta-rb'],
+                                  # A que a parametriza‡„o se refere
+                                  'TIPO': 'SD'})
         evento_dic['SD'] = True  # Define que planilha SD da LP padr„o ser  lida
 
-    index_linha = 9  # Linha 10 do LP_Config.xls, in¡cio de lista de Painel SAGE e Bastidores de Rede
-    if sheet.cell(index_linha, 12).value:  # Carregar dados RDP
-        conf_RDP = {'DE_RDP': sheet.cell(index_linha, 12).value,
-                    'ATE_RDP': sheet.cell(index_linha, 13).value or sheet.cell(index_linha, 12).value,
+    #in¡cio de lista de Painel SAGE e Bastidores de Rede
+    Eventos = arq_conf.rdp_central
+    if Eventos:
+        conf_RDP = {'DE_RDP': Eventos['rdpde'],
+                    'ATE_RDP': Eventos['rdpate'] or 1,
                     # Se n„o foi definido valor, atribuir valor do campo 1
                     'TIPO': 'RDP'}
         evento_dic['SD'] = True  # Define que planilha SD da LP padr„o ser  lida
 
-    index_linha = 18  # Linha 19 do LP_Config.xls, in¡cio de lista de LTs
-    while sheet.cell(index_linha, 0).value:  # Carregar dados da LT enquanto existir c¢digo da LT na linha Excel
-        # 0 - C¢digo operacional LT Ex. 04V1
-        conf_LT_array.append({'COD': sheet.cell(index_linha, 0).value.upper(),
-                              # Nome do painel (sem -1 ou -2) Ex. 4UA2A
-                              'PNL': sheet.cell(index_linha, 1).value.upper(),
-                              # Tem 87L (Sim ou N„o)
-                              '87L': sheet.cell(index_linha, 2).value,
-                              # Religamento
-                              '79': sheet.cell(index_linha, 3).value,
-                              # C¢digo LT Remota Ex. NTT
-                              'LTREM': sheet.cell(index_linha, 4).value.upper(),
-                              # Arranjo
-                              'ARR': sheet.cell(index_linha, 5).value,
-                              # RDP Stand Alone 
-                              'RDP': sheet.cell(index_linha, 6).value,
-                              # Bay Unit do 87B 
-                              'F9': sheet.cell(index_linha, 7).value,
-                              # RDP Stand Alone 
-                              '85PNL': sheet.cell(index_linha, 8).value,
-                              # Cƒmaras PASS.  
-                              'PASSCam': tratar_str_secc(sheet.cell(index_linha, 9).value),
-                              # Conjunto de comando das seccionadoras 
-                              'PASSSecc': tratar_str_secc(str(sheet.cell(index_linha, 10).value)),
-                              # A que a parametriza‡„o se refere
-                              'TIPO': 'LT'})
-        index_linha += 1
+    # in¡cio de lista de LTs
+    Eventos = arq_conf.find_all('lt')
+    if Eventos:
+        for evento in Eventos:
+            # Carregar dados da LT enquanto existir c¢digo da LT na linha Excel
+            # 0 - C¢digo operacional LT Ex. 04V1
+            conf_LT_array.append({'COD': str(evento.string),
+                                  # Nome do painel (sem -1 ou -2) Ex. 4UA2A
+                                  'PNL': str(evento['codpainel']),
+                                  # Tem 87L (Sim ou N„o)
+                                  '87L': 'Sim' if str(evento['87l']) == 'True' else 'N„o',
+                                  # Religamento
+                                  '79': str(evento['religamento']),
+                                  # C¢digo LT Remota Ex. NTT
+                                  'LTREM': str(evento['ltremota']),
+                                  # Arranjo
+                                  'ARR': str(evento['arranjo']),
+                                  # RDP Stand Alone
+                                  'RDP': 'Sim' if str(evento['rdp'])=='True' else 'N„o',
+                                  # Bay Unit do 87B
+                                  'F9': 'Sim' if str(evento['f9']) == 'True' else 'N„o',
+                                  # Painel Teleprot
+                                  '85PNL': 'Sim' if str(evento['painelteleprot']) == 'True' else 'N„o',
+                                  # Cƒmaras PASS.
+                                  'PASSCam': tratar_str_secc(str(evento['camarapass'])),
+                                  # Conjunto de comando das seccionadoras
+                                  'PASSSecc': tratar_str_secc(str(evento['conjuntosecc'])),
+                                  # A que a parametriza‡„o se refere
+                                  'TIPO': 'LT'})
         evento_dic['LT'] = True  # Define que planilha LT da LP padr„o ser  lida
         evento_dic['Disjuntor'] = True  # Define que planilha Disjuntor da LP padr„o ser  lida
         evento_dic['Secc'] = True  # Define que planilha Secc da LP padr„o ser  lida
-    index_linha = 37  # Linha 38 do LP_Config.xls, in¡cio de lista de Trafos
-    while sheet.cell(index_linha, 0).value:  # Carregar dados do Trafo enquanto existir c¢digo da Trafo na linha Excel
-        # 0 - C¢digodigo operacional Trafo Ex. 04T1
-        conf_Trafo_array.append({'COD': sheet.cell(index_linha, 0).value.upper(),
-                                 # 1 - Nome do painel de Alta Ex. 4UA3A
-                                 'PNLH': sheet.cell(index_linha, 1).value.upper(),
-                                 # 2 - Nome do painel de Baixa Ex. 2UA3B
-                                 'PNLX': sheet.cell(index_linha, 2).value.upper(),
-                                 # 3 - Arranjo do setor da alta do Trafo
-                                 'ARRH': sheet.cell(index_linha, 3).value,
-                                 # 4 - Arranjo do setor da baixa do Trafo
-                                 'ARRX': sheet.cell(index_linha, 4).value,
-                                 # 5 - Rela‡”es do Trafo Ex. 230/69/13,8
-                                 'REL': sheet.cell(index_linha, 5).value,
-                                 # 6 - Prote‡„o Ex. PU/PG (Prote‡„o Unit ria/Prote‡„o Gradativa)
-                                 'PUPG': sheet.cell(index_linha, 6).value,
-                                 # 7 - Equipamento Ex. Banco Monof sico
-                                 'BM': sheet.cell(index_linha, 7).value,
-                                 # RDP Stand Alone 
-                                 'RDP': sheet.cell(index_linha, 8).value,
-                                 # Bay Unit do 87B
-                                 'F9': sheet.cell(index_linha, 9).value,
-                                 # Cƒmaras PASS. Pega texto "A , B", coloca em  maipusculo, transforma em Array por v¡rgula e retira espa‡o de cada elemento 
-                                 'PASSCam': tratar_str_secc(sheet.cell(index_linha, 10).value),
-                                 # Conjunto de comando das seccionadoras 
-                                 'PASSSecc': tratar_str_secc(str(sheet.cell(index_linha, 11).value)),
-                                 # Sistema de Regula‡„o via Aplica‡„o (SAGE) (Sim/N„o)...
-                                 'REGAPLIC': sheet.cell(index_linha, 12).value,
-                                 # A que a parametriza‡„o se refere
-                                 'TIPO': 'Trafo'})
-        index_linha += 1
-        evento_dic['Trafo'] = True  # Define que planilha Trafo da LP padr„o ser  lida
+
+    #in¡cio de lista de Vao de Transferˆncia
+    Eventos = arq_conf.find_all('vaotrans')
+    if Eventos:
+        for evento in Eventos:
+            # Carregar dados Vao de Transferˆncia enquanto existir c¢digo da Vao de Transferˆncia na linha Excel
+            # 0 - C¢digo operacional BT Ex. 04D1
+            conf_BT_array.append({'COD': str(evento.string),
+                                  # 1 - Nome do painel Ex. 4UA7A
+                                  'PNL': str(evento['painel']),
+                                  # 2 - 87B no painel (Sim/N„o)
+                                  '87B': 'Sim' if str(evento['87B']) == 'True' else 'N„o',
+                                  # 3 - Arranjo
+                                  'ARR': str(evento['arranjo']),
+                                  # Cƒmaras PASS. Pega texto "A , B", coloca em  maipusculo, transforma em Array por v¡rgula e retira espa‡o de cada elemento
+                                  'PASSCam': tratar_str_secc(str(evento['camarapass'])),
+                                  # Conjunto de comando das seccionadoras
+                                  'PASSSecc': tratar_str_secc(str(evento['conjuntosecc'])),
+                                  # A que a parametriza‡„o se refere
+                                  'TIPO': 'BT'})
+        evento_dic['BARRA'] = True  # Define que planilha BARRA da LP padr„o ser  lida
         evento_dic['Disjuntor'] = True  # Define que planilha Disjuntor da LP padr„o ser  lida
         evento_dic['Secc'] = True  # Define que planilha Secc da LP padr„o ser  lida
 
-    index_linha = 49  # Linha 50 do LP_Config.xls, in¡cio de lista de Vao de Transferˆncia
-    while sheet.cell(index_linha,
-                     0).value:  # Carregar dados Vao de Transferˆncia enquanto existir c¢digo da Vao de Transferˆncia na linha Excel
-        # 0 - C¢digo operacional BT Ex. 04D1
-        conf_BT_array.append({'COD': sheet.cell(index_linha, 0).value.upper(),
-                              # 1 - Nome do painel Ex. 4UA7A
-                              'PNL': sheet.cell(index_linha, 1).value.upper(),
-                              # 2 - 87B no painel (Sim/N„o)
-                              '87B': sheet.cell(index_linha, 2).value,
-                              # 3 - Arranjo
-                              'ARR': sheet.cell(index_linha, 3).value,
-                              # Cƒmaras PASS. Pega texto "A , B", coloca em  maipusculo, transforma em Array por v¡rgula e retira espa‡o de cada elemento 
-                              'PASSCam': tratar_str_secc(sheet.cell(index_linha, 4).value),
-                              # Conjunto de comando das seccionadoras 
-                              'PASSSecc': tratar_str_secc(str(sheet.cell(index_linha, 5).value)),
-                              # A que a parametriza‡„o se refere
-                              'TIPO': 'BT'})
-        evento_dic['BARRA'] = True  # Define que planilha BARRA da LP padr„o ser  lida
-        evento_dic['Disjuntor'] = True  # Define que planilha Disjuntor da LP padr„o ser  lida
-        evento_dic['Secc'] = True  # Define que planilha Secc da LP padr„o ser  lida       
-        index_linha += 1
-
-    index_linha = 57  # Linha 58 do LP_Config.xls, in¡cio de lista de Reator
-    while sheet.cell(index_linha,
-                     0).value:  # Carregar dados Reator na linha enquanto existir c¢digo da Reator na linha Excel
-                                    # 0 - C¢digo operacional Reator Ex. 04E1
-        conf_Reator_array.append({'COD': sheet.cell(index_linha, 0).value.upper(),
-                                  # 1 - Nome do painel Ex. 4UA4A
-                                  'PNL': sheet.cell(index_linha, 1).value.upper(),
-                                  # 2 - Reator Manobr vel (Sim ou N„o)
-                                  'BRM': sheet.cell(index_linha, 2).value,
-                                  # 3 - Equipamento Ex. Banco Monof sico
-                                  'EQP': sheet.cell(index_linha, 3).value,
-                                  # RDP Stand Alone 
-                                  'RDP': sheet.cell(index_linha, 4).value,
-                                  # Bay Unit do 87B 
-                                  'F9': sheet.cell(index_linha, 5).value,
-                                  # Cƒmaras PASS. Pega texto "A , B", coloca em  maipusculo, transforma em Array por v¡rgula e retira espa‡o de cada elemento 
-                                  'PASSCam': tratar_str_secc(sheet.cell(index_linha, 6).value),
-                                  # Conjunto de comando das seccionadoras 
-                                  'PASSSecc': tratar_str_secc(str(sheet.cell(index_linha, 7).value)),
-                                  # A que a parametriza‡„o se refere
-                                  'TIPO': 'Reator'})
+# in¡cio de lista de Reator
+ # Carregar dados Reator na linha enquanto existir c¢digo da Reator na linha Excel
+    Eventos = arq_conf.find_all('reator')
+    if Eventos:
+        for evento in Eventos:
+            # 0 - C¢digo operacional Reator Ex. 04E1
+            conf_Reator_array.append({'COD': str(evento.string),
+                                      # 1 - Nome do painel Ex. 4UA4A
+                                      'PNL': str(evento['painel']),
+                                      # 2 - Reator Manobr vel (Sim ou N„o)
+                                      'BRM': 'Sim' if str(evento['manob']) == 'True' else 'N„o',
+                                      # 3 - Equipamento Ex. Banco Monof sico
+                                      'EQP': str(evento['equip']),
+                                      # RDP Stand Alone
+                                      'RDP': 'Sim' if str(evento['rdp']) == 'True' else 'N„o',
+                                      # Bay Unit do 87B
+                                      'F9': 'Sim' if str(evento['bunitf9']) == 'True' else 'N„o',
+                                      # Cƒmaras PASS. Pega texto "A , B", coloca em  maipusculo, transforma em Array por v¡rgula e retira espa‡o de cada elemento
+                                      'PASSCam': tratar_str_secc(str(evento['camarapass'])),
+                                      # Conjunto de comando das seccionadoras
+                                      'PASSSecc': tratar_str_secc(str(evento['conjuntosecc'])),
+                                      # A que a parametriza‡„o se refere
+                                      'TIPO': 'Reator'})
         evento_dic['Reator'] = True  # Define que planilha Reator da LP padr„o ser  lida
         evento_dic['Disjuntor'] = True  # Define que planilha Disjuntor da LP padr„o ser  lida
         evento_dic['Secc'] = True  # Define que planilha Secc da LP padr„o ser  lida
         index_linha += 1
-    index_linha = 57 #Linha 58 do LP_Config.xls, in¡cio da lista de V„o Segregado
-    while sheet.cell(index_linha,
-                     10).value: #Carregar dados Painel de Interface enquanto existir C¢digo do v„o na linha Excel
-                                    # 0 - Codigo Operacional do v„o
-        conf_PInterface_array.append({'COD': sheet.cell(index_linha, 10).value.upper(),
-                                    # 1 - Nome do Painel do ACESSANTE Ex: 4UA13
-                                      'PNL': sheet.cell(index_linha, 11).value.upper(),
-                                    # 2 - Se vai ser em um Painel j  existente
-                                      'PNLEXIST': sheet.cell(index_linha, 12).value,
-                                    # 3 - N£mero da UC em um painel existente
-                                     'N£mero_UC_CHESF': sheet.cell(index_linha, 13).value,
-                                    # 4 - N£mero da UC em um painel existente
-                                     'N£mero_UC_ACESSANTE': sheet.cell(index_linha, 14).value,
-                                    # 5 - Arranjo do v„o
-                                      'ARR': sheet.cell(index_linha, 15).value,
-                                    # 6 - Se tem Terminal Server
-                                      'TS': sheet.cell(index_linha, 16).value,
-                                    # 7 - N£mero do primeiro Terminal Server
-                                      'TS-DE': sheet.cell(index_linha, 17).value,
-                                    # 8 - N£mero do £ltimo Terminal Server
-                                      'TS-ATE': sheet.cell(index_linha, 18).value,
-                                    # 9 - Se Tem Redbox
-                                      'RB': sheet.cell(index_linha, 19).value,
-                                    # 10 - N£mero do primeiro Redbox
-                                      'RB-DE': sheet.cell(index_linha, 20).value,
-                                    # 11 - N£mero do £ltimo RedBox
-                                      'RB-ATE': sheet.cell(index_linha, 21).value,
-                                    #12 - Se Tem Multimedidor
-                                      'MM': sheet.cell(index_linha, 22).value,
-                                    #13 - N£mero do primeiro Multimedidor
-                                      'MM-DE': sheet.cell(index_linha, 23).value,
-                                    #14 - N£mero do £ltimo Multimedidor
-                                      'MM-ATE': sheet.cell(index_linha, 24).value,
-                                    #15 - Sigla da LT Remota ao v„o segregado
-                                      'LTREMOTA': sheet.cell(index_linha, 25).value
-                                      })
-        evento_dic['P. Interface'] = True
-        index_linha += 1
+ # in¡cio da lista de V„o Segregado
 
-    index_linha = 69  # Linha 70 do LP_Config.xls, in¡cio de lista de Trafo Terra
-    while sheet.cell(index_linha,
-                     0).value:  # Carregar dados Trafo Terra enquanto existir c¢digo da Trafo Terra na linha Excel
-        # 0 - C¢digo operacional TT Ex. 02A1
-        conf_TT_array.append({'COD': sheet.cell(index_linha, 0).value.upper(),
-                              # 1 - Nome do painel Ex. 2UA4A
-                              'PNL': sheet.cell(index_linha, 1).value.upper(),
-                              # Cƒmaras PASS. Pega texto "A , B", coloca em  maipusculo, transforma em Array por v¡rgula e retira espa‡o de cada elemento 
-                              'PASSCam': tratar_str_secc(sheet.cell(index_linha, 2).value),
-                              # Conjunto de comando das seccionadoras 
-                              'PASSSecc': tratar_str_secc(str(sheet.cell(index_linha, 3).value)),
-                              # A que a parametriza‡„o se refere
-                              'TIPO': 'TT'})
+ #Carregar dados Painel de Interface enquanto existir C¢digo do v„o na linha Excel
+    Eventos = arq_conf.find_all('acesso')
+    if Eventos:
+        for evento in Eventos:
+                                   # 0 - Codigo Operacional do v„o
+            conf_PInterface_array.append({'COD': str(evento.string),
+                                        # 1 - Nome do Painel do ACESSANTE Ex: 4UA13
+                                          'PNL': str(evento['painelacess']),
+                                        # 2 - Se vai ser em um Painel j  existente
+                                          'PNLEXIST':'Sim' if str(evento['painelexist']) == 'True' else 'N„o',
+                                        # 3 - N£mero da UC em um painel existente
+                                         'N£mero_UC_CHESF': evento['num-uc-chesf'],
+                                        # 4 - N£mero da UC em um painel existente
+                                         'N£mero_UC_ACESSANTE': evento['num-uc-acessante'],
+                                        # 5 - Arranjo do v„o
+                                          'ARR': str(evento['arranjo']),
+                                        # 6 - Se tem Terminal Server
+                                          'TS': 'Sim' if str(evento['ts']) == 'True' else 'N„o',
+                                        # 7 - N£mero do primeiro Terminal Server
+                                          'TS-DE': evento['ts-de'],
+                                        # 8 - N£mero do £ltimo Terminal Server
+                                          'TS-ATE': evento['ts-ate'],
+                                        # 9 - Se Tem Redbox
+                                          'RB': 'Sim' if str(evento['rb']) == 'True' else 'N„o',
+                                        # 10 - N£mero do primeiro Redbox
+                                          'RB-DE': evento['redbox-de'],
+                                        # 11 - N£mero do £ltimo RedBox
+                                          'RB-ATE': evento['redbox-ate'],
+                                        #12 - Se Tem Multimedidor
+                                          'MM': 'Sim' if str(evento['multimedidor']) == 'True' else 'N„o',
+                                        #13 - N£mero do primeiro Multimedidor
+                                          'MM-DE': evento['mm-de'],
+                                        #14 - N£mero do £ltimo Multimedidor
+                                          'MM-ATE': evento['mm-ate'],
+                                        #15 - Sigla da LT Remota ao v„o segregado
+                                          'LTREMOTA': str(evento['ltremota'])
+                                          })
+        evento_dic['P. Interface'] = True
+
+#  in¡cio de lista de Trafo Terra
+ # Carregar dados Trafo Terra enquanto existir c¢digo da Trafo Terra na linha Excel
+    Eventos = arq_conf.find_all('tterra')
+    if Eventos:
+        for evento in Eventos:
+            # 0 - C¢digo operacional TT Ex. 02A1
+            conf_TT_array.append({'COD': str(evento.string),
+                                  # 1 - Nome do painel Ex. 2UA4A
+                                  'PNL': str(evento['painel']),
+                                  # Cƒmaras PASS. Pega texto "A , B", coloca em  maipusculo, transforma em Array por v¡rgula e retira espa‡o de cada elemento
+                                  'PASSCam': tratar_str_secc(str(evento['camarapass'])),
+                                  # Conjunto de comando das seccionadoras
+                                  'PASSSecc': tratar_str_secc(str(evento['conjuntosecc'])),
+                                  # A que a parametriza‡„o se refere
+                                  'TIPO': 'TT'})
         evento_dic['T_Terra'] = True  # Define que planilha T_Terra da LP padr„o ser  lida
         evento_dic['Secc'] = True  # Define que planilha Secc da LP padr„o ser  lida
         index_linha += 1
 
-    index_linha = 75  # Linha 76 do LP_Config.xls, in¡cio de lista de Painel de Prote‡„o de Barras
-    while sheet.cell(index_linha,
-                     0).value:  # Carregar dados Painel de Prote‡„o de Barras enquanto existir Painel de Prote‡„o de Barras na linha Excel
-        # 0 - Nome do Painel Ex. 4UA8
-        conf_P87B_array.append({'PNL': sheet.cell(index_linha, 0).value.upper(),
-                                # 1 - N£mero de Pain‚is Ex. 2
-                                'NPNL': sheet.cell(index_linha, 1).value,
-                                # 2 - Arranjo
-                                'ARR': sheet.cell(index_linha, 2).value,
-                                # 3 - B.U. Instalada no Painel (Sim/N„o)
-                                'BU': sheet.cell(index_linha, 3).value,
-                                # 4 - V„os com B.U. Ex. 04T1/04V1/04D1
-                                'VAOS': sheet.cell(index_linha, 4).value,
-                                # A que a parametriza‡„o se refere
-                                'TIPO': '87B'})
+#  in¡cio de lista de Painel de Prote‡„o de Barras
+# Carregar dados Painel de Prote‡„o de Barras enquanto existir Painel de Prote‡„o de Barras na linha Excel
+    Eventos = arq_conf.find_all('protbarra')
+    if Eventos:
+        for evento in Eventos:
+            # 0 - Nome do Painel Ex. 4UA8
+            conf_P87B_array.append({'PNL': str(evento.string),
+                                    # 1 - N£mero de Pain‚is Ex. 2
+                                    'NPNL': evento['qtpan'],
+                                    # 2 - Arranjo
+                                    'ARR': str(evento['arranjo']),
+                                    # 3 - B.U. Instalada no Painel (Sim/N„o)
+                                    'BU': 'Sim' if str(evento['bu-no-painel']) == 'True' else 'N„o',
+                                    # 4 - V„os com B.U. Ex. 04T1/04V1/04D1
+                                    'VAOS': str(evento['vaos']),
+                                    # A que a parametriza‡„o se refere
+                                    'TIPO': '87B'})
         evento_dic['BARRA'] = True  # Define que planilha BARRA da LP padr„o ser  lida
-        index_linha += 1
 
-    index_linha = 81  # Linha 82 do LP_Config.xls, in¡cio de lista de Banco Capacitor
-    while sheet.cell(index_linha,
-                     0).value:  # Carregar dados Banco Capacitor enquanto existir Banco Capacitor na linha Excel
-        # 0 - C¢digo operacional Ex. 04H1
-        conf_BCap_array.append({'COD': sheet.cell(index_linha, 0).value.upper(),
-                                # 1 - - Nome do Painel Ex. 4UA6H
-                                'PNL': sheet.cell(index_linha, 1).value.upper(),
-                                # 2 - Arranjo
-                                'ARR': sheet.cell(index_linha, 2).value,
-                                # RDP Stand Alone 
-                                'RDP': sheet.cell(index_linha, 3).value,
-                                # Bay Unit do 87B 
-                                'F9': sheet.cell(index_linha, 4).value,
-                                # A que a parametriza‡„o se refere
-                                'TIPO': 'BCap'})
+    # in¡cio de lista de Banco Capacitor
+  # Carregar dados Banco Capacitor enquanto existir Banco Capacitor na linha Excel
+    Eventos = arq_conf.find_all('bcapshunt')
+    if Eventos:
+        for evento in Eventos:
+            # 0 - C¢digo operacional Ex. 04H1
+            conf_BCap_array.append({'COD': str(evento.string),
+                                    # 1 - - Nome do Painel Ex. 4UA6H
+                                    'PNL': str(evento['painel']),
+                                    # 2 - Arranjo
+                                    'ARR': str(evento['arranjo']),
+                                    # RDP Stand Alone
+                                    'RDP': 'Sim' if str(evento['rdp']) == 'True' else 'N„o',
+                                    # Bay Unit do 87B
+                                    'F9': 'Sim' if str(evento['f9']) == 'True' else 'N„o',
+                                    # A que a parametriza‡„o se refere
+                                    'TIPO': 'BCap'})
         evento_dic['B_CAP'] = True  # Define que planilha B_CAP da LP padr„o ser  lida
         evento_dic['Disjuntor'] = True  # Define que planilha Disjuntor da LP padr„o ser  lida
         evento_dic['Secc'] = True  # Define que planilha Secc da LP padr„o ser  lida
-        index_linha += 1
 
-    index_linha = 81  # Linha 82 do LP_Config.xls, in¡cio de lista de Banco Capacitor S‚rie
-    while sheet.cell(index_linha,
-                     5).value:  # Carregar dados Banco Capacitor enquanto existir Banco Capacitor na linha Excel
-        # 0 - C¢digo operacional Ex. 04H1
-        conf_BCS_array.append({'COD': sheet.cell(index_linha, 6).value.upper(),
-                               # 1 - - Nome do Painel Ex. 4UA6H
-                               'PNL': sheet.cell(index_linha, 7).value.upper(),
-                               # A que a parametriza‡„o se refere
-                               'TIPO': 'BCS'})
+#in¡cio de lista de Banco Capacitor S‚rie
+    # Carregar dados Banco Capacitor enquanto existir Banco Capacitor na linha Excel
+    Eventos = arq_conf.find_all('bcapserie')
+    if Eventos:
+        for evento in Eventos:
+            # 0 - C¢digo operacional Ex. 04H1
+            conf_BCS_array.append({'COD': str(evento.string),
+                                   # 1 - - Nome do Painel Ex. 4UA6H
+                                   'PNL': str(evento['painel']),
+                                   # A que a parametriza‡„o se refere
+                                   'TIPO': 'BCS'})
         evento_dic['BCS'] = True  # Define que planilha BCS da LP padr„o ser  lida
         evento_dic['Disjuntor'] = True  # Define que planilha Disjuntor da LP padr„o ser  lida
         evento_dic['Secc'] = True  # Define que planilha Secc da LP padr„o ser  lida
         index_linha += 1
 
-    index_linha = 90
-    while sheet.cell(index_linha, 0).value:  # Linha 91 do LP_Config.xls, Carregar dado do ECE
-        # 0 - C¢digo operacional Ex. 04B1
-        conf_ECE_array.append({'COD': sheet.cell(index_linha, 0).value.upper(),
-                               # 1 - Nome Painel UA Ex. 4UA7
-                               'PNL': sheet.cell(index_linha, 1).value.upper(),
-                               # A que a parametriza‡„o se refere
-                               'TIPO': 'ECE'})
+    # Carregar dado do ECE
+    Eventos = arq_conf.find_all('ece')
+    if Eventos:
+        for evento in Eventos:
+    # 0 - C¢digo operacional Ex. 04B1
+            conf_ECE_array.append({'COD': str(evento.string),
+                                   # 1 - Nome Painel UA Ex. 4UA7
+                                   'PNL': str(evento['painel']),
+                                   # A que a parametriza‡„o se refere
+                                   'TIPO': 'ECE'})
         evento_dic['ECE'] = True  # Define que planilha ECE da LP padr„o ser  lida
-        index_linha += 1
 
-    index_linha = 96
-    while sheet.cell(index_linha, 0).value:  # Linha 97 do LP_Config.xls, Carregar dado do Compensador S¡ncrono
-        # 0 - C¢digo operacional Ex. 04K1
-        conf_CS_array.append({'COD': sheet.cell(index_linha, 0).value.upper(),
-                              # 1 - Nome Painel UA Ex. 4UA7
-                              'PNL': sheet.cell(index_linha, 1).value.upper(),
-                              # A que a parametriza‡„o se refere
-                              'TIPO': 'CS'})
+
+ # , Carregar dado do Compensador S¡ncrono
+    Eventos = arq_conf.find_all('compsinc')
+    if Eventos:
+        for evento in Eventos:
+            # 0 - C¢digo operacional Ex. 04K1
+            conf_CS_array.append({'COD': str(evento.string),
+                                  # 1 - Nome Painel UA Ex. 4UA7
+                                  'PNL': str(evento['painel']),
+                                  # A que a parametriza‡„o se refere
+                                  'TIPO': 'CS'})
         evento_dic['CS'] = True  # Define que planilha CS da LP padr„o ser  lida
         index_linha += 1
 
-    index_linha = 90
-    while sheet.cell(index_linha, 7).value:  # Linha 91 do LP_Config.xls, Carregar dado de Prepara‡„o a Reenergiza‡„o
-        # 0 - C¢digo operacional Ex. UTR
-        conf_PR_array.append({'COD': sheet.cell(index_linha, 7).value.upper(),
-                              # A que a parametriza‡„o se refere
-                              'TIPO': 'PR'})
+ # Carregar dado de Prepara‡„o a Reenergiza‡„o
+    Eventos = arq_conf.find_all('prepreen')
+    if Eventos:
+        for evento in Eventos:
+            # 0 - C¢digo operacional Ex. UTR
+            conf_PR_array.append({'COD': str(evento.string),
+                                  # A que a parametriza‡„o se refere
+                                  'TIPO': 'PR'})
         evento_dic['Prep. Reen.'] = True  # Define que planilha Prep. Reen. da LP padr„o ser  lida
-        index_linha += 1
 
-    index_linha = 90
-    while sheet.cell(index_linha, 3).value:  # Linha 91 do LP_Config.xls, Carregar dado de Sistema de Regula‡„o
-        # 0 - C¢digo operacional. SAGE, UTR- ou PCPG
-        conf_SR_array.append({'COD': sheet.cell(index_linha, 3).value,
-                              # 1 - Tens„o Regula‡„o. 230kV, 138kV, 69kV ou 13,8kV
-                              'TENSAO': sheet.cell(index_linha, 4).value,
-                              # 2 - Nome Painel UA, caso exista Ex. 4UA7
-                              'PNL': sheet.cell(index_linha, 5).value.upper(),
-                              # A que a parametriza‡„o se refere
-                              'TIPO': 'SR'})
+    # Carregar dado de Sistema de Regula‡„o
+    Eventos = arq_conf.find_all('sistreg')
+    if Eventos:
+        for evento in Eventos:
+            # 0 - C¢digo operacional. SAGE, UTR- ou PCPG
+            conf_SR_array.append({'COD': str(evento.string),
+                                  # 1 - Tens„o Regula‡„o. 230kV, 138kV, 69kV ou 13,8kV
+                                  'TENSAO': str(evento['tensao-reg']),
+                                  # 2 - Nome Painel UA, caso exista Ex. 4UA7
+                                  'PNL': str(evento['painel']),
+                                  # A que a parametriza‡„o se refere
+                                  'TIPO': 'SR'})
         evento_dic['Prep. Reen.'] = True  # Define que planilha Prep. Reen. da LP padr„o ser  lida
         index_linha += 1
 
@@ -417,43 +404,44 @@ def gerarlp(lp_padrao, LP_Config):
     #        index_linha += 1
     #        evento_dic['CE'] = True
 
-    index_linha = 101
-    if sheet.cell(index_linha, 2).value:  # Carregar dados Serv. Aux. se existir nome do painel da UA
+    # Carregar dados Serv. Aux. se existir nome do painel da UA
+    Eventos = arq_conf.find_all('saux')
+    if Eventos:
         # 0 - Nome Painel UA Ex. 4UA7
-        conf_SA = {'PNL': sheet.cell(index_linha, 2).value.upper(),
+        conf_SA = {'PNL': str(Eventos.string),
                    # 1 - Tens„o CA. Ex. 220Vca
-                   'VCA': sheet.cell(index_linha + 1, 2).value,
+                   'VCA': str(Eventos['tensao-ca']),
                    # 2 - Tens„o CC. Ex. 125Vca
-                   'VCC': sheet.cell(index_linha + 2, 2).value,
+                   'VCC': str(Eventos['tensao-cc']),
                    # 3 - Nome Pain‚is Serv. Aux. Ex. PT1/PT3/PT4/PT1EA/PT1EB
-                   'PNLSA': sheet.cell(index_linha + 3, 2).value.upper(),
+                   'PNLSA': str(Eventos['nome-painel-saux']),
                    # 4 - Barras CA Ex. B1
-                   'BSCA': sheet.cell(index_linha + 4, 2).value.upper(),
+                   'BSCA': str(Eventos['barras-sup-ca']),
                    # 5 - Barras CC Ex. B1/B2
-                   'BSCC': sheet.cell(index_linha + 5, 2).value.upper(),
+                   'BSCC': str(Eventos['barras-sup-cc']),
                    # 6 - Disjuntores Motorizados CA Ex. T7/T8/G1/B2/R1/R2
-                   'DJCA': sheet.cell(index_linha + 6, 2).value.upper(),
+                   'DJCA': str(Eventos['disj-sup-ca']),
                    # 7 - Disjuntores Motorizados CC Ex. A1A/A2B/A2A/A1B
-                   'DJCC': sheet.cell(index_linha + 7, 2).value.upper(),
+                   'DJCC': str(Eventos['disj-sup-cc']),
                    # A que a parametriza‡„o se refere
                    'TIPO': 'SA'}
         evento_dic['SAs'] = True  # Define que planilha SA da LP padr„o ser  lida
 
     # Soma de arrays para gera‡„o de Secc e Disjuntores
     parametros = conf_LT_array + conf_Trafo_array + conf_BT_array + conf_Reator_array + conf_TT_array + conf_BCap_array + conf_BCS_array
-
+    print(parametros)
     # ----------Ler LP Padr„o----------#
     try:
         book = load_workbook(lp_padrao, data_only=True)  # Abrir arquivo de LP Padr„o definido no arquivo de configura‡„o
     except:
         print_exc(file=stdout)
         aviso = 'Arquivo \"' + lp_padrao + u'\" n„o encontrado'
-        showerror('Erro', aviso)
+        mensagem_erro('Erro', aviso)
     abas = book.sheetnames
-    if len(abas) < 4: showerror('Erro', u'O programa n„o reconheceu a LP Padr„o como v lida')
+    if len(abas) < 4: mensagem_erro('Erro', u'O programa n„o reconheceu a LP Padr„o como v lida')
     for plan_index in range(3, 22):  # Ler Planilhas com index 3 a 22 (quarta a vig‚sima primeira), uma a uma
         sheet = book[abas[plan_index]]  # Abrir planilhas
-        if abas[plan_index] not in evento_dic: showerror('Erro', u'O programa n„o reconheceu a LP Padr„o como v lida {}')
+        if abas[plan_index] not in evento_dic: mensagem_erro('Erro', u'O programa n„o reconheceu a LP Padr„o como v lida {}')
         if evento_dic[abas[plan_index]]:  # Verificar se no arquivo de configura‡„o foi solicitado ler planilha
             # Gerar dicion rio titulo_dic (dicion rio de t¡tulos das colunas)
             for li in range(2, 10):  # Varrer as linhas de 2 a 10
@@ -1311,6 +1299,7 @@ def gerarlp(lp_padrao, LP_Config):
                                         tag_disj = '1' + cod_disj
                                         tratar_1 = tratar.replace('1YYY', tag_disj)
                                         descricao_1 = descricao.replace('1YYY', tag_disj)
+                                        #print(parametros_vao.get('PASSCam', [None]))
                                         if parametros_vao.get('PASSCam', [None])[0] and ':Z' in tratar_1:
                                             for cam in parametros_vao['PASSCam']:
                                                 tratar_2 = tratar_1.replace(':Z', ':{}'.format(cam))

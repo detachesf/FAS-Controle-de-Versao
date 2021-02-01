@@ -4,6 +4,10 @@ from tkinter.messagebox import showerror
 from tkinter import Toplevel, ttk, E, W, CENTER, LEFT, SOLID, Label
 import threading
 from time import sleep
+import gi
+gi.require_version("Gtk", "3.0")
+from gi.repository import Gtk
+import FASgtkui
 
 try:
     from openpyxl import load_workbook,cell
@@ -155,36 +159,17 @@ def linhaInicialETitulos(arquivo, nomeAba):
 
 def processing(function, args):
 
-    def check(): # Checar momento de fechar janela
-        if not thread_f.isAlive(): window.destroy()
-        frame.after(500, check)
+    #def check(): # Checar momento de fechar janela
+    #    if not thread_f.isAlive(): janela.hide()
+    #    sleep(2)
+    #    check()
 
-    window = Toplevel()
-    window.resizable(0, 0)
-    window.overrideredirect(1)
-    window.attributes('-alpha', 0.7)
-
-    w = 150
-    h = 60
-    ws = window.winfo_screenwidth()
-    hs = window.winfo_screenheight()
-    x = (ws/2) - (w/2)
-    y = (hs/2) - (h/2)
-    window.geometry('{}x{}+{}+{}'.format(w, h, int(x), int(y)))
-
-    frame = ttk.Frame(window, height=h, width=w)
-    label = ttk.Label(frame, text = 'Processando', anchor=CENTER)
-    label.grid(row=1, column=1, pady=3, sticky=W+E)
-    progress = ttk.Progressbar(frame, orient='horizontal', mode='indeterminate', length=w-10)
-    progress.grid(row=2, column=1, pady=3, sticky=W+E)
-    progress.start(12)
-    frame.pack()
-
+    janela: Gtk.Window = FASgtkui.builder.get_object('janela_progressbar')
+    Spinner: Gtk.Spinner = FASgtkui.builder.get_object('spinner')
+    janela.show()
+    Spinner.activate()
     thread_f = threading.Thread(target=function, kwargs=args)
     thread_f.start()
-
-    frame.after(500, check)
-    frame.mainloop()
 
 class ToolTip(object):
     def __init__(self, widget):
