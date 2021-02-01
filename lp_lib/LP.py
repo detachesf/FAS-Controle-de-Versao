@@ -1,11 +1,18 @@
 # -*- coding: cp860 -*-
 from tkinter.messagebox import showerror
 import re
+from sys import stdout
+from traceback import print_exc
+
 
 try:
     from xlrd import open_workbook
 except:
     showerror('Erro', 'M¢dulo xlrd n„o instalado')
+try:
+    from openpyxl import load_workbook,cell
+except:
+    showerror('Erro', 'M¢dulo openpyxl n„o instalado')
 
 try:
     from lp_lib.func import painelLT69
@@ -81,11 +88,11 @@ def gerarlp(lp_padrao, LP_Config):
 
     # Fun‡„o para adicionar campos tratar e descri‡„o no saida_array
     def gravar_ponto(campo_tratar, campo_descricao):
-        saida_array.append([campo_tratar, sheet.cell(index_linha, titulo_dic[u'OCR (SAGE)']), campo_descricao] +
-                           [sheet.cell(index_linha, ions) for ions in
+        saida_array.append([campo_tratar, sheet.cell(row=index_linha, column=titulo_dic[u'OCR (SAGE)']), campo_descricao] +
+                           [sheet.cell(row=index_linha, column=ions) for ions in
                             range(titulo_dic[u'TIPO'], titulo_dic[u'VŽOS DIGITAIS'])] +
-                           [sheet.cell(index_linha, ions) for ions in
-                            range(titulo_dic[u'VŽOS DIGITAIS'] + 1, titulo_dic[u''])])
+                           [sheet.cell(row=index_linha, column=ions) for ions in
+                            range(titulo_dic[u'VŽOS DIGITAIS'] + 1, titulo_dic[u'NONE'])])
 
     # ----------Ler Arquivo de configura‡„o----------#
     try:
@@ -437,43 +444,51 @@ def gerarlp(lp_padrao, LP_Config):
 
     # ----------Ler LP Padr„o----------#
     try:
-        book = open_workbook(lp_padrao)  # Abrir arquivo de LP Padr„o definido no arquivo de configura‡„o
+        book = load_workbook(lp_padrao, data_only=True)  # Abrir arquivo de LP Padr„o definido no arquivo de configura‡„o
     except:
+        print_exc(file=stdout)
         aviso = 'Arquivo \"' + lp_padrao + u'\" n„o encontrado'
         showerror('Erro', aviso)
-
-    if book.nsheets < 4: showerror('Erro', u'O programa n„o reconheceu a LP Padr„o como v lida')
+    abas = book.sheetnames
+    if len(abas) < 4: showerror('Erro', u'O programa n„o reconheceu a LP Padr„o como v lida')
     for plan_index in range(3, 22):  # Ler Planilhas com index 3 a 22 (quarta a vig‚sima primeira), uma a uma
-        sheet = book.sheet_by_index(plan_index)  # Abrir planilhas
-        if sheet.name not in evento_dic: showerror('Erro', u'O programa n„o reconheceu a LP Padr„o como v lida {}')
-        if evento_dic[sheet.name]:  # Verificar se no arquivo de configura‡„o foi solicitado ler planilha
+        sheet = book[abas[plan_index]]  # Abrir planilhas
+        if abas[plan_index] not in evento_dic: showerror('Erro', u'O programa n„o reconheceu a LP Padr„o como v lida {}')
+        if evento_dic[abas[plan_index]]:  # Verificar se no arquivo de configura‡„o foi solicitado ler planilha
             # Gerar dicion rio titulo_dic (dicion rio de t¡tulos das colunas)
-            for li in range(1, 10):  # Varrer as linhas de 2 a 10
-                for i in range(sheet.ncols):  # Varrer as colunas da linha
-                    texto_coluna = sheet.cell_value(li,
-                                                    i).upper().strip()  # Pegar texto da c‚lula em mai£sculo e sem espa‡o antes e depois
+            for li in range(2, 10):  # Varrer as linhas de 2 a 10
+                for i in range(sheet.max_column):  # Varrer as colunas da linha
+                    texto_coluna = str(sheet.cell(row=li, column=i+1).value).upper().strip()
+                    #texto_coluna = sheet.cell_value(li,
+                                                 #   i).upper().strip()  # Pegar texto da c‚lula em mai£sculo e sem espa‡o antes e depois
                     if texto_coluna == '':  # Gravar posi‡„o do valor vazio (ap¢s £ltima coluna)
-                        titulo_dic[texto_coluna] = i
-                    elif texto_coluna not in titulo_dic:  # Iserir chave se n„o existir no dicion rio (garante pegar apenas primeira ocorrˆncia do t¡tulo
-                        titulo_dic[texto_coluna] = i
+                        titulo_dic[texto_coluna] = i+1
+                    elif texto_coluna not in titulo_dic or texto_coluna =='NONE':  # Iserir chave se n„o existir no dicion rio (garante pegar apenas primeira ocorrˆncia do t¡tulo
+                        titulo_dic[texto_coluna] = i+1
                 if 'ID (SAGE)' in titulo_dic: break  # Se foi passado pela linha com chave "ID (SAGE)", sair do "for" de varrer linhas
 
             # Definir linha de in¡cio da LP
             li += 1  # Seleciona linha ap¢s o t¡tulo
             while True:
-                if sheet.cell_value(li, titulo_dic[
-                    u'ID (SAGE)']):  # Verifica se a c‚lula (li,conula de t¡tulo) est  preenchida com algum valor 
+                if sheet.cell(row=li, column=titulo_dic[
+                    u'ID (SAGE)']).value:  # Verifica se a c‚lula (li,conula de t¡tulo) est  preenchida com algum valor
                     break  # Parar de procurar linha preenchida
                 else:
                     li += 1  # Selecionar linha seguinte
 
-            for index_linha in range(li, sheet.nrows):  # Ler colulas da linha definida at‚ o final da LP
-                if (sheet.cell(index_linha, titulo_dic[
+                if sheet.cell(row=li, column=titulo_dic[
+                    u'ID (SAGE)']).value:  # Verifica se a c‚lula (li,conula de t¡tulo) est  preenchida com algum valor
+                    break  # Parar de procurar linha preenchida
+                else:
+                    li += 1  # Selecionar linha seguinte
+
+            for index_linha in range(li, sheet.max_row):  # Ler colulas da linha definida at‚ o final da LP
+                if (sheet.cell(row=index_linha, column= titulo_dic[
                     u'VŽOS DIGITAIS']).value == 'X'):  # Ler apenas linhas do Excel que tenha campo "V„o Digital" marcado
                     # ----------In¡cio de tratamento de TAG (ID SAGE) e Descri‡„o----------#
-                    tratar_id = sheet.cell(index_linha, titulo_dic[u'ID (SAGE)']).value  # ID SAGE
-                    descricao = sheet.cell(index_linha, titulo_dic[u'DESCRI€ŽO']).value.strip()  # Descri‡„o
-                    observacao = sheet.cell(index_linha, titulo_dic[u'OBSERVA€ŽO']).value
+                    tratar_id = str(sheet.cell(row=index_linha, column = titulo_dic[u'ID (SAGE)']).value)  # ID SAGE
+                    descricao = str(sheet.cell(row= index_linha, column = titulo_dic[u'DESCRI€ŽO']).value).strip()  # Descri‡„o
+                    observacao = str(sheet.cell(row= index_linha, column = titulo_dic[u'OBSERVA€ŽO']).value)
 
 
                     tratar_id = tratar_id.replace('ZZZ', Codigo_SE)  # Substituir c¢digo da SE no ID SAGE
@@ -491,7 +506,7 @@ def gerarlp(lp_padrao, LP_Config):
                         tratar_IdSage.append(tratar_id)
 
                     for tratar in tratar_IdSage:  # Passar arrey tratar_IdSage com ID_SAGE
-                        if sheet.name == 'SD':
+                        if abas[plan_index] == 'SD':
                             if ':RDP' not in tratar:
                                 for parametros_SD in conf_SD_array:
                                     if tratar[-4:] == 'FDSD' or tratar[
@@ -548,7 +563,7 @@ def gerarlp(lp_padrao, LP_Config):
                                     gravar_ponto(tratar_1, descricao)
                                     k_sd += 1
 
-                        elif sheet.name == 'LT':
+                        elif abas[plan_index] == 'LT':
                             for parametros_LT in conf_LT_array:
                                 ###Condi‡”es para processar o ponto###
 
@@ -593,7 +608,9 @@ def gerarlp(lp_padrao, LP_Config):
                                 cd13 = ('#85PNL' not in observacao.upper()) or (
                                     '#85PNL' in tratar and parametros_LT['85PNL'] == 'Sim')
                                 cd14 = ('#ACESSANTE' not in observacao.upper())
-                                if cd1 * cd2 * cd3 * cd4 * cd5 * cd6 * cd7 * cd8 * cd9 * cd10 * cd11 * cd12 * cd13* cd14 :
+
+
+                                if cd1 * cd2 * cd3 * cd4 * cd5 * cd6 * cd7 * cd8 * cd9 * cd10 * cd11 * cd12 * cd13 * cd14 :
 
                                     tratar_1 = tratar.replace('0YYY', parametros_LT['COD'])
                                     descricao_0 = descricao.replace('0YYY', parametros_LT['COD'])
@@ -663,7 +680,7 @@ def gerarlp(lp_padrao, LP_Config):
                                         gravar_ponto(tratar_1, descricao_1)
                                         k_lt += 1
 
-                        elif sheet.name == 'P. Interface':
+                        elif abas[plan_index] == 'P. Interface':
                             for parametros_PINT in conf_PInterface_array:
 
                                 cd1 = ('#ACESSANTE' in observacao.upper() or ('#ACESSANTE' in observacao.upper() and '#ACESSADA' in observacao.upper()) or '#CHESF' in observacao.upper())
@@ -671,7 +688,9 @@ def gerarlp(lp_padrao, LP_Config):
                                 # N„o conste na obesrva‡„o #PAINEL ou conste #PAINEL e o PAINELINT definido como Sim
                                 cd2 = ('#PAINEL' not in observacao.upper()) or (
                                             '#PAINEL' in observacao.upper() and parametros_PINT['PNLEXIST'] == 'N„o')
-                                if cd1 * cd2:
+                                cd3 = ('Medida Inexistente para os casos de linhas e alimentadores de 69kV e 13,8kV' not in observacao or ('Medida Inexistente para os casos de linhas e alimentadores de 69kV e 13,8kV' in observacao and parametros_PINT['COD'][1] != '2'))
+
+                                if cd1 * cd2 * cd3:
 
                                     tratar_1 = tratar.replace('YYY', parametros_PINT['COD'][-3:])
                                     descricao_0 = descricao.replace('YYY',parametros_PINT['COD'][-3:])
@@ -682,7 +701,7 @@ def gerarlp(lp_padrao, LP_Config):
                                             painel = parametros_PINT['PNL'][0] + 'UA12-' + parametros_PINT['PNL'][6]
                                             tratar_2 = tratar_1.replace('{PNL}', painel)
                                             if 'UC1' in tratar_1:
-                                                if parametros_PINT['N£mero_UC_CHESF'] != "" and parametros_PINT['PNLEXIST'] =='Sim':
+                                                if parametros_PINT['N£mero_UC_CHESF'] != "" and parametros_PINT['PNLEXIST'] == 'Sim':
                                                     if int(parametros_PINT['N£mero_UC_CHESF']) != 1:
                                                         tratar_3 = tratar_2.replace('UC1','UC'+ '{:.0f}'.format(parametros_PINT['N£mero_UC_CHESF']))
                                                         if 'FPCn' in tratar_3:
@@ -708,13 +727,16 @@ def gerarlp(lp_padrao, LP_Config):
                                             else:
                                                 gravar_ponto(tratar_2, descricao_1)
                                                 k_Pint += 1
-                                        else:
+                                        if  '#ACESSANTE' in observacao.upper():
                                             tratar_2 = tratar_1.replace('{PNL}', parametros_PINT['PNL'])
                                             if 'UC1' in tratar_1:
                                                 if parametros_PINT['N£mero_UC_ACESSANTE'] != '':
                                                     tratar_3 = tratar_2.replace('UC1', 'UC' + '{:.0f}'.format(
                                                     parametros_PINT['N£mero_UC_ACESSANTE']))
                                                     if int(parametros_PINT['N£mero_UC_ACESSANTE']) != 1:
+                                                        gravar_ponto(tratar_3, descricao_1)
+                                                        k_Pint += 1
+                                                    else:
                                                         gravar_ponto(tratar_3, descricao_1)
                                                         k_Pint += 1
                                                 else:
@@ -832,7 +854,7 @@ def gerarlp(lp_padrao, LP_Config):
                                         gravar_ponto(tratar_1, descricao_1)
                                         k_Pint += 1
 
-                        elif sheet.name == 'Trafo':
+                        elif abas[plan_index] == 'Trafo':
 
                             for parametros_Trafo in conf_Trafo_array:
                                 tensoes_trafo = parametros_Trafo['REL'].split('/')  # Array com n¡vel de Tens„o
@@ -925,7 +947,7 @@ def gerarlp(lp_padrao, LP_Config):
                                         gravar_ponto(tratar_1, descricao_1)
                                         k_trafo += 1
 
-                        elif sheet.name == 'BARRA':
+                        elif abas[plan_index] == 'BARRA':
                             if conf_BT_array:  # Caso exista configura‡„o de V„o de Transferˆncia
                                 if tratar[5:8] == 'YDY':  # Caso de ponto de V„o de Transferˆncia
                                     for parametros_BT in conf_BT_array:
@@ -981,7 +1003,7 @@ def gerarlp(lp_padrao, LP_Config):
                                         elif parametros_87B['ARR'] == 'BPT':
                                             barras = [1]
 
-                                        if sheet.cell(index_linha, titulo_dic[
+                                        if sheet.cell(row=index_linha, column=titulo_dic[
                                             u'OCR (SAGE)']).value == u'OCR_PAS01':  # Pontos Anal¢gicos
                                             for i in barras:
                                                 if len(barras) == 1:
@@ -1044,7 +1066,7 @@ def gerarlp(lp_padrao, LP_Config):
                             # Tenha o tag '0XB' no ID SAGE ou seja ponto referente a Bay Unit de Prote‡„o de Barras
                             cd1 = tratar[4:7] == '0XB' or ('F9' in tratar and tratar[5:8] != 'YDY')
                             # N„o seja ponto anal¢gico (esse tipo de ponto deve ser processado apenas no V„o de Transferˆncia)
-                            cd2 = sheet.cell(index_linha, titulo_dic[u'OCR (SAGE)']).value != u'OCR_PAS01'
+                            cd2 = sheet.cell(row=index_linha, column=titulo_dic[u'OCR (SAGE)']).value != u'OCR_PAS01'
                             # Existe configura‡„o de 87B
                             cd3 = conf_P87B_array
 
@@ -1153,7 +1175,7 @@ def gerarlp(lp_padrao, LP_Config):
                                                     gravar_ponto(tratar_1, descricao_1)
                                                     k_barra += 1
 
-                        elif sheet.name == 'Reator':
+                        elif abas[plan_index] == 'Reator':
                             for parametros_Reator in conf_Reator_array:
                                 ###Condi‡”es para processar o ponto###
                                 # N„o conste obserna‡„o 'Em caso de Banco Monof cico' ou conste 'Em caso de Banco Monof cico' e "Equipamen." definido como 'Banco Monof.'
@@ -1189,7 +1211,7 @@ def gerarlp(lp_padrao, LP_Config):
                                         gravar_ponto(tratar_2, descricao_1)
                                         k_reator += 1
 
-                        elif sheet.name == 'T_Terra':
+                        elif abas[plan_index] == 'T_Terra':
                             for parametros_TT in conf_TT_array:
                                 # N„o conste obserna‡„o #PASS ou conste #PASS e "PASSSecc" n„o vazio
                                 cd1 = ('#PASS' not in observacao.upper()) or (
@@ -1210,7 +1232,7 @@ def gerarlp(lp_padrao, LP_Config):
                                             gravar_ponto(tratar_2, descricao_1)
                                             k_tt += 1
 
-                        elif sheet.name == 'Disjuntor':
+                        elif abas[plan_index] == 'Disjuntor':
                             for parametros_vao in parametros:
                                 if parametros_vao[
                                     'TIPO'] == 'Trafo':  # Em caso de Trafo pegar arranjo da baixa e da alta
@@ -1224,6 +1246,11 @@ def gerarlp(lp_padrao, LP_Config):
                                     arr = []
                                 else:
                                     arr = [parametros_vao['ARR']]
+
+                                if parametros_vao['TIPO'] =='BT':
+                                    VaoTransf = True
+                                else:
+                                    VaoTransf = False
 
                                 k_arr = True
                                 for arranjo in arr:
@@ -1239,13 +1266,17 @@ def gerarlp(lp_padrao, LP_Config):
 
                                     cd4 = ('#MONOPOLAR' not in observacao.upper() or (
                                         '#MONOPOLAR' in observacao.upper() and parametros_vao['79'] == 'MONO/TRI'))
+
                                     # Caso Tenha F9 em ID
                                     if 'F9' not in tratar:
                                         cd5 = True
                                     elif parametros_vao['COD'] == 'BCS':
                                         cd5 = False
                                     elif parametros_vao.get('F9', False):
-                                        if parametros_vao['F9'] == 'Sim': cd5 = True
+                                        if parametros_vao['F9'] == 'Sim':
+                                            cd5 = True
+                                        else:
+                                            cd5 = False
                                     else:
                                         cd5 = False
                                         # N„o se trate de ponto de Falha Sele‡„o Prote‡„o Intr¡nseca ou se trate deste ponto e seja um Trafo
@@ -1267,7 +1298,10 @@ def gerarlp(lp_padrao, LP_Config):
                                     cd11 = ('00:PBSS' not in tratar) or (
                                         '00:PBSS' in tratar and not bool(parametros_vao.get('PASSSecc', [None])[0]))
 
-                                    if cd1 * cd2 * cd3 * cd4 * cd5 * cd6 * cd7 * cd8 * cd9 * cd10 * cd11:
+                                    cd12 = ('Aplic vel a Disjuntor de transferˆncia' not in observacao or
+                                            ('Aplic vel a Disjuntor de transferˆncia' in observacao and VaoTransf))
+
+                                    if cd1 * cd2 * cd3 * cd4 * cd5 * cd6 * cd7 * cd8 * cd9 * cd10 * cd11 * cd12:
                                         if k_arr:  # Arranjo a ser processado ‚ o da posi‡„o 0 de "arr"
                                             cod_disj = parametros_vao['COD'][1:]
                                             k_arr = False
@@ -1291,7 +1325,7 @@ def gerarlp(lp_padrao, LP_Config):
                                             gravar_ponto(tratar_1, descricao_1)
                                             k_52 += 1
 
-                        elif sheet.name == 'Secc':
+                        elif abas[plan_index] == 'Secc':
                             for parametros_vao in parametros:
 
                                 if parametros_vao[
@@ -1392,7 +1426,7 @@ def gerarlp(lp_padrao, LP_Config):
                                                 gravar_ponto(tratar_1, descricao_1)
                                                 k_89 += 1
 
-                        elif sheet.name == 'B_CAP':
+                        elif abas[plan_index] == 'B_CAP':
                             for parametros_Bcap in conf_BCap_array:
                                 # N„o contem no ID 'F9' ou contem 'F9' e segunda casa do c¢digo da linha (ex. N£mero 4 de 04H1) for maior ou igual a 3 (maior ou igual a 138kV)
                                 cd1 = ('F9' not in tratar) or ('F9' in tratar and int(parametros_Bcap['COD'][1]) >= 3)
@@ -1426,7 +1460,7 @@ def gerarlp(lp_padrao, LP_Config):
                                         gravar_ponto(tratar_2, descricao_1)
                                         k_bcap += 1
 
-                        elif sheet.name == 'BCS':
+                        elif abas[plan_index] == 'BCS':
                             for parametros_BCS in conf_BCS_array:
                                 tratar_1 = tratar.replace('0XHY', parametros_BCS['COD'])
                                 '''if 'FPCn' not in tratar_1:
@@ -1451,7 +1485,7 @@ def gerarlp(lp_padrao, LP_Config):
                                     gravar_ponto(tratar_2, descricao)
                                     k_bcs += 1
 
-                        elif sheet.name == 'ECE':
+                        elif abas[plan_index] == 'ECE':
                             for parametros_ECE in conf_ECE_array:
                                 tratar_1 = tratar.replace('0XBY', parametros_ECE['COD'])
                                 '''if 'FPCn' not in tratar_1:
@@ -1476,7 +1510,7 @@ def gerarlp(lp_padrao, LP_Config):
                                     gravar_ponto(tratar_2, descricao)
                                     k_ece += 1
 
-                        elif sheet.name == 'CS':
+                        elif abas[plan_index] == 'CS':
                             for parametros_CS in conf_CS_array:
                                 tratar_1 = tratar.replace('0XKY', parametros_CS['COD'])
                                 '''if 'FPCn' not in tratar_1:
@@ -1504,7 +1538,7 @@ def gerarlp(lp_padrao, LP_Config):
                                     gravar_ponto(tratar_1, descricao)
                                     k_cs += 1
 
-                        elif sheet.name == 'Prep. Reen.':
+                        elif abas[plan_index] == 'Prep. Reen.':
                             if tratar.split(':')[1] == 'mmmmnnn':  # Sitema de Regula‡„o de Tens„o
                                 for parametros_SR in conf_SR_array:
                                     tratar_1 = tratar.replace('mmmmnnn', '%s%s' % (
@@ -1539,7 +1573,7 @@ def gerarlp(lp_padrao, LP_Config):
                                     #                                    gravar_ponto(tratar_2, descricao)
                                     #                                    k_ce+=1
 
-                        elif sheet.name == 'SAs':
+                        elif abas[plan_index] == 'SAs':
                             # Definir c¢digo Tens„o CA
                             if conf_SA['VCA'] == '220Vca':
                                 TensaoCA = '2'

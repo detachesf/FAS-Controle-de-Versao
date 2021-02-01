@@ -15,6 +15,10 @@ try:
     from xlrd import open_workbook
 except:
     showerror('Erro', 'M¢dulo xlrd n„o instalado')
+try:
+    from openpyxl import load_workbook
+except:
+    showerror('Erro', 'M¢dulo openpyxl n„o instalado')
 
 try:
     from lp_lib.Gerar_LP import gerar
@@ -308,47 +312,47 @@ class Janela:
             self.caminhoArquivoLPEditado = temp
             self.nomeArquivoLPEditado['text'] = path.basename(temp)
             try:
-                book = open_workbook(temp)  # Abrir arquivo de a ser checado
+                book = load_workbook(temp)  # Abrir arquivo de a ser checado
             except:
                 aviso = 'Arquivo \"' + temp + '\" n„o encontrado'
                 showerror('Erro', aviso)
             array_combo = []
-            for plan_index in range(book.nsheets):
-                sheet = book.sheet_by_index(plan_index)  # Abrir planilhas
-                array_combo.append(sheet.name)
-                # self.Lb.insert(END,str(plan_index)+' '+sheet.name)
+            for nome_aba in book.sheetnames:
+                array_combo.append(nome_aba)
             self.comboplan['values'] = tuple(array_combo)
             self.comboplan.current(0)
             self.botaoChecar.config(state=tkinter.NORMAL)
 
     def gerarClickButton(self):
         self.Lb.delete(0, tkinter.END)
-
         try:
             arq_conf = open_workbook(self.caminhoArquivoLP_Comfig)  # Abrir arquivo de LP_Config
         except:
+            print_exc(file=stdout)
             aviso = 'Arquivo \"' + self.caminhoArquivoLP_Comfig + u'\" n„o encontrado'
             showerror('Erro', aviso)
         try:
-            sheet = arq_conf.sheet_by_index(0)  # Abrir planilha "Configura‡”es" do arquivo LP_config.xls
+            sheet = arq_conf.sheet_by_index(0) # Abrir planilha "Configura‡”es" do arquivo LP_config.xls
             vers = re.findall('\d+\.\d+\.\d+', str(sheet.cell(110, 0)))[0].split('.')  # Ler defini‡„o do c¢digo da SE
             vers = list(map(int, vers))  # Transformar array de string em array de inteiro
             if vers < [2, 0, 13]:
                 showerror('Erro', 'Deve ser usado arquivo LP_Config.xls com vers„o igual ou maior a 2.0.13')
             else:
+
                 try:
                     processing(gerar, {'LP_Padrao': self.caminhoArquivoLP_Padrao, 'relatorio': self.Lb,
                                        'LP_Config': self.caminhoArquivoLP_Comfig})
                 except:
                     print_exc(file=stdout)
                     showerror('Erro', 'Erro inesperado ao tentar gerar lista de pontos.')
+
         except:
             showerror('Erro', 'Arquivo indicado n„o corresponde a arquivo de parametriza‡„o v lido')
 
     def checarClickButton(self):
+
         self.PlanilhaArquivoLPEditado = self.comboplan.get()
         self.Lb.delete(0, tkinter.END)
-
         try:
             arq_conf = open_workbook(self.caminhoArquivoLP_Comfig)  # Abrir arquivo de LP_Config
         except:
