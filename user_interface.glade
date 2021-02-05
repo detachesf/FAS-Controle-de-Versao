@@ -2,12 +2,6 @@
 <!-- Generated with glade 3.38.2 -->
 <interface>
   <requires lib="gtk+" version="3.24"/>
-  <object class="GtkApplicationWindow">
-    <property name="can-focus">False</property>
-    <child>
-      <placeholder/>
-    </child>
-  </object>
   <object class="GtkFileChooserDialog" id="diretorio_dialogo">
     <property name="width-request">800</property>
     <property name="can-focus">False</property>
@@ -16,8 +10,6 @@
     <property name="icon">CHESF.png</property>
     <property name="type-hint">dialog</property>
     <property name="action">select-folder</property>
-    <signal name="destroy" handler="on_diretorio_dialogo_destroy" swapped="no"/>
-    <signal name="file-activated" handler="on_diretorio_dialogo_file_activated" swapped="no"/>
     <signal name="selection-changed" handler="on_diretorio_dialogo_selection_changed" swapped="no"/>
     <child internal-child="vbox">
       <object class="GtkBox">
@@ -125,6 +117,8 @@
     <property name="filter">filefilter1</property>
     <child internal-child="vbox">
       <object class="GtkBox">
+        <property name="width-request">700</property>
+        <property name="height-request">400</property>
         <property name="can-focus">False</property>
         <property name="orientation">vertical</property>
         <property name="spacing">2</property>
@@ -182,9 +176,10 @@
     <property name="deletable">False</property>
     <property name="do-overwrite-confirmation">True</property>
     <property name="filter">filefilter1</property>
-    <signal name="confirm-overwrite" handler="on_arqconf_salvar_dialogo_confirm_overwrite" swapped="no"/>
     <child internal-child="vbox">
       <object class="GtkBox">
+        <property name="width-request">700</property>
+        <property name="height-request">400</property>
         <property name="can-focus">False</property>
         <property name="orientation">vertical</property>
         <property name="spacing">2</property>
@@ -269,21 +264,449 @@
       </object>
     </child>
   </object>
+  <object class="GtkFileFilter" id="filtro_xls">
+    <mime-types>
+      <mime-type>xlsx</mime-type>
+      <mime-type>xlsm</mime-type>
+    </mime-types>
+    <patterns>
+      <pattern>*.xlsm</pattern>
+      <pattern>*.xlsx</pattern>
+    </patterns>
+  </object>
+  <object class="GtkFileChooserDialog" id="arqlpachecar_comparar_dialog">
+    <property name="can-focus">False</property>
+    <property name="title" translatable="yes">Escolha o arquivo LP a ser Checado</property>
+    <property name="icon">CHESF.png</property>
+    <property name="type-hint">dialog</property>
+    <property name="deletable">False</property>
+    <property name="filter">filtro_xls</property>
+    <child internal-child="vbox">
+      <object class="GtkBox">
+        <property name="can-focus">False</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">2</property>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox">
+            <property name="can-focus">False</property>
+            <property name="layout-style">end</property>
+            <child>
+              <object class="GtkButton" id="arqlpachecar_button_abrir">
+                <property name="label" translatable="yes">Abrir</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <signal name="clicked" handler="on_arqlpachecar_button_abrir_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="arqlpachecar_button_fechar">
+                <property name="label" translatable="yes">Fechar</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <signal name="clicked" handler="on_arqlpachecar_button_fechar_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <placeholder/>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkFileChooserDialog" id="arqlpbase_comparar_dialog">
+    <property name="can-focus">False</property>
+    <property name="title" translatable="yes">Escolha o Arquivo LP Base</property>
+    <property name="icon">CHESF.png</property>
+    <property name="type-hint">dialog</property>
+    <property name="deletable">False</property>
+    <property name="filter">filtro_xls</property>
+    <child internal-child="vbox">
+      <object class="GtkBox">
+        <property name="can-focus">False</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">2</property>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox">
+            <property name="can-focus">False</property>
+            <property name="layout-style">end</property>
+            <child>
+              <object class="GtkButton" id="arqlpbase_button_abrir">
+                <property name="label" translatable="yes">Abrir</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <signal name="clicked" handler="on_arqlpbase_button_abrir_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="arqlpbase_button_fechar">
+                <property name="label" translatable="yes">Fechar</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <signal name="clicked" handler="on_arqlpbase_button_fechar_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <placeholder/>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkWindow" id="janela_comparar">
+    <property name="can-focus">False</property>
+    <property name="title" translatable="yes">Comparar Arquivos</property>
+    <property name="window-position">center</property>
+    <property name="icon">CHESF.png</property>
+    <property name="deletable">False</property>
+    <child>
+      <object class="GtkBox">
+        <property name="width-request">450</property>
+        <property name="height-request">250</property>
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="orientation">vertical</property>
+        <child>
+          <object class="GtkFrame">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="margin-start">10</property>
+            <property name="margin-end">11</property>
+            <property name="vexpand">True</property>
+            <property name="label-xalign">0</property>
+            <property name="shadow-type">out</property>
+            <child>
+              <object class="GtkAlignment">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="left-padding">12</property>
+                <child>
+                  <!-- n-columns=2 n-rows=1 -->
+                  <object class="GtkGrid">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="halign">center</property>
+                    <property name="valign">center</property>
+                    <child>
+                      <object class="GtkComboBoxText" id="combobox_arq_lp_base">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                      </object>
+                      <packing>
+                        <property name="left-attach">1</property>
+                        <property name="top-attach">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkFileChooserButton" id="filechooser_comparar_arquivo_lp_base">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="dialog">arqlpbase_comparar_dialog</property>
+                        <property name="title" translatable="yes">Escolha o arquivo LP Base</property>
+                      </object>
+                      <packing>
+                        <property name="left-attach">0</property>
+                        <property name="top-attach">0</property>
+                      </packing>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child type="label">
+              <object class="GtkLabel">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="label" translatable="yes"> Arquivo LP Base </property>
+                <attributes>
+                  <attribute name="font-desc" value="Sitka Text Bold 10"/>
+                </attributes>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkFrame">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="margin-start">10</property>
+            <property name="margin-end">10</property>
+            <property name="vexpand">True</property>
+            <property name="label-xalign">0</property>
+            <property name="shadow-type">out</property>
+            <child>
+              <object class="GtkAlignment">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="vexpand">True</property>
+                <property name="left-padding">12</property>
+                <child>
+                  <!-- n-columns=2 n-rows=1 -->
+                  <object class="GtkGrid">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="halign">center</property>
+                    <property name="valign">center</property>
+                    <child>
+                      <object class="GtkComboBoxText" id="combobox_arq_lp_a_checar">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                      </object>
+                      <packing>
+                        <property name="left-attach">1</property>
+                        <property name="top-attach">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkFileChooserButton" id="filechooser_comparar_lp_a_ser_checado">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="filter">filtro_xls</property>
+                        <property name="dialog">arqlpachecar_comparar_dialog</property>
+                        <property name="title" translatable="yes">Escolha o arquivo a ser checado</property>
+                      </object>
+                      <packing>
+                        <property name="left-attach">0</property>
+                        <property name="top-attach">0</property>
+                      </packing>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child type="label">
+              <object class="GtkLabel">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="label" translatable="yes"> Arquivo LP a ser Checado </property>
+                <attributes>
+                  <attribute name="font-desc" value="Sitka Text Bold 10"/>
+                </attributes>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButtonBox">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="valign">end</property>
+            <property name="margin-bottom">6</property>
+            <property name="vexpand">True</property>
+            <property name="spacing">2</property>
+            <property name="baseline-position">bottom</property>
+            <property name="layout-style">end</property>
+            <child>
+              <object class="GtkButton" id="button_compararlp">
+                <property name="label" translatable="yes">Comparar</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <signal name="clicked" handler="on_button_compararlp_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="button_fechar_compararlp">
+                <property name="label" translatable="yes">Fechar</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <signal name="clicked" handler="on_button_fechar_compararlp_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">2</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkFileChooserDialog" id="filechooser_dialog_cepel2excel">
+    <property name="width-request">700</property>
+    <property name="height-request">400</property>
+    <property name="can-focus">False</property>
+    <property name="title" translatable="yes">Escolha a Planilha CEPEL</property>
+    <property name="icon">CHESF.png</property>
+    <property name="type-hint">dialog</property>
+    <property name="deletable">False</property>
+    <property name="filter">filtro_xls</property>
+    <child internal-child="vbox">
+      <object class="GtkBox">
+        <property name="can-focus">False</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">2</property>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox">
+            <property name="can-focus">False</property>
+            <property name="layout-style">end</property>
+            <child>
+              <object class="GtkButton" id="button_cepel2excel_abrir">
+                <property name="label" translatable="yes">Abrir</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <signal name="clicked" handler="on_button_cepel2excel_abrir_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="button_cepel2excel_cancelar">
+                <property name="label" translatable="yes">Cancelar</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <signal name="clicked" handler="on_button_cepel2excel_cancelar_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <placeholder/>
+        </child>
+      </object>
+    </child>
+    <action-widgets>
+      <action-widget response="-3">button_cepel2excel_abrir</action-widget>
+      <action-widget response="-6">button_cepel2excel_cancelar</action-widget>
+    </action-widgets>
+  </object>
+  <object class="GtkImage" id="image1">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="icon-name">applications-engineering-symbolic</property>
+  </object>
+  <object class="GtkImage" id="image10">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="icon-name">edit-clear-all-symbolic</property>
+  </object>
+  <object class="GtkImage" id="image11">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="icon-name">object-select-symbolic</property>
+  </object>
+  <object class="GtkImage" id="image2">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="icon-name">folder-saved-search-symbolic</property>
+  </object>
+  <object class="GtkImage" id="image3">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="icon-name">edit-select-symbolic</property>
+  </object>
   <object class="GtkImage" id="image34">
     <property name="visible">True</property>
     <property name="can-focus">False</property>
     <property name="icon-name">list-add-symbolic</property>
+  </object>
+  <object class="GtkImage" id="image4">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="icon-name">system-file-manager-symbolic</property>
   </object>
   <object class="GtkImage" id="image5">
     <property name="visible">True</property>
     <property name="can-focus">False</property>
     <property name="icon-name">application-exit-symbolic</property>
   </object>
+  <object class="GtkImage" id="image6">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="icon-name">drive-multidisk-symbolic</property>
+  </object>
+  <object class="GtkImage" id="image7">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="icon-name">list-add-symbolic</property>
+  </object>
+  <object class="GtkImage" id="image8">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="icon-name">edit-copy-symbolic</property>
+  </object>
+  <object class="GtkImage" id="image9">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="icon-name">edit-delete-symbolic</property>
+  </object>
   <object class="GtkWindow" id="janela_principal">
     <property name="can-focus">False</property>
     <property name="title" translatable="yes">Arquivo de Configuração</property>
+    <property name="window-position">center</property>
     <property name="icon">CHESF.png</property>
-    <signal name="child-notify" handler="on_janela_principal_child_notify" swapped="no"/>
     <signal name="destroy" handler="on_janela_principal_destroy" swapped="no"/>
     <child>
       <object class="GtkBox">
@@ -379,48 +802,53 @@
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <child>
-                      <object class="GtkMenuItem" id="arqconf_menubar_editar_addlinha">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
+                      <object class="GtkImageMenuItem" id="arqconf_menubar_editar_addlinha">
                         <property name="label" translatable="yes">Adicionar Linha</property>
-                        <property name="use-underline">True</property>
-                        <signal name="activate" handler="on_button_add_linha_clicked" swapped="no"/>
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="image">image7</property>
+                        <property name="use-stock">False</property>
+                        <property name="always-show-image">True</property>
                       </object>
                     </child>
                     <child>
-                      <object class="GtkMenuItem" id="arqconf_menubar_editar_duplicar">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
+                      <object class="GtkImageMenuItem" id="arqconf_menubar_editar_duplicar">
                         <property name="label" translatable="yes">Duplicar Linha</property>
-                        <property name="use-underline">True</property>
-                        <signal name="activate" handler="on_button_duplicar_clicked" swapped="no"/>
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="image">image8</property>
+                        <property name="use-stock">False</property>
+                        <property name="always-show-image">True</property>
                       </object>
                     </child>
                     <child>
-                      <object class="GtkMenuItem" id="arqconf_menubar_editar_excluir">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
+                      <object class="GtkImageMenuItem" id="arqconf_menubar_editar_excluir">
                         <property name="label" translatable="yes">Excluir Linha</property>
-                        <property name="use-underline">True</property>
-                        <signal name="activate" handler="on_button_Excluir_clicked" swapped="no"/>
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="image">image9</property>
+                        <property name="use-stock">False</property>
+                        <property name="always-show-image">True</property>
                       </object>
                     </child>
                     <child>
-                      <object class="GtkMenuItem" id="arqconf_menubar_editar_limpar">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
+                      <object class="GtkImageMenuItem" id="arqconf_menubar_editar_limpar">
                         <property name="label" translatable="yes">Limpar Linha</property>
-                        <property name="use-underline">True</property>
-                        <signal name="activate" handler="on_button_limpar_clicked" swapped="no"/>
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="image">image10</property>
+                        <property name="use-stock">False</property>
+                        <property name="always-show-image">True</property>
                       </object>
                     </child>
                     <child>
-                      <object class="GtkMenuItem" id="arqconf_menubar_editar_selectodas">
+                      <object class="GtkImageMenuItem" id="arqconf_menubar_editar_selectodas">
+                        <property name="label" translatable="yes">Selecionar Todas as Linhas</property>
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="label" translatable="yes">Selecionar Todas as Linhas</property>
-                        <property name="use-underline">True</property>
-                        <signal name="activate" handler="on_selecionar_todas_clicked" swapped="no"/>
+                        <property name="image">image11</property>
+                        <property name="use-stock">False</property>
+                        <property name="always-show-image">True</property>
                       </object>
                     </child>
                   </object>
@@ -438,48 +866,54 @@
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <child>
-                      <object class="GtkMenuItem" id="arqconf_menubar_ferramentas_gerar">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
+                      <object class="GtkImageMenuItem" id="arqconf_menubar_ferramentas_gerar">
                         <property name="label" translatable="yes">Gerar LP</property>
-                        <property name="use-underline">True</property>
-                        <signal name="activate" handler="on_gerarlp_clicked" swapped="no"/>
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="image">image1</property>
+                        <property name="use-stock">False</property>
+                        <property name="always-show-image">True</property>
                       </object>
                     </child>
                     <child>
-                      <object class="GtkMenuItem" id="arqconf_menubar_ferramentas_checar">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
+                      <object class="GtkImageMenuItem" id="arqconf_menubar_ferramentas_checar">
                         <property name="label" translatable="yes">Checar LP</property>
-                        <property name="use-underline">True</property>
-                        <signal name="activate" handler="on_checarlp_clicked" swapped="no"/>
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="image">image2</property>
+                        <property name="use-stock">False</property>
+                        <property name="always-show-image">True</property>
                       </object>
                     </child>
                     <child>
-                      <object class="GtkMenuItem" id="arqconf_menubar_ferramentas_comparar">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
+                      <object class="GtkImageMenuItem" id="arqconf_menubar_ferramentas_comparar">
                         <property name="label" translatable="yes">Comparar Lista de Pontos</property>
-                        <property name="use-underline">True</property>
-                        <signal name="activate" handler="on_arqconf_menubar_ferramentas_comparar_activate" swapped="no"/>
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="image">image3</property>
+                        <property name="use-stock">False</property>
+                        <property name="always-show-image">True</property>
+                        <signal name="activate" handler="on_arqconf_ferramentas_comparar_activate" swapped="no"/>
                       </object>
                     </child>
                     <child>
-                      <object class="GtkMenuItem" id="arqconf_menubar_ferramentas_base2lp">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
+                      <object class="GtkImageMenuItem" id="arqconf_menubar_ferramentas_base2lp">
                         <property name="label" translatable="yes">Base SAGE para LP Excel</property>
-                        <property name="use-underline">True</property>
-                        <signal name="activate" handler="on_menubar_Base_SAGE_para_LP_Excel_activate" swapped="no"/>
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="image">image4</property>
+                        <property name="use-stock">False</property>
+                        <property name="always-show-image">True</property>
                       </object>
                     </child>
                     <child>
-                      <object class="GtkMenuItem" id="arqconf_menubar_ferramentas_cepel2excel">
+                      <object class="GtkImageMenuItem" id="arqconf_menubar_ferramentas_cepel2excel">
+                        <property name="label" translatable="yes">Planilha CEPEL para LP Excel</property>
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="label" translatable="yes">Planilha CEPEL para LP Excel</property>
-                        <property name="use-underline">True</property>
-                        <signal name="activate" handler="on_arqconf_menubar_ferramentas_cepel2excel_activate" swapped="no"/>
+                        <property name="image">image6</property>
+                        <property name="use-stock">False</property>
+                        <property name="always-show-image">True</property>
                       </object>
                     </child>
                   </object>
@@ -500,25 +934,16 @@
                       <object class="GtkMenuItem" id="arqconf_menubar_config_seleclppadrao">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="label" translatable="yes">Selecionar Arquivo LP Padrão</property>
+                        <property name="label" translatable="yes">Definir Arquivo LP Padrão</property>
                         <property name="use-underline">True</property>
                         <signal name="activate" handler="on_arqconf_menubar_config_seleclppadrao_activate" swapped="no"/>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkMenuItem" id="arqconf_menubar_config_seleclp_a_checar">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="label" translatable="yes">Selecionar Arquivo LP a ser Checado</property>
-                        <property name="use-underline">True</property>
-                        <signal name="activate" handler="on_arqconf_menubar_config_seleclp_a_checar_activate" swapped="no"/>
                       </object>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="arqconf_menubar_config_selecdir_salvamento">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="label" translatable="yes">Selecionar Diretório Padrão de Salvamento de Arquivos</property>
+                        <property name="label" translatable="yes">Definir Diretório Padrão de Salvamento de Arquivos</property>
                         <property name="use-underline">True</property>
                         <signal name="activate" handler="on_arqconf_menubar_config_selecdir_salvamento_activate" swapped="no"/>
                       </object>
@@ -751,7 +1176,7 @@
                 <property name="tooltip-text" translatable="yes">Comparar Lista de Pontos</property>
                 <property name="use-underline">True</property>
                 <property name="icon-name">edit-select-symbolic</property>
-                <signal name="clicked" handler="on_toolbar_compararlistas_clicked" swapped="no"/>
+                <signal name="clicked" handler="on_arqconf_ferramentas_comparar_activate" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -765,7 +1190,7 @@
                 <property name="tooltip-text" translatable="yes">Base SAGE para LP Excel</property>
                 <property name="use-underline">True</property>
                 <property name="icon-name">system-file-manager-symbolic</property>
-                <signal name="clicked" handler="on_toolbar_base2lp_clicked" swapped="no"/>
+                <signal name="clicked" handler="on_Base_SAGE_para_LP_Excel_activate" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -779,7 +1204,7 @@
                 <property name="tooltip-text" translatable="yes">Planilha Cepel para LP Excel</property>
                 <property name="use-underline">True</property>
                 <property name="icon-name">drive-multidisk-symbolic</property>
-                <signal name="clicked" handler="on_toolbar_cepel2lp_clicked" swapped="no"/>
+                <signal name="clicked" handler="on_arqconf_cepel2excel_activate" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -803,7 +1228,7 @@
                 <property name="tooltip-text" translatable="yes">Sobre</property>
                 <property name="use-underline">True</property>
                 <property name="icon-name">help-faq-symbolic</property>
-                <signal name="clicked" handler="on_toolbar_ajuda_clicked" swapped="no"/>
+                <signal name="clicked" handler="on_arqconf_menubar_ajuda_sobre_activate" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -939,7 +1364,8 @@
                   <object class="GtkFileChooserButton" id="file_chooser_lppadrao">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="title" translatable="yes"/>
+                    <property name="filter">filtro_xls</property>
+                    <property name="title" translatable="yes">Escolha o Arquivo LP Padrão</property>
                   </object>
                   <packing>
                     <property name="left-attach">3</property>
@@ -951,10 +1377,12 @@
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <child>
-                      <object class="GtkFileChooserButton">
+                      <object class="GtkFileChooserButton" id="lp_a_checar">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="title" translatable="yes"/>
+                        <property name="filter">filtro_xls</property>
+                        <property name="title" translatable="yes">Escolha o arquivo a ser Checado</property>
+                        <signal name="file-set" handler="on_lp_a_checar_file_set" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -963,7 +1391,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkComboBoxText">
+                      <object class="GtkComboBoxText" id="combobox_aba_a_checar">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
                       </object>
@@ -2881,7 +3309,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                                 <property name="can-focus">True</property>
                                 <property name="halign">center</property>
                                 <property name="valign">center</property>
-                                <property name="input-purpose">number</property>
+                                <property name="input-purpose">digits</property>
                               </object>
                               <packing>
                                 <property name="left-attach">3</property>
@@ -6540,7 +6968,6 @@ Paulo Roberto de Freitas (Contribuinte)
 </property>
     <property name="logo">CHESF.png</property>
     <property name="license-type">custom</property>
-    <signal name="response" handler="on_janela_sobre_response" swapped="no"/>
     <child internal-child="vbox">
       <object class="GtkBox">
         <property name="can-focus">False</property>
@@ -6567,6 +6994,7 @@ Paulo Roberto de Freitas (Contribuinte)
     <property name="icon">CHESF.png</property>
     <property name="decorated">False</property>
     <property name="deletable">False</property>
+    <signal name="hide" handler="on_janela_progressbar_hide" swapped="no"/>
     <child>
       <object class="GtkBox">
         <property name="visible">True</property>
@@ -6576,7 +7004,7 @@ Paulo Roberto de Freitas (Contribuinte)
           <object class="GtkLabel">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
-            <property name="label" translatable="yes">Carregando...</property>
+            <property name="label" translatable="yes">Processando...</property>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -6616,6 +7044,7 @@ Paulo Roberto de Freitas (Contribuinte)
         <child internal-child="action_area">
           <object class="GtkButtonBox">
             <property name="can-focus">False</property>
+            <property name="margin-bottom">8</property>
             <property name="homogeneous">True</property>
             <property name="layout-style">end</property>
           </object>
@@ -6643,6 +7072,7 @@ Paulo Roberto de Freitas (Contribuinte)
         <child internal-child="action_area">
           <object class="GtkButtonBox">
             <property name="can-focus">False</property>
+            <property name="margin-bottom">8</property>
             <property name="homogeneous">True</property>
             <property name="layout-style">end</property>
             <child>
@@ -6666,7 +7096,6 @@ Paulo Roberto de Freitas (Contribuinte)
     <property name="window-position">center</property>
     <property name="type-hint">dialog</property>
     <property name="buttons">yes-no</property>
-    <signal name="response" handler="on_pergunta_sim_nao_response" swapped="no"/>
     <child internal-child="vbox">
       <object class="GtkBox">
         <property name="can-focus">False</property>
@@ -6675,6 +7104,7 @@ Paulo Roberto de Freitas (Contribuinte)
         <child internal-child="action_area">
           <object class="GtkButtonBox">
             <property name="can-focus">False</property>
+            <property name="margin-bottom">6</property>
             <property name="homogeneous">True</property>
             <property name="layout-style">end</property>
             <child>
@@ -6693,19 +7123,4 @@ Paulo Roberto de Freitas (Contribuinte)
       </object>
     </child>
   </object>
-  <object class="GtkTextBuffer" id="text_buffer_relatorio"/>
-  <object class="GtkWindow" id="janela_relatorio">
-    <property name="can-focus">False</property>
-    <property name="title" translatable="yes">Relatório</property>
-    <property name="icon">CHESF.png</property>
-    <child>
-      <object class="GtkTextView" id="relatorio_textview">
-        <property name="visible">True</property>
-        <property name="can-focus">True</property>
-        <property name="editable">False</property>
-        <property name="buffer">text_buffer_relatorio</property>
-      </object>
-    </child>
-  </object>
-  <object class="GtkTextBuffer" id="textbuffer1"/>
 </interface>

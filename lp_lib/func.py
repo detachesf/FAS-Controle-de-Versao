@@ -6,8 +6,12 @@ import threading
 from time import sleep
 import gi
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk
+from gi.repository import Gtk, GObject, GLib
+GObject.threads_init()
 import FASgtkui
+from sys import stdout
+from traceback import print_exc
+import gobject
 
 try:
     from openpyxl import load_workbook,cell
@@ -159,17 +163,20 @@ def linhaInicialETitulos(arquivo, nomeAba):
 
 def processing(function, args):
 
-    #def check(): # Checar momento de fechar janela
-    #    if not thread_f.isAlive(): janela.hide()
-    #    sleep(2)
-    #    check()
-
+    def check():
+        if not thread_f.isAlive():
+            janela.hide()
+            FASgtkui.Manipulador.on_janela_progressbar_hide(FASgtkui.Manipulador)
+            return False
+        return True
     janela: Gtk.Window = FASgtkui.builder.get_object('janela_progressbar')
     Spinner: Gtk.Spinner = FASgtkui.builder.get_object('spinner')
     janela.show()
     Spinner.activate()
     thread_f = threading.Thread(target=function, kwargs=args)
     thread_f.start()
+    tread = GObject.timeout_add(300, check)
+
 
 class ToolTip(object):
     def __init__(self, widget):

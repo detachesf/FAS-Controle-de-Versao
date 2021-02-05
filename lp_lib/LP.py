@@ -115,23 +115,23 @@ def gerarlp(lp_padrao, ArqConf):
                                   # 1 - SAGE/BASTIDOR
                                   'SB': str(evento['sagebastidor']),
                                   # 2 - N£mero Inicial de Switch
-                                  'DE_SW': evento['sw-de'],
+                                  'DE_SW': int(evento['sw-de']),
                                   # 3 - N£mero Final de Switch
-                                  'ATE_SW': evento['sw-ate'],
+                                  'ATE_SW': int(evento['sw-ate']),
                                   # 4 - N£mero de portas de Switch
-                                  'POR_SW': evento['nportas-sw'],
+                                  'POR_SW': int(evento['nportas-sw']),
                                   # 5 - Firewall (Sim/N„o)
                                   'FW': 'Sim' if str(evento['fw']) == 'True' else 'N„o',
                                   # 6 - N£mero de portas do Firewall
-                                  'POR_FW': evento['nporta-fw'],
+                                  'POR_FW': int(evento['nporta-fw']),
                                   # 7 - RedBox (Sim/N„o)
                                   'RB':'Sim' if str(evento['rb']) == 'True' else 'N„o',
                                   # 8 - N£mero Inicial de RedBox
-                                  'DE_RB': evento['rb-de'],
+                                  'DE_RB': int(evento['rb-de']),
                                   # 9 - N£mero Final de RedBox
-                                  'ATE_RB': evento['rb-ate'],
+                                  'ATE_RB': int(evento['rb-ate']),
                                   # 10 - N£mero de portas do RedBox
-                                  'POR_RB': evento['nporta-rb'],
+                                  'POR_RB': int(evento['nporta-rb']),
                                   # A que a parametriza‡„o se refere
                                   'TIPO': 'SD'})
         evento_dic['SD'] = True  # Define que planilha SD da LP padr„o ser  lida
@@ -178,6 +178,41 @@ def gerarlp(lp_padrao, ArqConf):
         evento_dic['Disjuntor'] = True  # Define que planilha Disjuntor da LP padr„o ser  lida
         evento_dic['Secc'] = True  # Define que planilha Secc da LP padr„o ser  lida
 
+    Eventos = arq_conf.find_all('trafo')
+    if Eventos:
+        for evento in Eventos:
+            # 0 - C¢digodigo operacional Trafo Ex. 04T1
+            conf_Trafo_array.append({'COD': str(evento.string),
+                                     # 1 - Nome do painel de Alta Ex. 4UA3A
+                                     'PNLH': str(evento['codpainelh']),
+                                     # 2 - Nome do painel de Baixa Ex. 2UA3B
+                                     'PNLX': str(evento['codpainelx']),
+                                     # 3 - Arranjo do setor da alta do Trafo
+                                     'ARRH': str(evento['arranjoh']),
+                                     # 4 - Arranjo do setor da baixa do Trafo
+                                     'ARRX': str(evento['arranjox']),
+                                     # 5 - Rela‡”es do Trafo Ex. 230/69/13,8
+                                     'REL': str(evento['relacao']),
+                                     # 6 - Prote‡„o Ex. PU/PG (Prote‡„o Unit ria/Prote‡„o Gradativa)
+                                     'PUPG': str(evento['prot']),
+                                     # 7 - Equipamento Ex. Banco Monof sico
+                                     'BM': str(evento['equip']),
+                                     # RDP Stand Alone
+                                     'RDP': 'Sim' if str(evento['rdp']) == 'True' else 'N„o',
+                                     # Bay Unit do 87B
+                                     'F9': 'Sim' if str(evento['f9']) == 'True' else 'N„o',
+                                     # Cƒmaras PASS. Pega texto "A , B", coloca em  maipusculo, transforma em Array por v¡rgula e retira espa‡o de cada elemento
+                                     'PASSCam': tratar_str_secc(str(evento['camarapass'])),
+                                     # Conjunto de comando das seccionadoras
+                                     'PASSSecc': tratar_str_secc(str(evento['conjuntosecc'])),
+                                     # Sistema de Regula‡„o via Aplica‡„o (SAGE) (Sim/N„o)...
+                                     'REGAPLIC': 'Sim' if str(evento['regapp']) == 'True' else 'N„o',
+                                     # A que a parametriza‡„o se refere
+                                     'TIPO': 'Trafo'})
+        evento_dic['Trafo'] = True  # Define que planilha Trafo da LP padr„o ser  lida
+        evento_dic['Disjuntor'] = True  # Define que planilha Disjuntor da LP padr„o ser  lida
+        evento_dic['Secc'] = True  # Define que planilha Secc da LP padr„o ser  lida
+
     #in¡cio de lista de Vao de Transferˆncia
     Eventos = arq_conf.find_all('vaotrans')
     if Eventos:
@@ -188,7 +223,7 @@ def gerarlp(lp_padrao, ArqConf):
                                   # 1 - Nome do painel Ex. 4UA7A
                                   'PNL': str(evento['painel']),
                                   # 2 - 87B no painel (Sim/N„o)
-                                  '87B': 'Sim' if str(evento['87B']) == 'True' else 'N„o',
+                                  '87B': 'Sim' if str(evento['87b']) == 'True' else 'N„o',
                                   # 3 - Arranjo
                                   'ARR': str(evento['arranjo']),
                                   # Cƒmaras PASS. Pega texto "A , B", coloca em  maipusculo, transforma em Array por v¡rgula e retira espa‡o de cada elemento
@@ -217,7 +252,7 @@ def gerarlp(lp_padrao, ArqConf):
                                       # RDP Stand Alone
                                       'RDP': 'Sim' if str(evento['rdp']) == 'True' else 'N„o',
                                       # Bay Unit do 87B
-                                      'F9': 'Sim' if str(evento['bunitf9']) == 'True' else 'N„o',
+                                      'F9': 'Sim' if str(evento['f9']) == 'True' else 'N„o',
                                       # Cƒmaras PASS. Pega texto "A , B", coloca em  maipusculo, transforma em Array por v¡rgula e retira espa‡o de cada elemento
                                       'PASSCam': tratar_str_secc(str(evento['camarapass'])),
                                       # Conjunto de comando das seccionadoras
@@ -241,29 +276,29 @@ def gerarlp(lp_padrao, ArqConf):
                                         # 2 - Se vai ser em um Painel j  existente
                                           'PNLEXIST':'Sim' if str(evento['painelexist']) == 'True' else 'N„o',
                                         # 3 - N£mero da UC em um painel existente
-                                         'N£mero_UC_CHESF': evento['num-uc-chesf'],
+                                         'N£mero_UC_CHESF': int(evento['num-uc-chesf']),
                                         # 4 - N£mero da UC em um painel existente
-                                         'N£mero_UC_ACESSANTE': evento['num-uc-acessante'],
+                                         'N£mero_UC_ACESSANTE': int(evento['num-uc-acessante']),
                                         # 5 - Arranjo do v„o
                                           'ARR': str(evento['arranjo']),
                                         # 6 - Se tem Terminal Server
                                           'TS': 'Sim' if str(evento['ts']) == 'True' else 'N„o',
                                         # 7 - N£mero do primeiro Terminal Server
-                                          'TS-DE': evento['ts-de'],
+                                          'TS-DE': int(evento['ts-de']),
                                         # 8 - N£mero do £ltimo Terminal Server
-                                          'TS-ATE': evento['ts-ate'],
+                                          'TS-ATE': int(evento['ts-ate']),
                                         # 9 - Se Tem Redbox
                                           'RB': 'Sim' if str(evento['rb']) == 'True' else 'N„o',
                                         # 10 - N£mero do primeiro Redbox
-                                          'RB-DE': evento['redbox-de'],
+                                          'RB-DE': int(evento['redbox-de']),
                                         # 11 - N£mero do £ltimo RedBox
-                                          'RB-ATE': evento['redbox-ate'],
+                                          'RB-ATE': int(evento['redbox-ate']),
                                         #12 - Se Tem Multimedidor
                                           'MM': 'Sim' if str(evento['multimedidor']) == 'True' else 'N„o',
                                         #13 - N£mero do primeiro Multimedidor
-                                          'MM-DE': evento['mm-de'],
+                                          'MM-DE': int(evento['mm-de']),
                                         #14 - N£mero do £ltimo Multimedidor
-                                          'MM-ATE': evento['mm-ate'],
+                                          'MM-ATE': int(evento['mm-ate']),
                                         #15 - Sigla da LT Remota ao v„o segregado
                                           'LTREMOTA': str(evento['ltremota'])
                                           })
@@ -296,7 +331,7 @@ def gerarlp(lp_padrao, ArqConf):
             # 0 - Nome do Painel Ex. 4UA8
             conf_P87B_array.append({'PNL': str(evento.string),
                                     # 1 - N£mero de Pain‚is Ex. 2
-                                    'NPNL': evento['qtpan'],
+                                    'NPNL': int(evento['qtpan']),
                                     # 2 - Arranjo
                                     'ARR': str(evento['arranjo']),
                                     # 3 - B.U. Instalada no Painel (Sim/N„o)
@@ -405,7 +440,7 @@ def gerarlp(lp_padrao, ArqConf):
     #        evento_dic['CE'] = True
 
     # Carregar dados Serv. Aux. se existir nome do painel da UA
-    Eventos = arq_conf.find_all('saux')
+    Eventos = arq_conf.saux
     if Eventos:
         # 0 - Nome Painel UA Ex. 4UA7
         conf_SA = {'PNL': str(Eventos.string),
@@ -429,7 +464,6 @@ def gerarlp(lp_padrao, ArqConf):
 
     # Soma de arrays para gera‡„o de Secc e Disjuntores
     parametros = conf_LT_array + conf_Trafo_array + conf_BT_array + conf_Reator_array + conf_TT_array + conf_BCap_array + conf_BCS_array
-    print(parametros)
     # ----------Ler LP Padr„o----------#
     try:
         book = load_workbook(lp_padrao, data_only=True)  # Abrir arquivo de LP Padr„o definido no arquivo de configura‡„o
@@ -604,6 +638,16 @@ def gerarlp(lp_padrao, ArqConf):
                                     descricao_0 = descricao.replace('0YYY', parametros_LT['COD'])
                                     descricao_1 = descricao_0.replace('XXX', parametros_LT['LTREM'])
 
+                                    cd15 = 'FPCn' not in tratar_1
+                                    cd16 = 'FPTn' not in tratar_1
+                                    cd17 = 'FPCn' not in tratar_1
+                                    cd18 = 'FPDn' not in tratar_1
+                                    cd19 = 'FDSD' not in tratar_1
+                                    cd20 = cd15 * cd16 * cd17 * cd18 * cd19
+                                    cd21 = 'FGPS' in tratar_1 or 'FGOE' in tratar_1
+
+                                    linha69 = tratar_1[5] == '2'
+
                                     if '{PNL}' in tratar_1:  # Substituir {PNL} pelo nome do painel
                                         if int(parametros_LT['PNL'][
                                                0:1]) > 3:  # Caso o painel inicie com 4 ou 5 (230kV ou 500kV) gerar painel 1 e painel 2
@@ -618,35 +662,54 @@ def gerarlp(lp_padrao, ArqConf):
                                             k_lt += 1
 
                                     elif tratar_1[
-                                        5] == '2' and ':F2' in tratar_1:  # Caso de linha de 69kV com ID contendo F2 e ponto a ser tratato que j  n„o contenha UC1
-                                        cd1 = ('FPCn' not in tratar_1)
-                                        cd2 = ('FGOE' not in tratar_1)
-                                        cd3 = ('FGPS' not in tratar_1)
-                                        cd4 = ('FIRE' not in tratar_1)
-                                        cd5 = ('FSPF' not in tratar_1)
-                                        cd6 = ('RAUT' not in tratar_1)
-                                        if cd1 * cd2 * cd3 * cd4 * cd5 * cd6:
-                                            tratar_2 = tratar_1.replace(':F2', ':UC1')
+                                        5] == '2' and cd21 and cd20:  # Casos de linha de 69kV, substituir F2 e UC1 por F3
+                                            if ':F2' in tratar_1:
+                                                tratar_2 = tratar_1.replace(':F2', ':F3')
+                                                gravar_ponto(tratar_2, descricao_1)
+                                                k_lt += 1
+                                            else:
+                                                continue
+                                    elif tratar_1[
+                                        5] == '2' and cd20:
+                                        if ':UC1' in tratar_1:
+                                            tratar_2 = tratar_1.replace(':UC1', ':F3')
                                             gravar_ponto(tratar_2, descricao_1)
                                             k_lt += 1
-
+                                        elif ':F2' in tratar_1:
+                                            tratar_2 = tratar_1.replace(':F2', ':F3')
+                                            gravar_ponto(tratar_2, descricao_1)
+                                            k_lt += 1
                                     elif 'FPCn' in tratar_1:
                                         for n_canal in range(1, 3):
                                             texto_canal = tratar_1[tratar_1.find('FPCn'):-1] + str(n_canal)
                                             tratar_2 = tratar_1.replace('FPCn', texto_canal)
+                                            if linha69:
+                                                if ':F2' in tratar_1:
+                                                    tratar_2 = tratar_2.replace(':F2', ':F3')
+                                                elif ':UC1' in tratar_1:
+                                                    continue
                                             gravar_ponto(tratar_2, descricao_1)
                                             k_lt += 1
-
                                     elif 'FPTn' in tratar_1:
                                         for n_canal in range(1, 3):
                                             texto_canal = tratar_1[tratar_1.find('FPTn'):-1] + str(n_canal)
                                             tratar_2 = tratar_1.replace('FPTn', texto_canal)
+                                            if linha69:
+                                                if ':F2' in tratar_1:
+                                                    tratar_2 = tratar_2.replace(':F2', ':F3')
+                                                elif ':UC1' in tratar_1:
+                                                    continue
                                             gravar_ponto(tratar_2, descricao_1)
                                             k_lt += 1
                                     elif 'FPDn' in tratar_1:
                                         for n_canal in range(1, 3):
                                             texto_canal = tratar_1[tratar_1.find('FPDn'):-1] + str(n_canal)
                                             tratar_2 = tratar_1.replace('FPDn', texto_canal)
+                                            if linha69:
+                                                if ':F2' in tratar_1:
+                                                    tratar_2 = tratar_2.replace(':F2', ':F3')
+                                                elif ':UC1' in tratar_1:
+                                                    continue
                                             gravar_ponto(tratar_2, descricao_1)
                                             k_lt += 1
                                     elif tratar_1[-4:] == 'FDSD':  # Falha Dispositivo
@@ -662,6 +725,11 @@ def gerarlp(lp_padrao, ArqConf):
                                         if tratar[-4:] == 'FDSD' and disp_array != '':  # Falha Dispositivo
                                             for disp in disp_array:
                                                 tratar_1 = tratar.replace('{DISP}', disp[0])
+                                                if linha69:
+                                                    if ':F2' in tratar_1:
+                                                        tratar_2 = tratar_2.replace(':F2', ':F3')
+                                                    elif ':UC1' in tratar_1:
+                                                        continue
                                                 gravar_ponto(tratar_1, descricao)
                                                 k_lt += 1
                                     else:
@@ -987,10 +1055,8 @@ def gerarlp(lp_padrao, ArqConf):
                                                 barras = [3, 4]
                                             else:
                                                 barras = [1, 2]
-
-                                        elif parametros_87B['ARR'] == 'BPT':
+                                        elif parametros_87B['ARR'] == 'BPT' or parametros_87B['ARR'] == 'BS':
                                             barras = [1]
-
                                         if sheet.cell(row=index_linha, column=titulo_dic[
                                             u'OCR (SAGE)']).value == u'OCR_PAS01':  # Pontos Anal¢gicos
                                             for i in barras:

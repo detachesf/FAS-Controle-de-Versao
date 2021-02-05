@@ -15,13 +15,14 @@ except:
     mensagem_erro('Erro', 'Arquivo "gerarPlanilhaLP.py" deve estar no diret¢rio "lp_lib"')
 
 
-def base2lp(diretorio):
-    nome_arq_saida = './LP_da_Base.xlsx'  # Nome do arquivo de sa¡da
+def base2lp(diretorio, Diretorio_Padrao):
+    nome_arq_saida = 'LP_da_Base.xlsx'  # Nome do arquivo de sa¡da
     seq_arq = 0  # Sequˆncia do n£mero de arquivo
-    while path.exists(nome_arq_saida):  # Enquanto existir na pasta um arquivo com o nome definido
+    while path.exists(
+            Diretorio_Padrao + '\\' + nome_arq_saida):  # Enquanto existir na pasta um arquivo com o nome definido
         seq_arq += 1  # Adicionar um a sequˆncia do n£mero do arquivo
-        nome_arq_saida = nome_arq_saida[0:12] + '_' + str(seq_arq) + '.xlsx'  # Definir novo nome de arquivo
-
+        nome_arq_saida = nome_arq_saida + '_' + str(seq_arq) + '.xlsx'  # Definir novo nome de arquivo
+    nome_arq_saida = Diretorio_Padrao + '\\' + nome_arq_saida
     arq_lp = gerarPlanilha(nome_arq_saida)  # Gera um arquivo Excel com uma planilha com formata‡„o da LP Padr„o
     planilha_lp = arq_lp.worksheets()[0]
     planilha_relatorio = arq_lp.add_worksheet('RELATORIO')
@@ -764,9 +765,9 @@ def base2lp(diretorio):
 
         arq_lp.close()
 
-        abrirarquivo = pergunta_sim_nao('Aviso', 'Arquivo \"' + nome_arq_saida[
-                                                        2:] + '\" gerado em ' + getcwd() + '\n\n Deseja abrir o arquivo gerado agora?')
-        if abrirarquivo: startfile(getcwd() + '\\' + nome_arq_saida[2:])
+        abrirarquivo = pergunta_sim_nao('Aviso', 'Arquivo \"' + nome_arq_saida.rsplit('\\', 1)[
+            1] + '\" gerado em ' + Diretorio_Padrao + '\n\n Deseja abrir o arquivo gerado agora?')
+        if abrirarquivo: startfile(nome_arq_saida)
 
 
 if __name__ == "__main__":
