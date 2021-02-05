@@ -218,7 +218,7 @@ class Manipulador(object):
 
         try:
             root = BeautifulSoup(open(os.getcwd() + '\\' + 'ini.xml', 'r', encoding='utf-8'), 'html.parser')
-            caminho_lp_padrao = os.getcwd() + '\\' + 'Planilhas Padrão' + '\\' + root.ini['arqlppadrao']
+            caminho_lp_padrao = os.getcwd() + '\\' + 'static\\Planilhas Padrão' + '\\' + root.ini['arqlppadrao']
             if os.path.exists(caminho_lp_padrao):
                 self.Lppadrao.set_filename(caminho_lp_padrao)
             else:
@@ -233,7 +233,7 @@ class Manipulador(object):
                            diretorio_padrao=self.Diretorio_de_salvamento)
             ElementTree(root).write('ini.xml', 'UTF-8')
             self.Lppadrao.set_filename(
-                os.getcwd() + '\\' + 'Planilhas Padrão' + '\\' + 'Padrao Planilha Supervisao_rev1P.xlsm')
+                os.getcwd() + '\\' + 'static\\Planilhas Padrão' + '\\' + 'Padrao Planilha Supervisao_rev1P.xlsm')
 
     # Sinais de navegação entre páginas
 
@@ -1048,9 +1048,9 @@ class Manipulador(object):
         self.arqconf_novo = False
         self.arqconf_abrir_dialogo.hide()
         self.nome_arq_saida = nome_arquivo
-        caminho_lp_padrao = os.getcwd() + '\\' + 'Planilhas Padrão' + '\\' + root.eventos['lppadrao']
+        caminho_lp_padrao = os.getcwd() + '\\' + 'static\\Planilhas Padrão' + '\\' + root.eventos['lppadrao']
         if os.path.exists(caminho_lp_padrao):
-            self.Lppadrao.set_filename(os.getcwd() + '\\' + 'Planilhas Padrão' + '\\' + root.eventos['lppadrao'])
+            self.Lppadrao.set_filename(os.getcwd() + '\\' + 'static\\Planilhas Padrão' + '\\' + root.eventos['lppadrao'])
         else:
             mensagem_erro('Erro', 'Arquivo {} não encontrado na pasta Planilhas Padrão'.format(
                 caminho_lp_padrao.split('\\')[len(caminho_lp_padrao.split('\\')) - 1]))
