@@ -1,22 +1,17 @@
 # -*- coding: cp860 -*-
 
-from tkinter.messagebox import showerror
-from tkinter import Toplevel, ttk, E, W, CENTER, LEFT, SOLID, Label
 import threading
-from time import sleep
 import gi
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk, GObject, GLib
+from gi.repository import Gtk, GObject
 GObject.threads_init()
 import FASgtkui
-from sys import stdout
-from traceback import print_exc
-import gobject
+
 
 try:
     from openpyxl import load_workbook,cell
 except:
-    showerror('Erro', 'M¢dulo openpyxl n„o instalado')
+    FASgtkui.mensagem_erro('Erro', 'M¢dulo openpyxl n„o instalado')
 
 dados= '''            
 Vers„o do programa: 2.0.12
@@ -75,7 +70,7 @@ def linhaInicialETitulos(arquivo, nomeAba):
     #Tratamento dos t¡tulos principais, se n„o estiver da mesma forma da aba PADRAO da lista de pontos, a mensagem de erro ‚ gerada
     for tit in TitulosPrinc:
         if tit not in titulossuperiores:
-            showerror('Erro','T¡tulo {} n„o identificado no arquivo a ser checado, verifique se ele est  escrito desta mesma forma.'.format(tit))
+            FASgtkui.mensagem_erro('Erro','T¡tulo {} n„o identificado no arquivo a ser checado, verifique se ele est  escrito desta mesma forma.'.format(tit))
 
     subtitulosn2 = {}
     subtitulosn3Tele = {}
@@ -133,22 +128,22 @@ def linhaInicialETitulos(arquivo, nomeAba):
     camposONS = ['ITEM','DESCRI€ŽO']
     camposLimop = ['LIU','LIE','LIA','LSA','LSE','LSU','BNDMO','OBSERVA€™ES']
     if 'TELA' not in titulos['CHESF - N‹VEL 2'] and 'ANUNCIADOR' not in titulos['CHESF - N‹VEL 2']:
-        showerror('Erro','Campo TELA ou ANUNCIADOR n„o identificado abaixo do cabe‡alho CHESF - N‹VEL 2 do arquivo a ser checado, verifique se ele est  escrito desta mesma forma.')
+        FASgtkui.mensagem_erro('Erro','Campo TELA ou ANUNCIADOR n„o identificado abaixo do cabe‡alho CHESF - N‹VEL 2 do arquivo a ser checado, verifique se ele est  escrito desta mesma forma.')
     for campo in camposN2:
         if campo not in titulos['CHESF - N‹VEL 2']:
-            showerror('Erro','Campo {} n„o identificado abaixo do cabe‡alho CHESF - N‹VEL 2 do arquivo a ser checado, verifique se ele est  escrito desta mesma forma.'.format(campo))
+            FASgtkui.mensagem_erro('Erro','Campo {} n„o identificado abaixo do cabe‡alho CHESF - N‹VEL 2 do arquivo a ser checado, verifique se ele est  escrito desta mesma forma.'.format(campo))
     for campo in camposN3Tele:
         if campo not in titulos['CHESF - TELEASSIST‰NCIA N3']:
-            showerror('Erro', 'Campo {} n„o identificado abaixo do cabe‡alho CHESF - TELEASSIST‰NCIA N3 do arquivo a ser checado, verifique se ele est  escrito desta mesma forma.'.format(campo))
+            FASgtkui.mensagem_erro('Erro', 'Campo {} n„o identificado abaixo do cabe‡alho CHESF - TELEASSIST‰NCIA N3 do arquivo a ser checado, verifique se ele est  escrito desta mesma forma.'.format(campo))
     for campo in camposN3:
         if campo not in titulos['CHESF - N‹VEL 3']:
-            showerror('Erro','Campo {} n„o identificado abaixo do cabe‡alho CHESF - N‹VEL 3 do arquivo a ser checado, verifique se ele est  escrito desta mesma forma.'.format(campo))
+            FASgtkui.mensagem_erro('Erro','Campo {} n„o identificado abaixo do cabe‡alho CHESF - N‹VEL 3 do arquivo a ser checado, verifique se ele est  escrito desta mesma forma.'.format(campo))
     for campo in camposONS:
         if campo not in titulos['ONS']:
-            showerror('Erro','Campo {} n„o identificado abaixo do cabe‡alho ONS do arquivo a ser checado, verifique se ele est  escrito desta mesma forma.'.format(campo))
+            FASgtkui.mensagem_erro('Erro','Campo {} n„o identificado abaixo do cabe‡alho ONS do arquivo a ser checado, verifique se ele est  escrito desta mesma forma.'.format(campo))
     for campo in camposLimop:
         if campo not in titulos['LIMITES OPERACIONAIS']:
-            showerror('Erro','Campo {} n„o identificado abaixo do cabe‡alho LIMITES OPERACIONAIS do arquivo a ser checado, verifique se ele est  escrito desta mesma forma.'.format(campo))
+            FASgtkui.mensagem_erro('Erro','Campo {} n„o identificado abaixo do cabe‡alho LIMITES OPERACIONAIS do arquivo a ser checado, verifique se ele est  escrito desta mesma forma.'.format(campo))
 
     li += 1  # Seleciona linha ap¢s o t¡tulo
     if 'ID (SAGE)' in titulos['CHESF - N‹VEL 2']:                               #Verifica se foi encontrado chave "ID (SAGE)"
@@ -177,43 +172,5 @@ def processing(function, args):
     thread_f.start()
     tread = GObject.timeout_add(300, check)
 
-
-class ToolTip(object):
-    def __init__(self, widget):
-        self.widget = widget
-        self.tipwindow = None
-        self.id = None
-        self.x = self.y = 0
-    def showtip(self, text):
-        "Display text in tooltip window"
-        self.text = text
-        if self.tipwindow or not self.text:
-            return
-        x, y, _cx, cy = self.widget.bbox("insert")
-        x = x + self.widget.winfo_rootx() + 27
-        y = y + cy + self.widget.winfo_rooty() +27
-        self.tipwindow = tw = Toplevel(self.widget)
-        tw.wm_overrideredirect(1)
-        tw.wm_geometry("+%d+%d" % (x, y))
-
-        label = Label(tw, text=self.text, justify=LEFT,
-                         background="#ffffe0", relief=SOLID, borderwidth=1,
-                         font=("tahoma", "8", "normal"))
-        label.pack(ipadx=1)
-    def hidetip(self):
-        tw = self.tipwindow
-        self.tipwindow = None
-        if tw:
-            tw.destroy()
-
-def createToolTip(widget, text):
-    toolTip = ToolTip(widget)
-    def enter(event):
-        sleep(3)
-        toolTip.showtip(text)
-    def leave(event):
-        toolTip.hidetip()
-    widget.bind('<Enter>', enter)
-    widget.bind('<Leave>', leave)
 
 

@@ -104,6 +104,7 @@ class Manipulador(object):
         self.gerar_lp = False
         self.base_para_lp = False
         self.Diretorio_de_salvamento = os.getcwd()
+        self.Lb = ""
 
         # Arrays com os nomes padrão dos objetos de cada linha
         self.dicionario_nomes_objetos = [
@@ -181,8 +182,7 @@ class Manipulador(object):
         # Carregando objetos
 
         self.janela_sobre: Gtk.AboutDialog = builder.get_object('janela_sobre')
-        self.dialogo_diretorio: Gtk.FileChooserDialog = builder.get_object('diretorio_dialogo')
-        self.diretorio_dialogo_pasta_entry: Gtk.Entry = builder.get_object('diretorio_dialogo_pasta_entry')
+        self.janela_comparar: Gtk.Window = builder.get_object('janela_comparar')
 
         self.notebook: Gtk.Notebook = builder.get_object('notebook1')
         #
@@ -190,16 +190,17 @@ class Manipulador(object):
         self.fornecedor: Gtk.Entry = builder.get_object('entry_fornecedor')
         self.usuario: Gtk.Entry = builder.get_object('entry_usuario')
         self.descricao: Gtk.Entry = builder.get_object('entry_descricao_evento')
+        self.nome_arqconf: Gtk.Entry = builder.get_object('arqconf_entry_nome-arquivo')
+        self.diretorio_dialogo_pasta_entry: Gtk.Entry = builder.get_object('diretorio_dialogo_pasta_entry')
 
         self.Lppadrao: Gtk.FileChooserButton = builder.get_object('file_chooser_lppadrao')
         self.Lp_a_checar: Gtk.FileChooserButton = builder.get_object('lp_a_checar')
 
         self.arqconf_salvar_dialogo: Gtk.FileChooserDialog = builder.get_object('arqconf_salvar_dialogo')
-        self.nome_arqconf: Gtk.Entry = builder.get_object('arqconf_entry_nome-arquivo')
         self.arqconf_abrir_dialogo: Gtk.FileChooserDialog = builder.get_object('arqconf_abrir_dialogo')
-        self.Lb = ""
+        self.dialogo_diretorio: Gtk.FileChooserDialog = builder.get_object('diretorio_dialogo')
+
         self.comboplan: Gtk.ComboBoxText = builder.get_object('combobox_aba_a_checar')
-        self.janela_comparar: Gtk.Window = builder.get_object('janela_comparar')
 
         self.button_checarlp: Gtk.Button = builder.get_object('button_checarlp')
         self.button_comparar: Gtk.Button = builder.get_object('button_compararlp')
@@ -838,7 +839,7 @@ class Manipulador(object):
         else:
             return [preenchidas, linha_a_duplicar]
 
-    # Eventos ligados ao salvamento do arquivo de configuração
+# Eventos ligados ao salvamento do arquivo de configuração
 
     # Evento de clique do botão salvar do diálogo de salvamento
     def on_arqconf_button_salvar_clicked(self, button):
@@ -912,7 +913,7 @@ class Manipulador(object):
         else:
             self.salvar_arqconf()
 
-    # Eventos ligados ao abrir o arquivo de configuração
+# Eventos ligados ao abrir o arquivo de configuração
 
     def on_arqconf_abrir_activate(self, button):
         self.arqconf_abrir_dialogo.show()
@@ -1056,7 +1057,7 @@ class Manipulador(object):
                 caminho_lp_padrao.split('\\')[len(caminho_lp_padrao.split('\\')) - 1]))
             self.Lppadrao.set_filename('')
 
-    # Evento da tela principal
+# Evento da tela principal
     def on_arqconf_menubar_arquivo_sair_activate(self, button):
         Gtk.main_quit()
 
@@ -1066,7 +1067,7 @@ class Manipulador(object):
     def on_janela_principal_destroy(self, window):
         Gtk.main_quit()  # Encerra a aplicação quando fechar a janela no X vermelho
 
-    # Sinais das funcionalidades
+# Sinais das funcionalidades
 
     def on_gerarlp_clicked(self, button):
         if self.arqconf_novo:
@@ -1098,7 +1099,7 @@ class Manipulador(object):
         try:
             vers = arq_conf.arqconf['versão'].split('.')
             vers = list(map(int, vers))  # Transformar array de string em array de inteiro
-            if vers < [2, 0, 12]:
+            if vers < [2, 0, 13]:
                 mensagem_erro('Erro', 'Deve ser usado arquivo de configuração com versão igual ou maior a 2.0.12')
             else:
                 try:
@@ -1138,8 +1139,8 @@ class Manipulador(object):
         try:
             vers = arq_conf.arqconf['versão'].split('.')
             vers = list(map(int, vers))  # Transformar array de string em array de inteiro
-            if vers < [2, 0, 12]:
-                mensagem_erro('Erro', 'Deve ser usado arquivo de configuração com versão igual ou maior a 2.0.12')
+            if vers < [2, 0, 13]:
+                mensagem_erro('Erro', 'Deve ser usado arquivo de configuração com versão igual ou maior a 2.0.13')
             else:
                 try:
                     Diretorio_de_salvamento = self.Diretorio_de_salvamento

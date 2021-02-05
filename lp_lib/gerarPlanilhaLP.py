@@ -1,11 +1,11 @@
 # -*- coding: cp860 -*-
 
-from tkinter.messagebox import showerror
+import FASgtkui
 
 try:
     import xlsxwriter
 except:
-    showerror('Erro', 'M¢dulo XlsxWriter n„o instalado')
+    FASgtkui.mensagem_erro('Erro', 'M¢dulo XlsxWriter n„o instalado')
 
 
 dados= '''                  

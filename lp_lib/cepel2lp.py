@@ -12,10 +12,6 @@ from sys import stdout
 from traceback import print_exc
 
 try:
-    from xlrd import open_workbook
-except:
-    mensagem_erro('Erro', 'M¢dulo xlrd n„o instalado')
-try:
     from openpyxl import load_workbook, cell
 except:
     mensagem_erro('Erro', 'M¢dulo openpyxl n„o instalado')

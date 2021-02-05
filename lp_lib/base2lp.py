@@ -1,6 +1,5 @@
 # -*- coding: cp860 -*-
-from tkinter.messagebox import askyesno
-from os import listdir, path, getcwd, startfile
+from os import listdir, path, startfile
 from FASgtkui import mensagem_aviso, mensagem_erro, pergunta_sim_nao
 
 dados = '''
