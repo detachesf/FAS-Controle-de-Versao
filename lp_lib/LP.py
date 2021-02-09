@@ -644,7 +644,6 @@ def gerarlp(lp_padrao, ArqConf):
                                     cd18 = 'FPDn' not in tratar_1
                                     cd19 = 'FDSD' not in tratar_1
                                     cd20 = cd15 * cd16 * cd17 * cd18 * cd19
-                                    cd21 = 'FGPS' in tratar_1 or 'FGOE' in tratar_1
 
                                     linha69 = tratar_1[5] == '2'
 
@@ -662,32 +661,20 @@ def gerarlp(lp_padrao, ArqConf):
                                             k_lt += 1
 
                                     elif tratar_1[
-                                        5] == '2' and cd21 and cd20:  # Casos de linha de 69kV, substituir F2 e UC1 por F3
-                                            if ':F2' in tratar_1:
-                                                tratar_2 = tratar_1.replace(':F2', ':F3')
+                                        5] == '2' and cd20:  # Casos de linha de 69kV, substituir F2 e UC1 por F3
+                                            if ':UC1' in tratar_1:
+                                                tratar_2 = tratar_1.replace(':UC1', ':F3')
                                                 gravar_ponto(tratar_2, descricao_1)
                                                 k_lt += 1
                                             else:
                                                 continue
-                                    elif tratar_1[
-                                        5] == '2' and cd20:
-                                        if ':UC1' in tratar_1:
-                                            tratar_2 = tratar_1.replace(':UC1', ':F3')
-                                            gravar_ponto(tratar_2, descricao_1)
-                                            k_lt += 1
-                                        elif ':F2' in tratar_1:
-                                            tratar_2 = tratar_1.replace(':F2', ':F3')
-                                            gravar_ponto(tratar_2, descricao_1)
-                                            k_lt += 1
                                     elif 'FPCn' in tratar_1:
                                         for n_canal in range(1, 3):
                                             texto_canal = tratar_1[tratar_1.find('FPCn'):-1] + str(n_canal)
                                             tratar_2 = tratar_1.replace('FPCn', texto_canal)
                                             if linha69:
-                                                if ':F2' in tratar_1:
-                                                    tratar_2 = tratar_2.replace(':F2', ':F3')
-                                                elif ':UC1' in tratar_1:
-                                                    continue
+                                                if ':UC1' in tratar_1:
+                                                    tratar_2 = tratar_2.replace(':UC1', ':F3')
                                             gravar_ponto(tratar_2, descricao_1)
                                             k_lt += 1
                                     elif 'FPTn' in tratar_1:
@@ -695,10 +682,8 @@ def gerarlp(lp_padrao, ArqConf):
                                             texto_canal = tratar_1[tratar_1.find('FPTn'):-1] + str(n_canal)
                                             tratar_2 = tratar_1.replace('FPTn', texto_canal)
                                             if linha69:
-                                                if ':F2' in tratar_1:
-                                                    tratar_2 = tratar_2.replace(':F2', ':F3')
-                                                elif ':UC1' in tratar_1:
-                                                    continue
+                                                if ':UC1' in tratar_1:
+                                                    tratar_2 = tratar_2.replace(':UC1', ':F3')
                                             gravar_ponto(tratar_2, descricao_1)
                                             k_lt += 1
                                     elif 'FPDn' in tratar_1:
@@ -706,10 +691,8 @@ def gerarlp(lp_padrao, ArqConf):
                                             texto_canal = tratar_1[tratar_1.find('FPDn'):-1] + str(n_canal)
                                             tratar_2 = tratar_1.replace('FPDn', texto_canal)
                                             if linha69:
-                                                if ':F2' in tratar_1:
-                                                    tratar_2 = tratar_2.replace(':F2', ':F3')
-                                                elif ':UC1' in tratar_1:
-                                                    continue
+                                                if ':UC1' in tratar_1:
+                                                    tratar_2 = tratar_2.replace(':UC1', ':F3')
                                             gravar_ponto(tratar_2, descricao_1)
                                             k_lt += 1
                                     elif tratar_1[-4:] == 'FDSD':  # Falha Dispositivo
@@ -726,10 +709,8 @@ def gerarlp(lp_padrao, ArqConf):
                                             for disp in disp_array:
                                                 tratar_1 = tratar.replace('{DISP}', disp[0])
                                                 if linha69:
-                                                    if ':F2' in tratar_1:
-                                                        tratar_2 = tratar_2.replace(':F2', ':F3')
-                                                    elif ':UC1' in tratar_1:
-                                                        continue
+                                                    if ':UC1' in tratar_1:
+                                                        tratar_2 = tratar_2.replace(':UC1', ':F3')
                                                 gravar_ponto(tratar_1, descricao)
                                                 k_lt += 1
                                     else:
@@ -1123,8 +1104,8 @@ def gerarlp(lp_padrao, ArqConf):
                             cd2 = sheet.cell(row=index_linha, column=titulo_dic[u'OCR (SAGE)']).value != u'OCR_PAS01'
                             # Existe configura‡„o de 87B
                             cd3 = conf_P87B_array
-
-                            if cd1 * cd2 * cd3:  # Processar pontos referentes a Painel pr¢prio de Prote‡„o de Barras
+                            cd4 = ('#APLICACAO' not in observacao.upper())
+                            if cd1 * cd2 * cd3 * cd4:  # Processar pontos referentes a Painel pr¢prio de Prote‡„o de Barras
                                 for parametros_87B in conf_P87B_array:
                                     if parametros_87B['ARR'][:2] == 'BD' or parametros_87B['ARR'] == 'DISJ E MEIO':
                                         barras = [1, 2]
@@ -1354,6 +1335,7 @@ def gerarlp(lp_padrao, ArqConf):
 
                                     cd12 = ('Aplic vel a Disjuntor de transferˆncia' not in observacao or
                                             ('Aplic vel a Disjuntor de transferˆncia' in observacao and VaoTransf))
+                                    linha69 = tratar_1[5] == '2' and parametros_vao['TIPO'] == 'LT'
 
                                     if cd1 * cd2 * cd3 * cd4 * cd5 * cd6 * cd7 * cd8 * cd9 * cd10 * cd11 * cd12:
                                         if k_arr:  # Arranjo a ser processado ‚ o da posi‡„o 0 de "arr"
@@ -1364,6 +1346,8 @@ def gerarlp(lp_padrao, ArqConf):
                                             cod_disj = parametros_vao['PNLX'][0] + parametros_vao['COD'][2:]
                                         tag_disj = '1' + cod_disj
                                         tratar_1 = tratar.replace('1YYY', tag_disj)
+                                        if linha69 and ':UC1' in tratar_1:
+                                            tratar_1 = tratar_1.replace(':UC1', ':F3')
                                         descricao_1 = descricao.replace('1YYY', tag_disj)
                                         #print(parametros_vao.get('PASSCam', [None]))
                                         if parametros_vao.get('PASSCam', [None])[0] and ':Z' in tratar_1:

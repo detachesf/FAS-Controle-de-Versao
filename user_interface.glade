@@ -1808,6 +1808,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                                           <item translatable="yes">BPT</item>
                                           <item translatable="yes">BD3</item>
                                           <item translatable="yes">BD4</item>
+                                          <item translatable="yes">BD5</item>
                                         </items>
                                       </object>
                                       <packing>
@@ -2304,6 +2305,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                                           <item translatable="yes">BPT</item>
                                           <item translatable="yes">BD3</item>
                                           <item translatable="yes">BD4</item>
+                                          <item translatable="yes">BD5</item>
                                         </items>
                                       </object>
                                       <packing>
@@ -2389,6 +2391,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                                           <item translatable="yes">BPT</item>
                                           <item translatable="yes">BD3</item>
                                           <item translatable="yes">BD4</item>
+                                          <item translatable="yes">BD5</item>
                                         </items>
                                       </object>
                                       <packing>
@@ -2816,6 +2819,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                                   <item translatable="yes">BPT</item>
                                   <item translatable="yes">BD3</item>
                                   <item translatable="yes">BD4</item>
+                                  <item translatable="yes">BD5</item>
                                 </items>
                               </object>
                               <packing>
@@ -4364,6 +4368,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                                   <item translatable="yes">BPT</item>
                                   <item translatable="yes">BD3</item>
                                   <item translatable="yes">BD4</item>
+                                  <item translatable="yes">BD5</item>
                                 </items>
                               </object>
                               <packing>
@@ -5107,6 +5112,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                                   <item translatable="yes">BPT</item>
                                   <item translatable="yes">BD3</item>
                                   <item translatable="yes">BD4</item>
+                                  <item translatable="yes">BD5</item>
                                 </items>
                               </object>
                               <packing>
@@ -5447,6 +5453,7 @@ Se este campo for preenchido, o FAS entenderá que se trata de um módulo isolad
                                   <item translatable="yes">BPT</item>
                                   <item translatable="yes">BD3</item>
                                   <item translatable="yes">BD4</item>
+                                  <item translatable="yes">BD5</item>
                                 </items>
                               </object>
                               <packing>

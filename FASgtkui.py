@@ -74,12 +74,6 @@ try:
     from lp_lib.func import processing
 except:
     mensagem_erro('Erro', 'Módulo func não instalado')
-
-try:
-    from lp_lib.func import createToolTip
-except:
-    mensagem_erro('Erro',
-                  'Arquivo "func.pyc" deve estar no diretório "lp_lib"')
 try:
     from openpyxl import load_workbook
 except:
@@ -96,8 +90,8 @@ class Manipulador(object):
         # Vairáveis Gerais
         self.arqconf_novo = True
         self.pathchecar = getcwd()
-        self.versao = '2.0.13'
-        self.data = '10/11/2020'
+        self.versao = '2.1.0'
+        self.data = '09/02/2020'
         self.window: Gtk.Window = builder.get_object('janela_principal')  # Pega o Objeto da janela princial
         self.window.show_all()  # Mostra a janela principal
         self.lp_de_saida = ''
@@ -177,7 +171,7 @@ class Manipulador(object):
             self.dicionario_geral_linhas_removidas[self.dicionario_nomes_objetos[i][1].split('_')[0]] = []
 
         self.Arranjos = ['DISJ E MEIO', 'BS', 'BPT', 'BD3',
-                         'BD4']  # Array com os arranjos possíveis para preencher os comboboxes
+                         'BD4','BD5']  # Array com os arranjos possíveis para preencher os comboboxes
 
         # Carregando objetos
 
@@ -205,6 +199,11 @@ class Manipulador(object):
         self.button_checarlp: Gtk.Button = builder.get_object('button_checarlp')
         self.button_comparar: Gtk.Button = builder.get_object('button_compararlp')
 
+        self.toolbar_checar: Gtk.ToolButton = builder.get_object('toolbar_checar')
+        self.menubar_checar: Gtk.ImageMenuItem = builder.get_object('arqconf_menubar_ferramentas_checar')
+
+        self.menubar_checar.set_sensitive(False)
+        self.toolbar_checar.set_sensitive(False)
         self.button_comparar.set_sensitive(False)
         self.button_checarlp.set_sensitive(False)
 
@@ -219,12 +218,12 @@ class Manipulador(object):
 
         try:
             root = BeautifulSoup(open(os.getcwd() + '\\' + 'ini.xml', 'r', encoding='utf-8'), 'html.parser')
-            caminho_lp_padrao = os.getcwd() + '\\' + 'static\\Planilhas Padrão' + '\\' + root.ini['arqlppadrao']
+            caminho_lp_padrao = os.getcwd() + '\\' + 'static\\Planilhas Padrao' + '\\' + root.ini['arqlppadrao']
             if os.path.exists(caminho_lp_padrao):
                 self.Lppadrao.set_filename(caminho_lp_padrao)
             else:
                 mensagem_erro('Erro',
-                              'Arquivo {} não encontrado na pasta Planilhas Padrão'.format(root.ini['arqlppadrao']))
+                              'Arquivo {} não encontrado na pasta Planilhas Padrao'.format(root.ini['arqlppadrao']))
                 self.Lppadrao.set_filename('')
             self.Diretorio_de_salvamento = str(root.ini['diretorio_padrao'])
         except:
@@ -234,7 +233,7 @@ class Manipulador(object):
                            diretorio_padrao=self.Diretorio_de_salvamento)
             ElementTree(root).write('ini.xml', 'UTF-8')
             self.Lppadrao.set_filename(
-                os.getcwd() + '\\' + 'static\\Planilhas Padrão' + '\\' + 'Padrao Planilha Supervisao_rev1P.xlsm')
+                os.getcwd() + '\\' + 'static\\Planilhas Padrao' + '\\' + 'Padrao Planilha Supervisao_rev1P.xlsm')
 
     # Sinais de navegação entre páginas
 
@@ -1049,11 +1048,11 @@ class Manipulador(object):
         self.arqconf_novo = False
         self.arqconf_abrir_dialogo.hide()
         self.nome_arq_saida = nome_arquivo
-        caminho_lp_padrao = os.getcwd() + '\\' + 'static\\Planilhas Padrão' + '\\' + root.eventos['lppadrao']
+        caminho_lp_padrao = os.getcwd() + '\\' + 'static\\Planilhas Padrao' + '\\' + root.eventos['lppadrao']
         if os.path.exists(caminho_lp_padrao):
-            self.Lppadrao.set_filename(os.getcwd() + '\\' + 'static\\Planilhas Padrão' + '\\' + root.eventos['lppadrao'])
+            self.Lppadrao.set_filename(os.getcwd() + '\\' + 'static\\Planilhas Padrao' + '\\' + root.eventos['lppadrao'])
         else:
-            mensagem_erro('Erro', 'Arquivo {} não encontrado na pasta Planilhas Padrão'.format(
+            mensagem_erro('Erro', 'Arquivo {} não encontrado na pasta Planilhas Padrao'.format(
                 caminho_lp_padrao.split('\\')[len(caminho_lp_padrao.split('\\')) - 1]))
             self.Lppadrao.set_filename('')
 
@@ -1099,8 +1098,8 @@ class Manipulador(object):
         try:
             vers = arq_conf.arqconf['versão'].split('.')
             vers = list(map(int, vers))  # Transformar array de string em array de inteiro
-            if vers < [2, 0, 13]:
-                mensagem_erro('Erro', 'Deve ser usado arquivo de configuração com versão igual ou maior a 2.0.12')
+            if vers < [2, 1, 0]:
+                mensagem_erro('Erro', 'Deve ser usado arquivo de configuração com versão igual ou maior a 2.1.0')
             else:
                 try:
                     processing(Checar_LP.checar,
@@ -1122,12 +1121,16 @@ class Manipulador(object):
         except:
             aviso = 'Arquivo \"' + temp + '\" não encontrado'
             self.button_checarlp.set_sensitive(False)
+            self.menubar_checar.set_sensitive(False)
+            self.toolbar_checar.set_sensitive(False)
             mensagem_erro('Erro', aviso)
         self.comboplan.remove_all()
         for nome_aba in book.sheetnames:
             self.comboplan.append_text(nome_aba)
         self.comboplan.set_active(0)
         self.button_checarlp.set_sensitive(True)
+        self.menubar_checar.set_sensitive(True)
+        self.toolbar_checar.set_sensitive(True)
 
     def gerarlp(self):
         try:
@@ -1139,15 +1142,17 @@ class Manipulador(object):
         try:
             vers = arq_conf.arqconf['versão'].split('.')
             vers = list(map(int, vers))  # Transformar array de string em array de inteiro
-            if vers < [2, 0, 13]:
-                mensagem_erro('Erro', 'Deve ser usado arquivo de configuração com versão igual ou maior a 2.0.13')
+            if vers < [2, 1, 0]:
+                mensagem_erro('Erro', 'Deve ser usado arquivo de configuração com versão igual ou maior a 2.1.0')
             else:
                 try:
-                    Diretorio_de_salvamento = self.Diretorio_de_salvamento
-
-                    processing(Gerar_LP.gerar, {'LP_Padrao': self.Lppadrao.get_filename(),
+                    if self.codigo_se.get_text() != '' and arq_conf.eventos['codigo_se'] != '':
+                        Diretorio_de_salvamento = self.Diretorio_de_salvamento
+                        processing(Gerar_LP.gerar, {'LP_Padrao': self.Lppadrao.get_filename(),
                                                 'Arq_Conf': self.nome_arq_saida,
                                                 'Diretorio_Padrao': self.Diretorio_de_salvamento})
+                    else:
+                        mensagem_erro('Erro', 'Código da SE não especificado, se o campo estiver preenchido, salve antes de gerar')
                 except:
                     print_exc(file=stdout)
                     mensagem_erro('Erro', 'Erro inesperado ao tentar gerar lista de pontos.')

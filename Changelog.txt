@@ -4,6 +4,32 @@ Todas as mudanças serão documentadas neste arquivo.
 
 ###### Mantido pelo DETA.
 
+## [2.1.0]()- 09-02-2020
+
+### Adicionado
+
+- Arquivo de configuração próprio do FAS, substituindo a LP CONFIG
+
+### Modificado
+
+- Nova Interface gráfica com gtk e glade
+- Biblioteca xlrd substituida pela openpyxl
+- Instalador gerado pela biblioteca cx_freeze no ambiente Mingw64
+- Substituição de UC1 por F3 em LT's de 69kV 
+
+### Corrigido
+
+- Pontos da aplicação sendo gerados para o evento de proteção de barras
+- Pontos F9:FLDI/IDEV/RETR da aba disjuntor sendo gerados para eventos sem a marcação de 'F9' como 'Sim'
+- Erro na checagem de listas por ter campos como inteiros, agora os campos são tratados como string
+- Pontos MDCA e MDCE sendo gerados para LT's
+
+### Removido
+
+- LP CONFIG
+- Função Gerar Planilha ONS
+- Instalador pelo NSIS
+
 ## [2.0.12](https://github.com/detachesf/FAS-Controle-de-Versao/tree/1d9e30fe3d207ac460a0b86b1a8d629a9e08c90f)- 16-10-2020
 
 ### Adicionado
@@ -154,8 +180,8 @@ Todas as mudanças serão documentadas neste arquivo.
 - Erro na lógica de geração de pontos com #TRIFASICO.
 - Erro no tratamento de #PASS na geração dos pontos:
   - "FTCO" e "FCAM"
-  -  Para LT.
-  -  Para Disjuntor.
+  - Para LT.
+  - Para Disjuntor.
 
 ## 2.0.1 
 ### Modificado
@@ -254,7 +280,7 @@ Todas as mudanças serão documentadas neste arquivo.
 
 - BUG na  funcionalidade de comparação de LPs surgido na versão 1.0.0.
 - Em  linhas de 69kV com código 02F2 no ID SAGE o código era substituído por 02UC1.  Resolvido.
-- 
+- ​
 
 ## 1.0.1 - 30-08-2013 
 
