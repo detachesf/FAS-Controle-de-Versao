@@ -4,7 +4,7 @@ Todas as mudanças serão documentadas neste arquivo.
 
 ###### Mantido pelo DETA.
 
-## [2.1.0]()- 09-02-2020
+## [2.1.0](https://github.com/detachesf/FAS-Controle-de-Versao/tree/9e7206a1e5907daad160342ba1d2f34931b3fce6)- 09-02-2021
 
 ### Adicionado
 
