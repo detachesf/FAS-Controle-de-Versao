@@ -579,6 +579,63 @@
       </object>
     </child>
   </object>
+  <object class="GtkFileChooserDialog" id="arqlppadrao_dialog">
+    <property name="can-focus">False</property>
+    <property name="title" translatable="yes">Escolha o arquivo LP Padrão</property>
+    <property name="icon">static\CHESF1.png</property>
+    <property name="type-hint">dialog</property>
+    <property name="deletable">False</property>
+    <property name="filter">filtro_xls</property>
+    <child internal-child="vbox">
+      <object class="GtkBox">
+        <property name="can-focus">False</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">2</property>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox">
+            <property name="can-focus">False</property>
+            <property name="layout-style">end</property>
+            <child>
+              <object class="GtkButton" id="button_abrir_lppadrao_dialog">
+                <property name="label" translatable="yes">Abrir</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <signal name="clicked" handler="on_button_abrir_lppadrao_dialog_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="button_fechar_lppadrao_dialog">
+                <property name="label" translatable="yes">Fechar</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <signal name="clicked" handler="on_button_fechar_lppadrao_dialog_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <placeholder/>
+        </child>
+      </object>
+    </child>
+  </object>
   <object class="GtkFileChooserDialog" id="filechooser_dialog_cepel2excel">
     <property name="width-request">700</property>
     <property name="height-request">400</property>
@@ -809,6 +866,7 @@
                         <property name="image">image7</property>
                         <property name="use-stock">False</property>
                         <property name="always-show-image">True</property>
+                        <signal name="activate" handler="on_button_add_linha_clicked" swapped="no"/>
                       </object>
                     </child>
                     <child>
@@ -819,6 +877,7 @@
                         <property name="image">image8</property>
                         <property name="use-stock">False</property>
                         <property name="always-show-image">True</property>
+                        <signal name="activate" handler="on_button_duplicar_clicked" swapped="no"/>
                       </object>
                     </child>
                     <child>
@@ -829,6 +888,7 @@
                         <property name="image">image9</property>
                         <property name="use-stock">False</property>
                         <property name="always-show-image">True</property>
+                        <signal name="activate" handler="on_button_Excluir_clicked" swapped="no"/>
                       </object>
                     </child>
                     <child>
@@ -839,6 +899,7 @@
                         <property name="image">image10</property>
                         <property name="use-stock">False</property>
                         <property name="always-show-image">True</property>
+                        <signal name="activate" handler="on_button_limpar_clicked" swapped="no"/>
                       </object>
                     </child>
                     <child>
@@ -849,6 +910,7 @@
                         <property name="image">image11</property>
                         <property name="use-stock">False</property>
                         <property name="always-show-image">True</property>
+                        <signal name="activate" handler="on_selecionar_todas_clicked" swapped="no"/>
                       </object>
                     </child>
                   </object>
@@ -873,6 +935,7 @@
                         <property name="image">image1</property>
                         <property name="use-stock">False</property>
                         <property name="always-show-image">True</property>
+                        <signal name="activate" handler="on_gerarlp_clicked" swapped="no"/>
                       </object>
                     </child>
                     <child>
@@ -883,6 +946,7 @@
                         <property name="image">image2</property>
                         <property name="use-stock">False</property>
                         <property name="always-show-image">True</property>
+                        <signal name="activate" handler="on_checarlp_clicked" swapped="no"/>
                       </object>
                     </child>
                     <child>
@@ -904,6 +968,7 @@
                         <property name="image">image4</property>
                         <property name="use-stock">False</property>
                         <property name="always-show-image">True</property>
+                        <signal name="activate" handler="on_Base_SAGE_para_LP_Excel_activate" swapped="no"/>
                       </object>
                     </child>
                     <child>
@@ -914,6 +979,7 @@
                         <property name="image">image6</property>
                         <property name="use-stock">False</property>
                         <property name="always-show-image">True</property>
+                        <signal name="activate" handler="on_arqconf_cepel2excel_activate" swapped="no"/>
                       </object>
                     </child>
                   </object>
@@ -1361,18 +1427,6 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkFileChooserButton" id="file_chooser_lppadrao">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <property name="filter">filtro_xls</property>
-                    <property name="title" translatable="yes">Escolha o Arquivo LP Padrão</property>
-                  </object>
-                  <packing>
-                    <property name="left-attach">3</property>
-                    <property name="top-attach">0</property>
-                  </packing>
-                </child>
-                <child>
                   <object class="GtkBox">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
@@ -1430,6 +1484,19 @@
                   <packing>
                     <property name="left-attach">3</property>
                     <property name="top-attach">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkFileChooserButton" id="file_chooser_lppadrao">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="filter">filtro_xls</property>
+                    <property name="dialog">arqlppadrao_dialog</property>
+                    <property name="title" translatable="yes">Escolha o Arquivo LP Padrão</property>
+                  </object>
+                  <packing>
+                    <property name="left-attach">3</property>
+                    <property name="top-attach">0</property>
                   </packing>
                 </child>
               </object>

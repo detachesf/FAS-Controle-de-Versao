@@ -193,6 +193,7 @@ class Manipulador(object):
         self.arqconf_salvar_dialogo: Gtk.FileChooserDialog = builder.get_object('arqconf_salvar_dialogo')
         self.arqconf_abrir_dialogo: Gtk.FileChooserDialog = builder.get_object('arqconf_abrir_dialogo')
         self.dialogo_diretorio: Gtk.FileChooserDialog = builder.get_object('diretorio_dialogo')
+        self.dialogo_lppadrao: Gtk.FileChooserDialog = builder.get_object('arqlppadrao_dialog')
 
         self.comboplan: Gtk.ComboBoxText = builder.get_object('combobox_aba_a_checar')
 
@@ -1299,7 +1300,20 @@ class Manipulador(object):
 
     # Funções de configuração do FAS
     def on_arqconf_menubar_config_seleclppadrao_activate(self, button):
-        self.Lppadrao.show()
+        self.dialogo_lppadrao.show_all()
+
+    def on_button_fechar_lppadrao_dialog_clicked(self, button):
+        self.dialogo_lppadrao.hide()
+
+    def on_button_abrir_lppadrao_dialog_clicked(self, button):
+        self.Lppadrao.set_filename(self.dialogo_lppadrao.get_filename())
+        lppadrao = str(self.Lppadrao.get_filename()).rsplit('\\', 1)[1]
+        root = Element('ini', data='{}'.format(date.today()),
+                       versão=self.versao,
+                       arqlppadrao=str(lppadrao),
+                       diretorio_padrao=self.Diretorio_de_salvamento)
+        ElementTree(root).write(os.getcwd() + '\\' + 'ini.xml', 'UTF-8')
+        self.dialogo_lppadrao.hide()
 
     def on_arqconf_menubar_config_selecdir_salvamento_activate(self, button):
         self.dialogo_diretorio.show()
