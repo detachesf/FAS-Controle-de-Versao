@@ -9,6 +9,7 @@
     <property name="window-position">center-always</property>
     <property name="icon">static\CHESF1.png</property>
     <property name="type-hint">dialog</property>
+    <property name="deletable">False</property>
     <property name="action">select-folder</property>
     <signal name="selection-changed" handler="on_diretorio_dialogo_selection_changed" swapped="no"/>
     <child internal-child="vbox">
@@ -7061,6 +7062,55 @@ Paulo Roberto de Freitas (Contribuinte)
       </object>
     </child>
   </object>
+  <object class="GtkWindow" id="janela_carregando">
+    <property name="width-request">400</property>
+    <property name="height-request">50</property>
+    <property name="can-focus">True</property>
+    <property name="has-focus">True</property>
+    <property name="can-default">True</property>
+    <property name="has-default">True</property>
+    <property name="title" translatable="yes">Processando...</property>
+    <property name="resizable">False</property>
+    <property name="window-position">center</property>
+    <property name="icon">static\CHESF1.png</property>
+    <property name="urgency-hint">True</property>
+    <property name="deletable">False</property>
+    <property name="gravity">center</property>
+    <child>
+      <object class="GtkBox">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="orientation">vertical</property>
+        <child>
+          <object class="GtkLabel" id="label_progressbar">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="label" translatable="yes">label</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkProgressBar" id="progress_bar">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="hexpand">True</property>
+            <property name="vexpand">True</property>
+            <property name="show-text">True</property>
+            <property name="ellipsize">middle</property>
+          </object>
+          <packing>
+            <property name="expand">True</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
   <object class="GtkWindow" id="janela_progressbar">
     <property name="can-focus">False</property>
     <property name="window-position">center</property>
@@ -7068,7 +7118,6 @@ Paulo Roberto de Freitas (Contribuinte)
     <property name="icon">static\CHESF1.png</property>
     <property name="decorated">False</property>
     <property name="deletable">False</property>
-    <signal name="hide" handler="on_janela_progressbar_hide" swapped="no"/>
     <child>
       <object class="GtkBox">
         <property name="visible">True</property>
@@ -7193,6 +7242,62 @@ Paulo Roberto de Freitas (Contribuinte)
             <property name="fill">False</property>
             <property name="position">0</property>
           </packing>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkFileChooserDialog" id="vtelasbotoes_dialogo">
+    <property name="can-focus">False</property>
+    <property name="title" translatable="yes">Selecione o Arquivo VTelasBotoes.led</property>
+    <property name="icon">static\CHESF1.png</property>
+    <property name="type-hint">dialog</property>
+    <property name="deletable">False</property>
+    <child internal-child="vbox">
+      <object class="GtkBox">
+        <property name="can-focus">False</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">2</property>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox">
+            <property name="can-focus">False</property>
+            <property name="layout-style">end</property>
+            <child>
+              <object class="GtkButton" id="Vtelasbotoes_button_abrir">
+                <property name="label" translatable="yes">Abrir</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <signal name="clicked" handler="on_Vtelasbotoes_button_abrir_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="Vtelasbotoes_button_cancelar">
+                <property name="label" translatable="yes">Cancelar</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <signal name="clicked" handler="on_Vtelasbotoes_button_cancelar_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <placeholder/>
         </child>
       </object>
     </child>

@@ -4,7 +4,7 @@ import FASgtkui
 import os
 import pickle
 import gi
-
+import time
 dados = '''
 Vers„o 2.0.13
 Atualiza‡„o do programa: 02/12/2014
@@ -12,6 +12,7 @@ Gerar LP baseado nos m¢dulos LP e gerarPlanlhaLP
 '''
 
 gi.require_version("Gtk", "3.0")
+from gi.repository import GObject
 
 try:
     from bs4 import BeautifulSoup
@@ -32,13 +33,18 @@ def gerar(LP_Padrao, Arq_Conf, Diretorio_Padrao):
     try:
         arq_conf = BeautifulSoup(open(Arq_Conf, 'r', encoding='utf-8'), 'html.parser')  # Abrir arquivo de cofigura‡„o
     except:
-        FASgtkui.mensagem_erro('Erro', 'Arquivo de parametriza‡„o n„o encontrado')
+        GObject.idle_add(FASgtkui.mensagem_erro,'Erro', 'Arquivo de parametriza‡„o n„o encontrado')
+        time.sleep(1)
+        while FASgtkui.mensagem_erro_dialog.get_visible() == True:
+            time.sleep(1)
     try:
         Codigo_SE = arq_conf.eventos['codigo_se']  # Ler defini‡„o do c¢digo da SE
     except:
-        FASgtkui.mensagem_erro('Erro',
+        GObject.idle_add(FASgtkui.mensagem_erro,'Erro',
                                'Arquivo indicado n„o corresponde a arquivo de parametriza‡„o v lido, c¢digo da SE n„o encontrado')
-
+        time.sleep(1)
+        while FASgtkui.mensagem_erro_dialog.get_visible() == True:
+            time.sleep(1)
     nome_arq_saida = 'LP_gerada_%s.xlsx' % (Codigo_SE)  # Nome do arquivo de sa¡da
     seq_arq = 0  # Sequˆncia do n£mero de arquivo
 
@@ -130,8 +136,7 @@ def gerar(LP_Padrao, Arq_Conf, Diretorio_Padrao):
     arq_log.write('\n')
     arq_log.write('Total: ' + str(total))
     arq_log.close()
-    FASgtkui.Manipulador.set_nome_arq_saida(FASgtkui.Manipulador, nome_arq_saida.rsplit('\\', 1)[1])
-    FASgtkui.Manipulador.set_diretorio_salvamento(FASgtkui.Manipulador, Diretorio_Padrao)
+    GObject.idle_add(FASgtkui.dialogo_abrir_arquivo_gerado, nome_arq_saida.rsplit('\\', 1)[1], Diretorio_Padrao)
 
     nomearquivo = nome_arq_saida[2:]
     conf = {'arquivo': nomearquivo}

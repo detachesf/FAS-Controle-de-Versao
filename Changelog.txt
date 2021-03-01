@@ -4,6 +4,27 @@ Todas as mudanças serão documentadas neste arquivo.
 
 ###### Mantido pelo DETA.
 
+## [2.1.1](https://github.com/detachesf/FAS-Controle-de-Versao/tree/9e7206a1e5907daad160342ba1d2f34931b3fce6)- 28-02-2021
+
+### Adicionado
+
+- Configuração do diretorio de salvamento
+- Configuração da lp padrão a se utilizar
+
+### Modificado
+
+- Função base para lp excel com a bilioteca sagon
+  - Possibilidade de selecionar somente include
+  - Tratamento de erro ao não achar o arquivo de telas VTelasBotoes.led
+
+### Corrigido
+
+- Algumas funções da barra de ferramentas não estavam funcionando
+
+### Removido
+
+- ​
+
 ## [2.1.0](https://github.com/detachesf/FAS-Controle-de-Versao/tree/9e7206a1e5907daad160342ba1d2f34931b3fce6)- 09-02-2021
 
 ### Adicionado

@@ -6,7 +6,7 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GObject
 GObject.threads_init()
 import FASgtkui
-
+import time
 
 try:
     from openpyxl import load_workbook,cell
@@ -70,15 +70,17 @@ def linhaInicialETitulos(arquivo, nomeAba):
     #Tratamento dos t¡tulos principais, se n„o estiver da mesma forma da aba PADRAO da lista de pontos, a mensagem de erro ‚ gerada
     for tit in TitulosPrinc:
         if tit not in titulossuperiores:
-            FASgtkui.mensagem_erro('Erro','T¡tulo {} n„o identificado no arquivo a ser checado, verifique se ele est  escrito desta mesma forma.'.format(tit))
-
+            GObject.idle_add(FASgtkui.mensagem_erro,'Erro','T¡tulo {} n„o identificado no arquivo a ser checado, verifique se ele est  escrito desta mesma forma.'.format(tit))
+            time.sleep(1)
+            while FASgtkui.mensagem_erro_dialog.get_visible() == True:
+                time.sleep(1)
     subtitulosn2 = {}
     subtitulosn3Tele = {}
     subtitulosn3 = {}
     subtitulosONS = {}
     subtitulosLO = {}
 # sess„o onde os subt¡tulos s„o captados da lista a ser checada
-    for coluna in range( titulossuperiores['CHESF - N‹VEL 2'][1], titulossuperiores['CHESF - TELEASSIST‰NCIA N3'][1]):
+    for coluna in range(titulossuperiores['CHESF - N‹VEL 2'][1], titulossuperiores['CHESF - TELEASSIST‰NCIA N3'][1]):
         for i in range(1,3):
             if str(sheet.cell(row = titulossuperiores['CHESF - N‹VEL 2'][0] + i, column = coluna).value).upper().strip() != '':
                 subtitulosn2[str(sheet.cell(row = titulossuperiores['CHESF - N‹VEL 2'][0] + i, column = coluna).value).upper().strip()] = coluna
@@ -128,23 +130,40 @@ def linhaInicialETitulos(arquivo, nomeAba):
     camposONS = ['ITEM','DESCRI€ŽO']
     camposLimop = ['LIU','LIE','LIA','LSA','LSE','LSU','BNDMO','OBSERVA€™ES']
     if 'TELA' not in titulos['CHESF - N‹VEL 2'] and 'ANUNCIADOR' not in titulos['CHESF - N‹VEL 2']:
-        FASgtkui.mensagem_erro('Erro','Campo TELA ou ANUNCIADOR n„o identificado abaixo do cabe‡alho CHESF - N‹VEL 2 do arquivo a ser checado, verifique se ele est  escrito desta mesma forma.')
+        GObject.idle_add(FASgtkui.mensagem_erro,'Erro','Campo TELA ou ANUNCIADOR n„o identificado abaixo do cabe‡alho CHESF - N‹VEL 2 do arquivo a ser checado, verifique se ele est  escrito desta mesma forma.')
+        time.sleep(1)
+        while FASgtkui.mensagem_erro_dialog.get_visible() == True:
+            time.sleep(1)
     for campo in camposN2:
         if campo not in titulos['CHESF - N‹VEL 2']:
-            FASgtkui.mensagem_erro('Erro','Campo {} n„o identificado abaixo do cabe‡alho CHESF - N‹VEL 2 do arquivo a ser checado, verifique se ele est  escrito desta mesma forma.'.format(campo))
+            GObject.idle_add(FASgtkui.mensagem_erro,'Erro','Campo {} n„o identificado abaixo do cabe‡alho CHESF - N‹VEL 2 do arquivo a ser checado, verifique se ele est  escrito desta mesma forma.'.format(campo))
+            time.sleep(1)
+            while FASgtkui.mensagem_erro_dialog.get_visible() == True:
+                time.sleep(1)
     for campo in camposN3Tele:
         if campo not in titulos['CHESF - TELEASSIST‰NCIA N3']:
-            FASgtkui.mensagem_erro('Erro', 'Campo {} n„o identificado abaixo do cabe‡alho CHESF - TELEASSIST‰NCIA N3 do arquivo a ser checado, verifique se ele est  escrito desta mesma forma.'.format(campo))
+            GObject.idle_add(FASgtkui.mensagem_erro,'Erro', 'Campo {} n„o identificado abaixo do cabe‡alho CHESF - TELEASSIST‰NCIA N3 do arquivo a ser checado, verifique se ele est  escrito desta mesma forma.'.format(campo))
+            time.sleep(1)
+            while FASgtkui.mensagem_erro_dialog.get_visible() == True:
+                time.sleep(1)
     for campo in camposN3:
         if campo not in titulos['CHESF - N‹VEL 3']:
-            FASgtkui.mensagem_erro('Erro','Campo {} n„o identificado abaixo do cabe‡alho CHESF - N‹VEL 3 do arquivo a ser checado, verifique se ele est  escrito desta mesma forma.'.format(campo))
+            GObject.idle_add(FASgtkui.mensagem_erro,'Erro','Campo {} n„o identificado abaixo do cabe‡alho CHESF - N‹VEL 3 do arquivo a ser checado, verifique se ele est  escrito desta mesma forma.'.format(campo))
+            time.sleep(1)
+            while FASgtkui.mensagem_erro_dialog.get_visible() == True:
+                time.sleep(1)
     for campo in camposONS:
         if campo not in titulos['ONS']:
-            FASgtkui.mensagem_erro('Erro','Campo {} n„o identificado abaixo do cabe‡alho ONS do arquivo a ser checado, verifique se ele est  escrito desta mesma forma.'.format(campo))
+            GObject.idle_add(FASgtkui.mensagem_erro,'Erro','Campo {} n„o identificado abaixo do cabe‡alho ONS do arquivo a ser checado, verifique se ele est  escrito desta mesma forma.'.format(campo))
+            time.sleep(1)
+            while FASgtkui.mensagem_erro_dialog.get_visible() == True:
+                time.sleep(1)
     for campo in camposLimop:
         if campo not in titulos['LIMITES OPERACIONAIS']:
-            FASgtkui.mensagem_erro('Erro','Campo {} n„o identificado abaixo do cabe‡alho LIMITES OPERACIONAIS do arquivo a ser checado, verifique se ele est  escrito desta mesma forma.'.format(campo))
-
+            GObject.idle_add(FASgtkui.mensagem_erro,'Erro','Campo {} n„o identificado abaixo do cabe‡alho LIMITES OPERACIONAIS do arquivo a ser checado, verifique se ele est  escrito desta mesma forma.'.format(campo))
+            time.sleep(1)
+            while FASgtkui.mensagem_erro_dialog.get_visible() == True:
+                time.sleep(1)
     li += 1  # Seleciona linha ap¢s o t¡tulo
     if 'ID (SAGE)' in titulos['CHESF - N‹VEL 2']:                               #Verifica se foi encontrado chave "ID (SAGE)"
         while True:
@@ -160,14 +179,16 @@ def processing(function, args):
 
     def check():
         if not thread_f.isAlive():
-            janela.hide()
-            FASgtkui.Manipulador.on_janela_progressbar_hide(FASgtkui.Manipulador)
+            if args.get('base_path', None) == None:
+                janela.hide()
             return False
         return True
-    janela: Gtk.Window = FASgtkui.builder.get_object('janela_progressbar')
-    Spinner: Gtk.Spinner = FASgtkui.builder.get_object('spinner')
-    janela.show()
-    Spinner.activate()
+
+    if args.get('base_path', None) == None:
+        janela: Gtk.Window = FASgtkui.builder.get_object('janela_progressbar')
+        Spinner: Gtk.Spinner = FASgtkui.builder.get_object('spinner')
+        janela.show()
+        Spinner.activate()
     thread_f = threading.Thread(target=function, kwargs=args)
     thread_f.start()
     tread = GObject.timeout_add(300, check)

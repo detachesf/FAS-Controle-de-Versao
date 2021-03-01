@@ -10,7 +10,12 @@ import inspect
 
 import copy
 
+import gi
+gi.require_version("Gtk", "3.0")
+from gi.repository import Gtk,GObject
+from FASgtkui import mensagem_aviso, message_aviso_dialog
 
+import time
 DAT_KEYS = {}
 DAT_KEYS["pds"]=DAT_KEYS["pdf"]=DAT_KEYS["pdd"]=DAT_KEYS["pas"]=DAT_KEYS["noh"]=DAT_KEYS["cnf"]=DAT_KEYS["nv1"]= \
     DAT_KEYS["tac"]=DAT_KEYS["paf"]=DAT_KEYS["cgs"]=DAT_KEYS["cgf"]=DAT_KEYS["pts"]=DAT_KEYS["ptf"]=\
@@ -201,7 +206,11 @@ def get_file(dat_path, **kwargs):
     if not os.path.exists(dat_path):
         dat_path = os.path.join(os.curdir,dat_path)
     if not os.path.exists(dat_path):
-        print_msg(__name__, "caminho para o arquivo n„o existe: (0)".format(dat_path), **kwargs)
+        GObject.idle_add(mensagem_aviso,'Aviso','Caminho para o arquivo n„o exite: {}'.format(dat_path))
+        time.sleep(1)
+        while message_aviso_dialog.get_visible() == True:
+            time.sleep(1)
+        #print_msg(__name__, "caminho para o arquivo n„o existe: (0)".format(dat_path), **kwargs)
     if os.path.isfile(dat_path):
         # leitura do arquivo e cria‡„o da string
         try:
@@ -368,6 +377,8 @@ def load_dat(dat_type, **kwargs):
     source_path = kwargs.get("source_path","")
     source_str = kwargs.get("source_str","")
     concatenate = kwargs.get("concatenate",False)
+    label_progressbar: Gtk.Label = kwargs.get('label_progressbar',None)
+
 
     # Carrega o dat em uma das op‡”es na seguinte ordem de prioridade: base, caminho, string ou diret¢rio corrente
     if base != "":
@@ -445,7 +456,9 @@ def load_dat(dat_type, **kwargs):
                     include_path = include_str.lstrip("/")
                     include_path = fix_path(include_path)
                     #TESTE include_path = os.path.join(base_path, include_path )
-                    print_msg(__name__, "lendo "+include_path, MSG_INFO,**kwargs)
+                    fname = inspect.currentframe().f_back.f_code.co_name
+                    label_progressbar.set_text("({0}.{1}) {2}: {3}".format(__name__, fname, MSG_INFO, include_path))
+
                     tmp_path = os.path.join(base_path, include_path)
                     inc_recs = load_dat(dat_type=dat_type, source_path=tmp_path, no_comments=no_comments, \
                                           no_field_comment=no_field_comment, concatenate=concatenate, \
@@ -1197,7 +1210,7 @@ def _ds_get_item(dat_type, dataset, item_id="", item={}, **kwargs):
     output = {}
     if item_id:
         for d in dataset:
-            if d.get(DAT_KEYS[dat_type])==item_id:
+            if d.get(DAT_KEYS[dat_type]) == item_id:
                 output = d.copy()
                 break
     elif item:
@@ -1210,6 +1223,7 @@ def _ds_get_item(dat_type, dataset, item_id="", item={}, **kwargs):
             if conditions_apply(d, where, op):
                 output = d.copy()
                 break
+    #print(str(len(dataset)) + ' ' + dat_type)
     return output
 
 

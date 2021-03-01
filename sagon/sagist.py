@@ -1549,6 +1549,8 @@ def get_item_from_base(dat_type, item_id="", item={}, **kwargs):
     else:
         return "", {}
 
+
+
 def get_dataset_from_base(dat_type, id_set=[], item_set = [], **kwargs):
     dat_type = dat_type.lower()
     #where = kwargs.get("where",{})
@@ -1954,8 +1956,6 @@ def get_aconf_from_base(dat_type, item_id="", item={}, **kwargs):
     tpaqs = TPAQS[tac_item.get("TPAQS", "ASAC")]
     #s_type = tpaqs[I_DESCR]
 
-
-
     # lˆ a lsc do item
     s_lsc_id = tac_item.get("LSC")
     if s_lsc_id is None:
@@ -1989,8 +1989,12 @@ def get_aconf_from_base(dat_type, item_id="", item={}, **kwargs):
         else:
             where = {"PNT": "== "+s_item.get("ID"),
                     "TPPNT": "== "+dat_type.upper()}
+        #print('dtf: ' + str(dtf))
         xxf_location, xxf_item = get_item_from_base(dat_type=dtf, where=where, **kwargs)
         xxf_conf = get_physical_conf(dtf, item=xxf_item, **kwargs)
+        #xxf_item = xxf_conf.get(dtf).get('item')
+        #xxf_location = xxf_conf.get(dtf).get('location')
+        #print('xxf item: '+ str(xxf_item) + '\n' + 'xxf_conf: '+ str(xxf_conf))
         xxf_locations.append(xxf_location)
         xxf_items.append(xxf_item)
         nv1_items.append(xxf_conf["nv1"]["item"])
@@ -2001,7 +2005,6 @@ def get_aconf_from_base(dat_type, item_id="", item={}, **kwargs):
         output[dtf] = {"locations": xxf_locations, "items": xxf_items}
         output["nv1"] = {"locations": nv1_locations, "items": nv1_items}
         output["nv2"] = {"locations": nv2_locations, "items": nv2_items}
-
 
     # caso seja um c lculo, pegar as parcelas de rca
     elif tpaqs == TPAQS_ACSC:
@@ -2250,9 +2253,10 @@ def get_logical_dist(dat_type, item_id="", item={}, **kwargs):
     # um ponto pode ter v rias distribui‡”es configuradas
 
     xxd_items = get_dataset_from_base(dat_type=dtd, where=where, **kwargs)
+    print('xxd_items: ' + str(xxd_items))
     for xxd_item in xxd_items:
         xxd_location = find_item_in_base(dat_type, item=xxd_item, **kwargs)
-        tdd_location, tdd_item = get_tdd(item_id=xxd_item.get("TDD"), **kwargs)
+        tdd_location, tdd_item = get_tdd(item_id=item_id, **kwargs)
         xxf_location, xxf_item = get_item_from_base(dtf,
                                                     where={
                                                       "PNT": "== "+xxd_item.get("ID"),
@@ -2280,6 +2284,82 @@ def get_logical_dist(dat_type, item_id="", item={}, **kwargs):
         output.append(item)
     return output
 
+def get_endN3_dist(dat_type, item_id="", item={}, **kwargs):
+    '''
+     Retorna um dicion rio com configura‡”es de distribui‡„o do ponto l¢gico passado como parƒmetro. Formato da sa¡da:
+     {
+     [pdd|pad|ptd] : {
+                     "item": dict item,
+                     "location": str include_location
+                     },
+     [pdf|paf|ptf] : {
+                     "item": dict item,
+                     "location": str include_location
+                     },
+     "tdd" :         {
+                     "item": dict item,
+                     "location": str include_location
+                     },
+     "nv1" :         {
+                     "item": dict item,
+                     "location": str include_location
+                     },
+     "nv2" :         {
+                     "item": dict item,
+                     "location": str include_location
+                     },
+     "lsc" :         {
+                     "item": dict item,
+                     "location": str include_location
+                     },
+     "cnf" :         {
+                     "item": dict item,
+                     "location": str include_location
+                     },
+     }
+     :param dat_type:
+     :param item_id:
+     :param item:
+     :param kwargs:
+     :return:
+     '''
+    output = ''
+    dat = kwargs.get('base')
+    dat_type = dat_type.lower()
+    dtf = dat_type.replace("s", "f")
+    dtd = dat_type.replace("s", "d")
+    if dat_type == 'cgs':
+        dtd = 'pdd'
+    where = {
+        dat_type.upper(): "== " + item_id
+    }
+    # um ponto pode ter v rias distribui‡”es configuradas
+    xxd_items = get_dataset(dat_type=dtd.lower(), generic_set=dat, id_set=[], item_set=[],
+                            **kwargs)
+    #for xxd_item in xxd_items:
+    xxd_item = xxd_items[len(xxd_items)-1]
+    #xxd_location = find_item_in_base(dat_type, item=xxd_item, **kwargs)
+    #xxd_location = find_item(dat_type=dat_type, generic_set=dat, item_id="", item=xxd_item)
+    xxd_location, xxd_dic = get_item_from_base(dat_type=dtd, where={"PDS": "== " + item_id}, base_item = dat, **kwargs)
+    if xxd_dic != {}:
+        #tdd_location, tdd_item = get_tdd(item_id = xxd_dic.get('TDD'), base_item = dat, **kwargs)
+        xxf_location, xxf_item = get_item_from_base(dtf,
+                                                    where={
+                                                        "PNT": "== " + xxd_dic.get("ID"),
+                                                        "TPPNT": "== " + dtd.upper()
+                                                    },base_item = dat, **kwargs)
+        '''item = {
+            dtf: {
+                "item": xxf_item,
+                "location": xxf_location
+            }
+            }'''
+        #phy_conf = get_physical_conf(dat_type=dtf, item=xxf_item, base_item = dat, **kwargs)
+        #item.update(phy_conf)
+        if item_id =='BNO:34S2-7:89':
+            print(xxf_item)
+        output = xxf_item.get('ORDEM')
+    return output
 
 def get_control_dist(item_id="", item={}, **kwargs):
     '''

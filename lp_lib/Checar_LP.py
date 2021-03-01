@@ -13,6 +13,11 @@ from operator import itemgetter
 from difflib import get_close_matches
 from traceback import print_exc
 from sys import stdout
+import threading
+import time
+import gi
+gi.require_version("Gtk", "3.0")
+from gi.repository import GObject
 
 try:
     from openpyxl import load_workbook, cell
@@ -63,7 +68,10 @@ def checar(LP_Padrao='', LP_Editado='', planilha='', Arq_Conf='',
     try:
         book = load_workbook(LP_Validar, data_only=True)  # Abrir arquivo de LP a ser validada
     except:
-        FASgtkui.mensagem_erro('Erro', 'Arquivo ' + LP_Validar + ' n„o encontrado')
+        GObject.idle_add(FASgtkui.mensagem_erro,'Erro', 'Arquivo ' + LP_Validar + ' n„o encontrado')
+        time.sleep(1)
+        while FASgtkui.mensagem_erro_dialog.get_visible() == True:
+            time.sleep(1)
 
     sheet = book[Nome_Planilha]  # Abrir planilhas
     try:
@@ -256,7 +264,10 @@ def checar(LP_Padrao='', LP_Editado='', planilha='', Arq_Conf='',
                 array_validar.append(array_coletado)
     except:
         print_exc(file=stdout)
-        FASgtkui.mensagem_erro('Erro', 'O programa n„o reconhece o arquivo a ser checado como v lido')
+        GObject.idle_add(FASgtkui.mensagem_erro,'Erro', 'O programa n„o reconhece o arquivo a ser checado como v lido')
+        time.sleep(1)
+        while FASgtkui.mensagem_erro_dialog.get_visible() == True:
+            time.sleep(1)
         gerararquivo = False
     if array_base:
         array_padrao = array_base
@@ -399,9 +410,11 @@ def checar(LP_Padrao='', LP_Editado='', planilha='', Arq_Conf='',
             '{}_{}_{}'.format(str(dic[0]).split(':')[1], str(dic[2]).strip(), str(dic[4]).strip()): (dic[0], dic[4]) for
             dic in dic_faltando.values()}  # Chave: [VŽO]_[DESCRI€ŽO]_[COMANDO], Valor: [ID SAGE]
     except:
-        FASgtkui.mensagem_aviso('Impossibilidade de Sugest„o de ID',
+        GObject.idle_add(FASgtkui.mensagem_aviso,'Impossibilidade de Sugest„o de ID',
                                 'N„o ser  poss¡vel realizar sugest„o de ponto.\nProvavelmente existem ID de pontos fora do padr„o')
-
+        time.sleep(1)
+        while FASgtkui.message_aviso_dialog.get_visible() == True:
+            time.sleep(1)
     # sugestao1_dic = {'{}_{}_{}_{}'.format(dic[0].split(':')[1], dic[0].split(':')[2], dic[2].strip(),dic[4].strip()) : (dic[0],dic[4]) for dic in array_padrao} # Chave: [VŽO]_[IED]_[DESCRI€ŽO]_[COMANDO], Valor: [ID SAGE]
     # sugestao2_dic = {'{}_{}_{}'.format(dic[0].split(':')[1], dic[2].strip(),dic[4].strip()) : (dic[0],dic[4]) for dic in array_padrao} # Chave: [VŽO]_[DESCRI€ŽO]_[COMANDO], Valor: [ID SAGE]
     # array_validar_ID_COM = [(col[0],col[4]) for col in array_validar]
@@ -531,9 +544,11 @@ def checar(LP_Padrao='', LP_Editado='', planilha='', Arq_Conf='',
     if msgerroNumero:
         print_exc(file=stdout)
         gerararquivo = False
-        FASgtkui.mensagem_erro('Erro',
+        GObject.idle_add(FASgtkui.mensagem_erro,'Erro',
                                'Verifique preenchimento de campos no Arquivo LP a ser checado. Nem um dos campos deve ser preenchido apenas com n£meros')
-
+        time.sleep(1)
+        while FASgtkui.mensagem_erro_dialog.get_visible() == True:
+            time.sleep(1)
     # ----------Pontos Faltantes----------#
     for pfaltando in sorted(dic_faltando.items(), key=itemgetter(0)):
         pfalta_array.append(pfaltando[1])
@@ -628,8 +643,7 @@ def checar(LP_Padrao='', LP_Editado='', planilha='', Arq_Conf='',
     # ----------Gravar arquivo Excel----------#
     if gerararquivo:
         arq_Relatorio.close()
-        FASgtkui.Manipulador.set_nome_arq_saida(FASgtkui.Manipulador, nome_arq_saida.rsplit('\\', 1)[1])
-        FASgtkui.Manipulador.set_diretorio_salvamento(FASgtkui.Manipulador, Diretorio_Padrao)
+        GObject.idle_add(FASgtkui.dialogo_abrir_arquivo_gerado, nome_arq_saida.rsplit('\\', 1)[1], Diretorio_Padrao)
 
         nomearquivo = nome_arq_saida[2:]
         conf = {'arquivo': nomearquivo}

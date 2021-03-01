@@ -1,8 +1,12 @@
 # -*- coding: cp860 -*-
 import re
-from FASgtkui import mensagem_erro
+import time
+from FASgtkui import mensagem_erro, mensagem_erro_dialog
 from sys import stdout
 from traceback import print_exc
+import gi
+gi.require_version("Gtk", "3.0")
+from gi.repository import GObject
 
 try:
     from openpyxl import load_workbook,cell
@@ -97,13 +101,17 @@ def gerarlp(lp_padrao, ArqConf):
     try:
         arq_conf = BeautifulSoup(open(ArqConf, 'r', encoding='utf-8'),'html.parser')  # Abrir arquivo de cofigura‡„o
     except:
-        mensagem_erro('Erro', u'Arquivo de parametriza‡„o n„o encontrado')
-
+        GObject.idle_add(mensagem_erro,'Erro', u'Arquivo de parametriza‡„o n„o encontrado')
+        time.sleep(1)
+        while mensagem_erro_dialog.get_visible() == True:
+            time.sleep(1)
     try:
         Codigo_SE = arq_conf.eventos['codigo_se']    #Ler defini‡„o do c¢digo da SE
     except:
-        mensagem_erro('Erro', u'Arquivo indicado n„o corresponde a arquivo de parametriza‡„o v lido')
-
+        GObject.idle_add(mensagem_erro,'Erro', u'Arquivo indicado n„o corresponde a arquivo de parametriza‡„o v lido')
+        time.sleep(1)
+        while mensagem_erro_dialog.get_visible() == True:
+            time.sleep(1)
     index_linha = 9  # Linha 10 do LP_Config.xls, in¡cio de lista de Painel SAGE e Bastidores de Rede
 
 
@@ -470,12 +478,23 @@ def gerarlp(lp_padrao, ArqConf):
     except:
         print_exc(file=stdout)
         aviso = 'Arquivo \"' + lp_padrao + u'\" n„o encontrado'
-        mensagem_erro('Erro', aviso)
+        GObject.idle_add(mensagem_erro,'Erro', aviso)
+        time.sleep(1)
+        while mensagem_erro_dialog.get_visible() == True:
+            time.sleep(1)
     abas = book.sheetnames
-    if len(abas) < 4: mensagem_erro('Erro', u'O programa n„o reconheceu a LP Padr„o como v lida')
+    if len(abas) < 4:
+       GObject.idle_add(mensagem_erro,'Erro', u'O programa n„o reconheceu a LP Padr„o como v lida')
+       time.sleep(1)
+       while mensagem_erro_dialog.get_visible() == True:
+           time.sleep(1)
     for plan_index in range(3, 22):  # Ler Planilhas com index 3 a 22 (quarta a vig‚sima primeira), uma a uma
         sheet = book[abas[plan_index]]  # Abrir planilhas
-        if abas[plan_index] not in evento_dic: mensagem_erro('Erro', u'O programa n„o reconheceu a LP Padr„o como v lida {}')
+        if abas[plan_index] not in evento_dic:
+            GObject.idle_add(mensagem_erro,'Erro', u'O programa n„o reconheceu a LP Padr„o como v lida {}')
+            time.sleep(1)
+            while mensagem_erro_dialog.get_visible() == True:
+                time.sleep(1)
         if evento_dic[abas[plan_index]]:  # Verificar se no arquivo de configura‡„o foi solicitado ler planilha
             # Gerar dicion rio titulo_dic (dicion rio de t¡tulos das colunas)
             for li in range(2, 10):  # Varrer as linhas de 2 a 10

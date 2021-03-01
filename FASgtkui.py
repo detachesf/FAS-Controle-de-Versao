@@ -17,25 +17,27 @@ from traceback import print_exc
 
 # Caixas de diálogo
 
+mensagem_erro_dialog: Gtk.MessageDialog = builder.get_object('message_erro')
+
 def mensagem_erro(titulo, msg):
-    mensagem_erro: Gtk.MessageDialog = builder.get_object('message_erro')
-    mensagem_erro.props.text = titulo
-    mensagem_erro.set_title('Erro')
-    mensagem_erro.props.secondary_text = msg
-    mensagem_erro.props.icon_name = 'dialog-error-symbolic'
-    mensagem_erro.show_all()
-    mensagem_erro.run()
-    mensagem_erro.hide()
 
+    mensagem_erro_dialog.props.text = titulo
+    mensagem_erro_dialog.set_title('Erro')
+    mensagem_erro_dialog.props.secondary_text = msg
+    mensagem_erro_dialog.props.icon_name = 'dialog-error-symbolic'
+    mensagem_erro_dialog.show_all()
+    mensagem_erro_dialog.run()
+    mensagem_erro_dialog.hide()
 
+message_aviso_dialog: Gtk.MessageDialog = builder.get_object('message_aviso')
 def mensagem_aviso(titulo, msg):
-    message_aviso: Gtk.MessageDialog = builder.get_object('message_aviso')
-    message_aviso.props.text = titulo
-    message_aviso.props.secondary_text = msg
-    message_aviso.props.icon_name = 'dialog-warning-symbolic'
-    message_aviso.show_all()
-    message_aviso.run()
-    message_aviso.hide()
+
+    message_aviso_dialog.props.text = titulo
+    message_aviso_dialog.props.secondary_text = msg
+    message_aviso_dialog.props.icon_name = 'dialog-warning-symbolic'
+    message_aviso_dialog.show_all()
+    message_aviso_dialog.run()
+    message_aviso_dialog.hide()
 
 
 def pergunta_sim_nao(titulo, msg):
@@ -43,14 +45,13 @@ def pergunta_sim_nao(titulo, msg):
     perguntasimnao.props.text = titulo
     perguntasimnao.props.secondary_text = msg
     perguntasimnao.props.icon_name = 'dialog-question-symbolic'
-    perguntasimnao.show_all()
+    perguntasimnao.show()
     resposta = perguntasimnao.run()
     perguntasimnao.hide()
     if resposta == Gtk.ResponseType.YES:
         return True
     elif resposta == Gtk.ResponseType.NO:
         return False
-
 
 try:
     import lp_lib.LP_Comparar as LP_Comparar
@@ -96,6 +97,7 @@ class Manipulador(object):
         self.window.show_all()  # Mostra a janela principal
         self.lp_de_saida = ''
         self.gerar_lp = False
+        self.checar_lp = False
         self.base_para_lp = False
         self.Diretorio_de_salvamento = os.getcwd()
         self.Lb = ""
@@ -177,6 +179,10 @@ class Manipulador(object):
 
         self.janela_sobre: Gtk.AboutDialog = builder.get_object('janela_sobre')
         self.janela_comparar: Gtk.Window = builder.get_object('janela_comparar')
+        self.janela_carregando: Gtk.Window = builder.get_object('janela_carregando')
+
+        self.label_progressbar: Gtk.Label = builder.get_object('label_progressbar')
+        self.progress_bar: Gtk.ProgressBar = builder.get_object('progress_bar')
 
         self.notebook: Gtk.Notebook = builder.get_object('notebook1')
         #
@@ -187,6 +193,7 @@ class Manipulador(object):
         self.nome_arqconf: Gtk.Entry = builder.get_object('arqconf_entry_nome-arquivo')
         self.diretorio_dialogo_pasta_entry: Gtk.Entry = builder.get_object('diretorio_dialogo_pasta_entry')
 
+
         self.Lppadrao: Gtk.FileChooserButton = builder.get_object('file_chooser_lppadrao')
         self.Lp_a_checar: Gtk.FileChooserButton = builder.get_object('lp_a_checar')
 
@@ -194,6 +201,8 @@ class Manipulador(object):
         self.arqconf_abrir_dialogo: Gtk.FileChooserDialog = builder.get_object('arqconf_abrir_dialogo')
         self.dialogo_diretorio: Gtk.FileChooserDialog = builder.get_object('diretorio_dialogo')
         self.dialogo_lppadrao: Gtk.FileChooserDialog = builder.get_object('arqlppadrao_dialog')
+        self.dialogo_vtelas : Gtk.FileChooserDialog = builder.get_object('vtelasbotoes_dialogo')
+
 
         self.comboplan: Gtk.ComboBoxText = builder.get_object('combobox_aba_a_checar')
 
@@ -1166,17 +1175,13 @@ class Manipulador(object):
     def set_diretorio_salvamento(self, nome):
         self.Diretorio_de_salvamento = nome
 
-    def on_janela_progressbar_hide(self):
-        abrirarquivo = pergunta_sim_nao('Aviso', 'Arquivo \"' + self.lp_de_saida
-                                        + '\" gerado em ' + self.Diretorio_de_salvamento + '\n\n Deseja abrir o arquivo gerado agora?')
-        if abrirarquivo:
-            os.startfile(self.Diretorio_de_salvamento + '\\' + self.lp_de_saida)
-
     # Eventos ligados a função base SAGE para LP excel
 
     def on_Base_SAGE_para_LP_Excel_activate(self, menubar):
         self.base_para_lp = True
+        self.dialogo_diretorio.set_title('Selecione o diretório onde estão os arquivos .dat (Pasta dados ou include)')
         self.dialogo_diretorio.show()
+
 
     def on_diretorio_dialogo_pasta_button_cancelar_clicked(self, button):
         self.dialogo_diretorio.hide()
@@ -1201,7 +1206,7 @@ class Manipulador(object):
 
     def Base2Lp(self):
         try:
-            from lp_lib.base2lp import base2lp
+            from lp_lib.base2lp_sagon import base2xls
         except:
             mensagem_erro('Erro', 'Módulo base2lp não instalado')
             return 0
@@ -1210,11 +1215,67 @@ class Manipulador(object):
         self.diretorio_dialogo_pasta_entry.set_text("")
         if diretorio:
             try:
-                base2lp(diretorio, self.Diretorio_de_salvamento)
-                self.base_para_lp = False
+                telas, include_indice = self.analisa_vtelas(diretorio)
+                if telas != None:
+                    processing(base2xls,{'base_path': diretorio, 'Diretorio_Padrao' : self.Diretorio_de_salvamento,
+                                         'label_progressbar':self.label_progressbar,
+                                         'progress_bar':self.progress_bar,
+                                         'janela_carregando':self.janela_carregando,
+                                         'telas':telas,
+                                         'include_indice':include_indice})
+                    self.janela_carregando.show_all()
+                    self.base_para_lp = False
             except:
                 print_exc(file=stdout)
                 mensagem_erro('Erro', 'Erro inesperado ao tentar gerar lista de pontos.')
+
+    def analisa_vtelas(self, diretorio):
+        include_indice = 2  # Variável para identificar se foi selecionado um include
+        try:
+            nome_arq_tela = ''
+            if os.path.exists('{}\\ihm\\VTelasBotoes.led'.format(diretorio.rsplit('\\', 2)[0])):
+                nome_arq_tela = '{}\\ihm\\VTelasBotoes.led'.format(diretorio.rsplit('\\', 2)[0])
+                include_indice = 2
+            elif os.path.exists('{}\\ihm\\VTelasBotoes.led'.format(diretorio.rsplit('\\', 3)[0])):
+                nome_arq_tela = '{}\\ihm\\VTelasBotoes.led'.format(diretorio.rsplit('\\', 3)[0])
+                include_indice = 3
+            arq_telas = open(nome_arq_tela)
+            telas = []
+            for linha in arq_telas.readlines():
+                if 'TELA' in linha:
+                    telas.append(linha.split('\"')[1].split()[1])
+            arq_telas.close()
+            return telas, include_indice
+        except:
+            if diretorio.rsplit('\\',3)[2] == 'dados':
+                include_indice = 3
+            elif diretorio.rsplit('\\',3)[2] == 'bd':
+                include_indice = 2
+            else:
+                mensagem_erro('Erro', 'A Base não pôde ser carregada, pasta dados ou de include não foram selecionados')
+                return None, None
+            vtelas_manualmente = pergunta_sim_nao('Aviso', 'O arquivo {}\\ihm\\VTelasBotoes.led não pode ser carregado. Deseja selecionar manualmente o arquivo?  \
+                            \n OBS:A coluna "TELA" da tabela gerada não será preenchida caso não selecione o arquivo.'.format(diretorio.rsplit('\\', include_indice)[0]))
+
+            if vtelas_manualmente:
+                self.dialogo_vtelas.set_current_folder(diretorio)
+                self.dialogo_vtelas.run()
+                if 'VTelasBotoes.led' in self.nome_arq_tela:
+                    arq_telas = open(self.nome_arq_tela)
+                    telas = []
+                    for linha in arq_telas.readlines():
+                        if 'TELA' in linha:
+                            telas.append(linha.split('\"')[1].split()[1])
+                    arq_telas.close()
+                elif 'cancelar' in self.nome_arq_tela:
+                    mensagem_aviso('Aviso', 'Operação cancelada.')
+                    return None, None
+                else:
+                    mensagem_erro('Erro', 'Arquivo inválido.')
+                    return None, None
+            else:
+                telas = []
+            return telas,include_indice
 
     # Comparar Listas
 
@@ -1316,8 +1377,23 @@ class Manipulador(object):
         self.dialogo_lppadrao.hide()
 
     def on_arqconf_menubar_config_selecdir_salvamento_activate(self, button):
+        self.dialogo_diretorio.set_title('Selecione o diretório de salvamento padrão')
         self.dialogo_diretorio.show()
 
+    def on_Vtelasbotoes_button_abrir_clicked(self, button):
+        self.nome_arq_tela = self.dialogo_vtelas.get_filename()
+        self.dialogo_vtelas.hide()
+
+    def on_Vtelasbotoes_button_cancelar_clicked(self, button):
+        self.nome_arq_tela = 'cancelar'
+        self.dialogo_vtelas.hide()
+
+
+def dialogo_abrir_arquivo_gerado(lp_de_saida, Diretorio_de_salvamento):
+    abrirarquivo = pergunta_sim_nao('Aviso', 'Arquivo \"' + lp_de_saida
+                                    + '\" gerado em ' + Diretorio_de_salvamento + '\n\n Deseja abrir o arquivo gerado agora?')
+    if abrirarquivo:
+        os.startfile(Diretorio_de_salvamento + '\\' + lp_de_saida)
 
 if __name__ == '__main__':
     builder.connect_signals(Manipulador())  # Conecta os sinais da interface com a classe manipuladora "manipulador"
