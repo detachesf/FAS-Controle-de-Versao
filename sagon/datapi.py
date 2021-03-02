@@ -13,7 +13,7 @@ import copy
 import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk,GObject
-from FASgtkui import mensagem_aviso, message_aviso_dialog
+from FASgtkui import mensagem_aviso, message_aviso_dialog, mensagem_erro, mensagem_erro_dialog
 
 import time
 DAT_KEYS = {}
@@ -387,12 +387,16 @@ def load_dat(dat_type, **kwargs):
             dat = get_file(dat_path, **kwargs)
             base_path = os.path.dirname(dat_path)
         except:
-            print("(datapi.load_dat) erro: base {0} n„o encontrada".format(base))
+            GObject.idle_add(mensagem_erro,'Erro',"base {0} n„o encontrada".format(base))
+            time.sleep(1)
+            while mensagem_erro_dialog.get_visible() == True:
+                time.sleep(1)
+            #print("(datapi.load_dat) erro: base {0} n„o encontrada".format(base))
 
     elif source_path != "":
         source_path = fix_path(source_path)
         if not ".dat" in source_path:
-            dat_path = os.path.join(source_path,dat_type+".dat")
+            dat_path = os.path.join(source_path, dat_type+".dat")
         else:
             dat_path = source_path
         #dat_path = os.path.join(os.path.curdir,source_path)
@@ -400,7 +404,11 @@ def load_dat(dat_type, **kwargs):
             dat = get_file(dat_path, **kwargs)
             base_path = os.path.dirname(dat_path)
         except:
-            print("(datapi.load_dat) erro na leitura: {0}".format(source_path))
+            GObject.idle_add(mensagem_erro, 'Erro', "erro na leitura: {0}".format(source_path))
+            time.sleep(1)
+            while mensagem_erro_dialog.get_visible() == True:
+                time.sleep(1)
+            #print("(datapi.load_dat) erro na leitura: {0}".format(source_path))
 
     elif source_str != "":
         dat = source_str
@@ -411,7 +419,11 @@ def load_dat(dat_type, **kwargs):
             dat = get_file(dat_path, **kwargs)
             base_path = os.path.dirname(dat_path)
         except:
-            print("(datapi.load_dat) erro: nenhuma entrada especificada")
+            GObject.idle_add(mensagem_erro, 'Erro', "erro: nenhuma entrada especificada")
+            time.sleep(1)
+            while mensagem_erro_dialog.get_visible() == True:
+                time.sleep(1)
+            #print("(datapi.load_dat) erro: nenhuma entrada especificada")
 
     # checa se o dat ‚ do tipo informado
     #if not is_dat_type(dat_type,dat):

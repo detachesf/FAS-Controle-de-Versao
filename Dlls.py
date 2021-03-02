@@ -83,6 +83,7 @@ include_files = [
     ('C:/msys64/mingw64/share/locale', 'share/locale'),
     # arquivos estáticos
     ('static'),
+    ('sagon'),
     ('user_interface.glade'),
     ('Changelog.pdf'),
     ('Consideracoes Tecnicas N1 e N2 R05.pdf')

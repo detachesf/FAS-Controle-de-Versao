@@ -58,7 +58,6 @@ def base2xls(base_path='', Diretorio_Padrao = '', **kwargs):
                     SOE, OBSERVACAO, ENDERECO, LIU, LIE, LIA, LSA, LSE,LSU,BNDMO])
 
     #Loop principal
-    dat_conf ={}
     for dat_type in ['pds','pas', 'pts', 'cgs']:
         dat = base[dat_type]
         janela_carregando.set_title('Lendo {0}...'.format(dat_type.upper()))
@@ -118,8 +117,7 @@ def base2xls(base_path='', Diretorio_Padrao = '', **kwargs):
                             # ws['D' + str(row)].value = dat_conf.get('lsc').get('item').get('ID') #Escreve na coluna tipo do rel‚
                             TIPO_RELE = dat_conf.get('lsc').get('item').get('ID')
                         except:
-                            print('ID: ' + str(dat_item.get('ID', '')))
-                            print('TIPO : {}'.format(dat_type))
+                            pass
                     # campos extras comuns a todos pds, pas, pts, cgs
                     # ws[COLS[xs.cIDICCP]+str(row)].value = dat_item.get('IDICCP')
                     # ws['S'+ str(row)].value = dat_item.get('OBSRV') #escreve na coluna Observa‡„o

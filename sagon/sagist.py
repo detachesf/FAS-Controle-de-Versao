@@ -1960,6 +1960,8 @@ def get_aconf_from_base(dat_type, item_id="", item={}, **kwargs):
     s_lsc_id = tac_item.get("LSC")
     if s_lsc_id is None:
         print_msg(__name__, "o item n„o tem LSC configurada", **kwargs)
+        print(item_id)
+        print(tac_item.get('ID'))
         return {}
     lsc_location, lsc_item = get_lsc(item_id=s_lsc_id, **kwargs)
 
@@ -2104,6 +2106,16 @@ def load_base(**kwargs):
     base['rca'] = load_rca(**kwargs)
     base['rfc'] = load_rfc(**kwargs)
     base['rfi'] = load_rfi(**kwargs)
+
+    source_path = kwargs.get('source_path')
+    # Ajusta o caminho da base para a pasta raiz dados, caso tenha sido selecionado um inlcude
+    # Esse procedimento ‚ feito apenas para carregar os arquivos de configura‡„o abaixo
+    if source_path != None:
+        if source_path.rsplit('\\', 3)[2] == 'dados':
+            source_path = source_path.rsplit('\\', 1)[0]
+            kwargs['source_path'] = source_path
+        elif source_path.rsplit('\\', 3)[2] == 'bd':
+            pass
 
     base['tac'] = load_tac(**kwargs)
     base['ocr'] = load_ocr(**kwargs)
@@ -2286,37 +2298,7 @@ def get_logical_dist(dat_type, item_id="", item={}, **kwargs):
 
 def get_endN3_dist(dat_type, item_id="", item={}, **kwargs):
     '''
-     Retorna um dicion rio com configura‡”es de distribui‡„o do ponto l¢gico passado como parƒmetro. Formato da sa¡da:
-     {
-     [pdd|pad|ptd] : {
-                     "item": dict item,
-                     "location": str include_location
-                     },
-     [pdf|paf|ptf] : {
-                     "item": dict item,
-                     "location": str include_location
-                     },
-     "tdd" :         {
-                     "item": dict item,
-                     "location": str include_location
-                     },
-     "nv1" :         {
-                     "item": dict item,
-                     "location": str include_location
-                     },
-     "nv2" :         {
-                     "item": dict item,
-                     "location": str include_location
-                     },
-     "lsc" :         {
-                     "item": dict item,
-                     "location": str include_location
-                     },
-     "cnf" :         {
-                     "item": dict item,
-                     "location": str include_location
-                     },
-     }
+     Retorna a ordem de distribui‡„o de N3
      :param dat_type:
      :param item_id:
      :param item:
@@ -2336,10 +2318,7 @@ def get_endN3_dist(dat_type, item_id="", item={}, **kwargs):
     # um ponto pode ter v rias distribui‡”es configuradas
     xxd_items = get_dataset(dat_type=dtd.lower(), generic_set=dat, id_set=[], item_set=[],
                             **kwargs)
-    #for xxd_item in xxd_items:
     xxd_item = xxd_items[len(xxd_items)-1]
-    #xxd_location = find_item_in_base(dat_type, item=xxd_item, **kwargs)
-    #xxd_location = find_item(dat_type=dat_type, generic_set=dat, item_id="", item=xxd_item)
     xxd_location, xxd_dic = get_item_from_base(dat_type=dtd, where={"PDS": "== " + item_id}, base_item = dat, **kwargs)
     if xxd_dic != {}:
         #tdd_location, tdd_item = get_tdd(item_id = xxd_dic.get('TDD'), base_item = dat, **kwargs)
@@ -2348,16 +2327,6 @@ def get_endN3_dist(dat_type, item_id="", item={}, **kwargs):
                                                         "PNT": "== " + xxd_dic.get("ID"),
                                                         "TPPNT": "== " + dtd.upper()
                                                     },base_item = dat, **kwargs)
-        '''item = {
-            dtf: {
-                "item": xxf_item,
-                "location": xxf_location
-            }
-            }'''
-        #phy_conf = get_physical_conf(dat_type=dtf, item=xxf_item, base_item = dat, **kwargs)
-        #item.update(phy_conf)
-        if item_id =='BNO:34S2-7:89':
-            print(xxf_item)
         output = xxf_item.get('ORDEM')
     return output
 
