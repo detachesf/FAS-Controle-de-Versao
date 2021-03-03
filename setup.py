@@ -19,7 +19,7 @@ target = Executable(
 setup(
     name="FAS",
     author="Hugo Everaldo Salvador Bezerra",
-    version="2.1.0",
+    version="2.1.1",
     description="Ferramenta de Automatização para Projetos de Sistemas Supervisórios",
     options={'build_exe': {
         'includes': ["gi", 'xml', 'datetime', 'os', 'bs4','sys', 'traceback', 'openpyxl', 're',
@@ -28,6 +28,6 @@ setup(
         'packages': ["gi", 'xml'],
         'include_files': include_files
     },
-    'bdist_msi': {'initial_target_dir': 'C:\\FAS_2.1.0'}},
+    'bdist_msi': {'initial_target_dir': 'C:\\FAS_2.1.1'}},
     executables=[target]
 )
