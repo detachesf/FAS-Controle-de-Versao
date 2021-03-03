@@ -1114,7 +1114,7 @@ class Manipulador(object):
         try:
             vers = arq_conf.arqconf['versão'].split('.')
             vers = list(map(int, vers))  # Transformar array de string em array de inteiro
-            if vers < [2, 1, 0]:
+            if vers < [2, 1, 1]:
                 mensagem_erro('Erro', 'Deve ser usado arquivo de configuração com versão igual ou maior a 2.1.0')
             else:
                 try:
@@ -1158,7 +1158,7 @@ class Manipulador(object):
         try:
             vers = arq_conf.arqconf['versão'].split('.')
             vers = list(map(int, vers))  # Transformar array de string em array de inteiro
-            if vers < [2, 1, 0]:
+            if vers < [2, 1, 1]:
                 mensagem_erro('Erro', 'Deve ser usado arquivo de configuração com versão igual ou maior a 2.1.0')
             else:
                 try:
