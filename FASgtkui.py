@@ -180,6 +180,12 @@ class Manipulador(object):
         self.janela_sobre: Gtk.AboutDialog = builder.get_object('janela_sobre')
         self.janela_comparar: Gtk.Window = builder.get_object('janela_comparar')
         self.janela_carregando: Gtk.Window = builder.get_object('janela_carregando')
+        self.janela_config_base2lp: Gtk.Window = builder.get_object('janela_config_base2lp')
+
+        self.checkbutton_rfc: Gtk.CheckButton = builder.get_object('checkbutton_rfc')
+        self.checkbutton_rca: Gtk.CheckButton = builder.get_object('checkbutton_rca')
+        self.button_base2lp_confirmar : Gtk.Button = builder.get_object('button_base2lp_confirmar')
+        self.button_base2lp_cancelar: Gtk.Button = builder.get_object('button_base2lp_cancelar')
 
         self.label_progressbar: Gtk.Label = builder.get_object('label_progressbar')
         self.progress_bar: Gtk.ProgressBar = builder.get_object('progress_bar')
@@ -1192,7 +1198,7 @@ class Manipulador(object):
 
     def on_diretorio_dialogo_pasta_button_selecionar_clicked(self, button):
         if self.base_para_lp:
-            self.Base2Lp()
+            self.janela_config_base2lp.show()
         else:
             self.Diretorio_de_salvamento = self.diretorio_dialogo_pasta_entry.get_text()
             root = BeautifulSoup(open(os.getcwd() + '\\' + 'ini.xml', 'r', encoding='utf-8'), 'html.parser')
@@ -1204,7 +1210,7 @@ class Manipulador(object):
             ElementTree(root).write(os.getcwd() + '\\' + 'ini.xml', 'UTF-8')
             self.dialogo_diretorio.hide()
 
-    def Base2Lp(self):
+    def Base2Lp(self,parcela_rca, parcela_rfc):
         try:
             from lp_lib.base2lp_sagon import base2xls
         except:
@@ -1222,7 +1228,9 @@ class Manipulador(object):
                                          'progress_bar':self.progress_bar,
                                          'janela_carregando':self.janela_carregando,
                                          'telas':telas,
-                                         'include_indice':include_indice})
+                                         'include_indice':include_indice, 'parcela_rca':parcela_rca,
+                                         'parcela_rfc':parcela_rfc})
+
                     self.janela_carregando.show_all()
                     self.base_para_lp = False
             except:
@@ -1277,6 +1285,19 @@ class Manipulador(object):
                 telas = []
             return telas,include_indice
 
+    def on_button_base2lp_confirmar_clicked(self, button):
+        self.janela_config_base2lp.hide()
+        parcela_rfc = self.checkbutton_rfc.get_active()
+        parcela_rca = self.checkbutton_rfc.get_active()
+        self.checkbutton_rfc.set_active(False)
+        self.checkbutton_rfc.set_active(False)
+        self.Base2Lp(parcela_rca, parcela_rfc)
+
+    def on_button_base2lp_cancelar_clicked(self, button):
+        self.janela_config_base2lp.hide()
+        self.dialogo_diretorio.hide()
+        self.checkbutton_rfc.set_active(False)
+        self.checkbutton_rfc.set_active(False)
     # Comparar Listas
 
     def on_arqconf_ferramentas_comparar_activate(self, button):

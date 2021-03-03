@@ -10,6 +10,7 @@
     <property name="icon">static\CHESF1.png</property>
     <property name="type-hint">dialog</property>
     <property name="deletable">False</property>
+    <property name="gravity">center</property>
     <property name="action">select-folder</property>
     <signal name="selection-changed" handler="on_diretorio_dialogo_selection_changed" swapped="no"/>
     <child internal-child="vbox">
@@ -112,9 +113,11 @@
   <object class="GtkFileChooserDialog" id="arqconf_abrir_dialogo">
     <property name="can-focus">False</property>
     <property name="title" translatable="yes">Abrir arquivo de configuração</property>
+    <property name="window-position">center-always</property>
     <property name="icon">static\CHESF1.png</property>
     <property name="type-hint">dialog</property>
     <property name="deletable">False</property>
+    <property name="gravity">center</property>
     <property name="filter">filefilter1</property>
     <child internal-child="vbox">
       <object class="GtkBox">
@@ -171,10 +174,12 @@
   <object class="GtkFileChooserDialog" id="arqconf_salvar_dialogo">
     <property name="can-focus">False</property>
     <property name="title" translatable="yes">Salvar Arquivo de Parametrização</property>
+    <property name="window-position">center-always</property>
     <property name="destroy-with-parent">True</property>
     <property name="icon">static\CHESF1.png</property>
     <property name="type-hint">dialog</property>
     <property name="deletable">False</property>
+    <property name="gravity">center</property>
     <property name="do-overwrite-confirmation">True</property>
     <property name="filter">filefilter1</property>
     <child internal-child="vbox">
@@ -642,9 +647,11 @@
     <property name="height-request">400</property>
     <property name="can-focus">False</property>
     <property name="title" translatable="yes">Escolha a Planilha CEPEL</property>
+    <property name="window-position">center-always</property>
     <property name="icon">static\CHESF1.png</property>
     <property name="type-hint">dialog</property>
     <property name="deletable">False</property>
+    <property name="gravity">center</property>
     <property name="filter">filtro_xls</property>
     <child internal-child="vbox">
       <object class="GtkBox">
@@ -7106,6 +7113,126 @@ Paulo Roberto de Freitas (Contribuinte)
             <property name="expand">True</property>
             <property name="fill">True</property>
             <property name="position">1</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkWindow" id="janela_config_base2lp">
+    <property name="width-request">550</property>
+    <property name="height-request">140</property>
+    <property name="can-focus">False</property>
+    <property name="title" translatable="yes">Selecione o que deseja incluir na leitura da base</property>
+    <property name="resizable">False</property>
+    <property name="window-position">center</property>
+    <property name="icon">static\CHESF1.png</property>
+    <property name="deletable">False</property>
+    <property name="gravity">center</property>
+    <child>
+      <object class="GtkBox">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="orientation">vertical</property>
+        <child>
+          <object class="GtkLabel">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <attributes>
+              <attribute name="font-desc" value="Sitka Display Bold 12"/>
+            </attributes>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkBox">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="vexpand">False</property>
+            <property name="orientation">vertical</property>
+            <child>
+              <object class="GtkCheckButton" id="checkbutton_rfc">
+                <property name="label" translatable="yes">Parcelas de Filtro Composto (RFC)</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">False</property>
+                <property name="halign">center</property>
+                <property name="vexpand">True</property>
+                <property name="draw-indicator">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkCheckButton" id="checkbutton_rca">
+                <property name="label" translatable="yes">Parcelas de Pontos Calculados (RCA)</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">False</property>
+                <property name="halign">center</property>
+                <property name="vexpand">True</property>
+                <property name="draw-indicator">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButtonBox">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="valign">end</property>
+            <property name="vexpand">True</property>
+            <property name="baseline-position">bottom</property>
+            <property name="layout-style">end</property>
+            <child>
+              <object class="GtkButton" id="button_base2lp_confirmar">
+                <property name="label" translatable="yes">Confirmar</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <signal name="clicked" handler="on_button_base2lp_confirmar_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="button_base2lp_cancelar">
+                <property name="label" translatable="yes">Cancelar</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <signal name="clicked" handler="on_button_base2lp_cancelar_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">2</property>
           </packing>
         </child>
       </object>

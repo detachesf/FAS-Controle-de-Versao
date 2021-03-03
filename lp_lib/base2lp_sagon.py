@@ -34,6 +34,8 @@ def base2xls(base_path='', Diretorio_Padrao = '', **kwargs):
     # ***** Captar texto de arquivos de telas para verificar preenchimento da coluna anunciador *****
     telas = kwargs.get('telas', None)
     include_indice = kwargs.get('include_indice', None)
+    parcela_rfc = kwargs.get('parcela_rfc')
+    parcela_rca = kwargs.get('parcela_rca')
     texto_telas = ''
     for tela in telas:
         try:
@@ -188,7 +190,11 @@ def base2xls(base_path='', Diretorio_Padrao = '', **kwargs):
                             if OBSERVACAO != 'RFC Parcelas: ':
                                 OBSERVACAO = OBSERVACAO + ' ; '
                             ID_PROTOCOLO = rfc.get('PNT', '')
-                            OBSERVACAO = OBSERVACAO + rfc.get('PARC','')
+                            if parcela_rfc:
+                                OBSERVACAO = OBSERVACAO + rfc.get('PARC','')
+                            else:
+                                OBSERVACAO = ''
+                                break
                         grava_ponto(CONTEMPLADO, TIPO_RELE, ID_PROTOCOLO, ID_SAGE, OCR_SAGE, DESCRICAO, TIPO,
                                         COMANDO, MEDICAO, TELA, LISTA_DE_ALARMES,
                                         SOE, OBSERVACAO, ENDERECO, LIU, LIE, LIA, LSA, LSE, LSU, BNDMO)
@@ -258,7 +264,11 @@ def base2xls(base_path='', Diretorio_Padrao = '', **kwargs):
                         for i in range(0, len(dat_conf['rca']['items'])):
                             ID_SAGE = dat_conf['rca']['items'][i].get('PNT')
                             TELA = ('X' if 'WHERE id = ' + ID_SAGE in texto_telas else '')
-                            OBSERVACAO = OBSERVACAO + str(dat_conf['rca']['items'][i].get('PARC')) + ' ; '
+                            if parcela_rca:
+                                OBSERVACAO = OBSERVACAO + str(dat_conf['rca']['items'][i].get('PARC')) + ' ; '
+                            else:
+                                OBSERVACAO = ''
+                                break
                         grava_ponto(CONTEMPLADO=CONTEMPLADO, ID_SAGE=ID_SAGE, OBSERVACAO=OBSERVACAO,
                                         TIPO_RELE=TIPO_RELE, DESCRICAO=DESCRICAO, OCR_SAGE=OCR_SAGE, TELA=TELA)
                             # row +=1

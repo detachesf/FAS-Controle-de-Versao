@@ -4,7 +4,7 @@ Todas as mudanças serão documentadas neste arquivo.
 
 ###### Mantido pelo DETA.
 
-## [2.1.1](https://github.com/detachesf/FAS-Controle-de-Versao/tree/9e7206a1e5907daad160342ba1d2f34931b3fce6)- 28-02-2021
+## [2.1.1](https://github.com/detachesf/FAS-Controle-de-Versao/tree/9e7206a1e5907daad160342ba1d2f34931b3fce6)- 03-03-2021
 
 ### Adicionado
 
@@ -16,14 +16,15 @@ Todas as mudanças serão documentadas neste arquivo.
 - Função base para lp excel com a bilioteca sagon
   - Possibilidade de selecionar somente include
   - Tratamento de erro ao não achar o arquivo de telas VTelasBotoes.led
+  - Busca do ID sage nos arquivos de tela apenas no contexto WHERE id = 'ID'
+  - Possibilidade de visualização das parcelas dos pontos calculados, filtros compostos e os diferentes endereços de aquisição de filtros simples
+- Remoção da descrição dos pontos analógicos associados a LT as siglas da subestação de destino
+- Possibilidade de usar versões diferentes da LP Padrão, adicionando na pasta static/Planilhas Padrao 
 
 ### Corrigido
 
 - Algumas funções da barra de ferramentas não estavam funcionando
-
-### Removido
-
-- ​
+- Cabeçalho do relatório gerado na função de checagem (ANUNCIADOR para TELA)
 
 ## [2.1.0](https://github.com/detachesf/FAS-Controle-de-Versao/tree/9e7206a1e5907daad160342ba1d2f34931b3fce6)- 09-02-2021
 
