@@ -131,10 +131,20 @@ def gerarPlanilha(nome_arquivo):
     'bg_color': '#7DF9FF',
     'border' : 1,
     })
+    formato_quebratexto = arquivo.add_format({
+        'text_wrap':True,
+        'align':'left',
+        'valign':'vcenter',})
+    formato_centro = arquivo.add_format({
+        'align': 'left',
+        'valign': 'vcenter', })
     for i in ('ID (SAGE)','OCR (SAGE)','DESCRI€ŽO','TIPO','COMANDO','MEDI€ŽO','TELA','LISTA DE ALARMES','SOE','OBSERVA€ŽO','AGRUPAMENTO'):
         planilha.merge_range(4,col,5,col,i, formato7)
+        if i == 'OBSERVA€ŽO':
+            planilha.set_column(col,col,width=31, cell_format=formato_quebratexto)
         col+=1
-    
+
+
     # Campo CHESF - TELEASSIST‰NCIA N3 --------------------------------------------
     formato8 = arquivo.add_format({
     'bold': True,
@@ -265,8 +275,10 @@ def gerarPlanilha(nome_arquivo):
     'border' : 1,
     })
     planilha.merge_range(4,col,5,col,'OBSERVA€™ES', formato17)
-    col+=1  
-    
+    col+=1
+    planilha.set_column(1,17,width=25, cell_format=formato_centro)
+    planilha.set_column(19,col,width=25, cell_format=formato_centro)
+
     return arquivo
 
 
