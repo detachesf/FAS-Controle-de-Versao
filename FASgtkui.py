@@ -91,8 +91,8 @@ class Manipulador(object):
         # Vairáveis Gerais
         self.arqconf_novo = True
         self.pathchecar = getcwd()
-        self.versao = '2.1.0'
-        self.data = '09/02/2020'
+        self.versao = '2.1.1'
+        self.data = '03/03/2020'
         self.window: Gtk.Window = builder.get_object('janela_principal')  # Pega o Objeto da janela princial
         self.window.show_all()  # Mostra a janela principal
         self.lp_de_saida = ''
