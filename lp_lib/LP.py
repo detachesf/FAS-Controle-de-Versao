@@ -123,23 +123,23 @@ def gerarlp(lp_padrao, ArqConf):
                                   # 1 - SAGE/BASTIDOR
                                   'SB': str(evento['sagebastidor']),
                                   # 2 - N£mero Inicial de Switch
-                                  'DE_SW': int(evento['sw-de']),
+                                  'DE_SW': int(evento['sw-de']) if evento['sw-de'] else '',
                                   # 3 - N£mero Final de Switch
-                                  'ATE_SW': int(evento['sw-ate']),
+                                  'ATE_SW': int(evento['sw-ate']) if evento['sw-ate'] else '',
                                   # 4 - N£mero de portas de Switch
-                                  'POR_SW': int(evento['nportas-sw']),
+                                  'POR_SW': int(evento['nportas-sw']) if evento['nportas-sw'] else '',
                                   # 5 - Firewall (Sim/N„o)
                                   'FW': 'Sim' if str(evento['fw']) == 'True' else 'N„o',
                                   # 6 - N£mero de portas do Firewall
-                                  'POR_FW': int(evento['nporta-fw']),
+                                  'POR_FW': int(evento['nporta-fw']) if evento['nporta-fw'] else '',
                                   # 7 - RedBox (Sim/N„o)
                                   'RB':'Sim' if str(evento['rb']) == 'True' else 'N„o',
                                   # 8 - N£mero Inicial de RedBox
-                                  'DE_RB': int(evento['rb-de']),
+                                  'DE_RB': int(evento['rb-de']) if evento['rb-de'] else '',
                                   # 9 - N£mero Final de RedBox
-                                  'ATE_RB': int(evento['rb-ate']),
+                                  'ATE_RB': int(evento['rb-ate']) if evento['rb-ate'] else '',
                                   # 10 - N£mero de portas do RedBox
-                                  'POR_RB': int(evento['nporta-rb']),
+                                  'POR_RB': int(evento['nporta-rb']) if evento['nporta-rb'] else '',
                                   # A que a parametriza‡„o se refere
                                   'TIPO': 'SD'})
         evento_dic['SD'] = True  # Define que planilha SD da LP padr„o ser  lida
@@ -284,29 +284,29 @@ def gerarlp(lp_padrao, ArqConf):
                                         # 2 - Se vai ser em um Painel j  existente
                                           'PNLEXIST':'Sim' if str(evento['painelexist']) == 'True' else 'N„o',
                                         # 3 - N£mero da UC em um painel existente
-                                         'N£mero_UC_CHESF': int(evento['num-uc-chesf']),
+                                         'N£mero_UC_CHESF': int(evento['num-uc-chesf']) if evento['num-uc-chesf'] else '',
                                         # 4 - N£mero da UC em um painel existente
-                                         'N£mero_UC_ACESSANTE': int(evento['num-uc-acessante']),
+                                         'N£mero_UC_ACESSANTE': int(evento['num-uc-acessante']) if evento['num-uc-acessante'] else '',
                                         # 5 - Arranjo do v„o
                                           'ARR': str(evento['arranjo']),
                                         # 6 - Se tem Terminal Server
                                           'TS': 'Sim' if str(evento['ts']) == 'True' else 'N„o',
                                         # 7 - N£mero do primeiro Terminal Server
-                                          'TS-DE': int(evento['ts-de']),
+                                          'TS-DE': int(evento['ts-de']) if evento['ts-de'] else '',
                                         # 8 - N£mero do £ltimo Terminal Server
-                                          'TS-ATE': int(evento['ts-ate']),
+                                          'TS-ATE': int(evento['ts-ate']) if evento['ts-ate'] else '',
                                         # 9 - Se Tem Redbox
                                           'RB': 'Sim' if str(evento['rb']) == 'True' else 'N„o',
                                         # 10 - N£mero do primeiro Redbox
-                                          'RB-DE': int(evento['redbox-de']),
+                                          'RB-DE': int(evento['redbox-de']) if evento['redbox-de'] else '',
                                         # 11 - N£mero do £ltimo RedBox
-                                          'RB-ATE': int(evento['redbox-ate']),
+                                          'RB-ATE': int(evento['redbox-ate']) if evento['redbox-ate'] else '',
                                         #12 - Se Tem Multimedidor
                                           'MM': 'Sim' if str(evento['multimedidor']) == 'True' else 'N„o',
                                         #13 - N£mero do primeiro Multimedidor
-                                          'MM-DE': int(evento['mm-de']),
+                                          'MM-DE': int(evento['mm-de']) if evento['mm-de'] else '',
                                         #14 - N£mero do £ltimo Multimedidor
-                                          'MM-ATE': int(evento['mm-ate']),
+                                          'MM-ATE': int(evento['mm-ate']) if evento['mm-ate'] else '',
                                         #15 - Sigla da LT Remota ao v„o segregado
                                           'LTREMOTA': str(evento['ltremota'])
                                           })
@@ -339,7 +339,7 @@ def gerarlp(lp_padrao, ArqConf):
             # 0 - Nome do Painel Ex. 4UA8
             conf_P87B_array.append({'PNL': str(evento.string),
                                     # 1 - N£mero de Pain‚is Ex. 2
-                                    'NPNL': int(evento['qtpan']),
+                                    'NPNL': int(evento['qtpan']) if evento['qtpan'] else '',
                                     # 2 - Arranjo
                                     'ARR': str(evento['arranjo']),
                                     # 3 - B.U. Instalada no Painel (Sim/N„o)
