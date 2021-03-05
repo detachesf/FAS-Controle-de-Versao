@@ -2189,8 +2189,12 @@ def get_tcv_conf(dat_type, item_id="", item={}, **kwargs):
     :param kwargs:
     :return:
     '''
-    conf = get_aconf_from_base(dat_type, item_id=item_id, item=item, **kwargs)
-    return TCV[conf["lsc"]["item"]["TCV"]]
+    aconf = kwargs.get('aconf')
+    if aconf:
+        return TCV[aconf["lsc"]["item"]["TCV"]]
+    else:
+        conf = get_aconf_from_base(dat_type, item_id=item_id, item=item, **kwargs)
+        return TCV[conf["lsc"]["item"]["TCV"]]
 
 def is_61850(dat_type, item_id="", item={}, **kwargs):
     '''

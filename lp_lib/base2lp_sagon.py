@@ -73,24 +73,25 @@ def base2xls(base_path='', Diretorio_Padrao = '', **kwargs):
                 total = 1
             GObject.idle_add(atualiza_progresso, progress_bar, interation, total) #Esse m‚todo direciona a execu‡„o da fun‡„o para a thread encarregada da interface gr fica
             for dat_item in dat[key]:
-                #tempo_inicio = time.time()
-                #tempo_antes_datconf = 0
+                tempo_inicio = time.time()
+                tempo_antes_datconf = tempo_depois_datconf = tempo_depois_confisica = tempo_antes_confisica =0
+
                 CONTEMPLADO = TIPO_RELE = ID_PROTOCOLO = ID_SAGE = OCR_SAGE = DESCRICAO = TIPO = COMANDO = MEDICAO = TELA = LISTA_DE_ALARMES = SOE = OBSERVACAO = ENDERECO = LIU = LIE = LIA = LSA = LSE = LSU = BNDMO = ''
                 # loop de itera‡„o sobre os itens
                 if (not dt.is_comment(dat_item)):
                     if dt.is_commented_point(dat_item) and include_cmts:
                         dat_item = dt.clean_commented_point(dat_item)
-                        # ws[COLS[xs.cCOMENTADO]+str(row)].value = 'X'
                     if dat_item.get('ID', '') == '':
                         # ponto mal formado (sem id)
                         interation += 1
                         GObject.idle_add(atualiza_progresso, progress_bar, interation, total)
                         continue
-                    #tempo_antes_datconf = time.time()
+                    tempo_antes_datconf = time.time()
                     #print(dat_item.get('ID',''))
                     dat_conf = sg.get_aconf_from_base(dat_type, item_id=dat_item.get('ID', ''), base_item=base,
                                                       **kwargs)
-                    #tempo_antes_depois_datconf = time.time()
+                    #print(dat_conf)
+                    tempo_depois_datconf = time.time()
 
                     # checa se ‚ roteamento de controle e pula se for o caso
                     if (dat_type == 'cgs') and dat_conf.get('cgf'):
@@ -105,6 +106,7 @@ def base2xls(base_path='', Diretorio_Padrao = '', **kwargs):
                     DESCRICAO = dat_item.get('NOME')
                     CONTEMPLADO = dat_item.get('TAC')
                     ENDERECO = sg.get_endN3_dist(dat_type, ID_SAGE, base=base, **kwargs)
+
                     # extrai metacampos de cmt
                     if '|' in dat_item.get('CMT', ''):
                         try:
@@ -235,7 +237,6 @@ def base2xls(base_path='', Diretorio_Padrao = '', **kwargs):
                                     pass
                             OBSERVACAO = 'FILTRO SIMPLES'
                             i += 1
-                        ENDERECO = sg.get_endN3_dist(dat_type, ID_SAGE, base=base, **kwargs)
                         grava_ponto(CONTEMPLADO, TIPO_RELE, ID_PROTOCOLO, ID_SAGE, OCR_SAGE, DESCRICAO, TIPO,
                                     COMANDO, MEDICAO, TELA, LISTA_DE_ALARMES,
                                     SOE, OBSERVACAO, ENDERECO, LIU, LIE, LIA, LSA, LSE, LSU, BNDMO)
@@ -244,17 +245,16 @@ def base2xls(base_path='', Diretorio_Padrao = '', **kwargs):
                         continue
                     # caso seja um ponto f¡sico aquisitado, preencher conf f¡sica
                     dat_typef = dat_type[:2] + 'f'
-                    #tempo_antes_confisica = time.time()
+                    tempo_antes_confisica = time.time()
                     if dat_typef in list(dat_conf.keys()):
                         # n„o for um filtro
                         if len(dat_conf[dat_typef]['items']) == 1:
-                            if sg.is_61850(dat_type, item_id=dat_item['ID'], base_item=base):
-                                # ws['H' + str(row)].value = xs.expand_address(dat_type=dat_typef, aconf=dat_conf) # escreve na coluna "ID PROTOCOLO"
+                            if sg.is_61850(dat_type, item_id=dat_item['ID'], aconf=dat_conf):
                                 ID_PROTOCOLO = xs.expand_address(dat_type=dat_typef, aconf=dat_conf)
                             else:
                                 # ws['H' + str(row)].value = dat_conf[dat_typef]['items'][0].get('ID')  # escreve na coluna "ID PROTOCOLO"
                                 ID_PROTOCOLO = dat_conf[dat_typef]['items'][0].get('ID')
-                    #tempo_depois_confisica = time.time()
+                    tempo_depois_confisica = time.time()
                     # caso seja um ponto calculado, preencher planilha CALC
                     if 'rca' in list(dat_conf):
                         OBSERVACAO ='Parcelas: '
@@ -283,7 +283,13 @@ def base2xls(base_path='', Diretorio_Padrao = '', **kwargs):
                     # row+=1
                 interation += 1
                 GObject.idle_add(atualiza_progresso, progress_bar, interation, total)
-                #tempo_final_loop = time.time()
+                tempo_final_loop = time.time()
+                tempodatconf = tempo_depois_datconf - tempo_antes_datconf
+                tempototal = tempo_final_loop - tempo_inicio
+                tempo_confisica = tempo_depois_confisica - tempo_antes_confisica
+                if tempototal>0:
+                    print('tempo datconf: {} , porcentagem: {}'.format(tempodatconf,100*(tempodatconf/tempototal)))
+                    print('tempo na conf fisica: {} , porcentagem: {}'.format(tempo_confisica, 100*(tempo_confisica/tempototal)))
                 # fim do loop de itera‡„o sobre os itens
             key_number += 1
     # FIM DA LEITURA DA PLANILHA
