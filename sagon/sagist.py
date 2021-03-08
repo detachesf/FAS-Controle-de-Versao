@@ -1,7 +1,8 @@
 # -*- coding: cp860 -*-
 
 from sagon.datapi import *
-
+import sagon.datapi as dt
+import time
 import copy
 
 I_NSEQ = 0
@@ -1811,13 +1812,18 @@ def get_physical_conf(dat_type, item_id="", item={}, **kwargs):
     dat_type = dat_type.lower()
     if not item_id:
         item_id = item.get("ID")
-    f_location, f_item = get_item_from_base(dat_type=dat_type, item_id=item_id, **kwargs)
+    f_item = kwargs.get('xxfitem')
+    f_location = kwargs.get('xxflocation')
+    if not f_item:
+        f_location, f_item = get_item_from_base(dat_type=dat_type, item_id=item_id, **kwargs)
+
     nv2_location, nv2_item = get_nv2(item_id=f_item.get("NV2"),
                                      where={"TPPNT": "== "+dat_type.upper()},
                                      **kwargs)
     nv1_location, nv1_item = get_nv1(item_id=nv2_item.get("NV1"), **kwargs)
 
     cnf_location, cnf_item = get_cnf(item_id=nv1_item.get("CNF"), **kwargs)
+    #print('segunda :{}'.format(cnf_item))
 
     lsc_location, lsc_item = get_lsc(item_id=cnf_item.get("LSC"), **kwargs)
 
@@ -1932,8 +1938,13 @@ def get_aconf_from_base(dat_type, item_id="", item={}, **kwargs):
 
     nv2_items = []
     nv2_locations = []
-
-    s_location, s_item = get_item_from_base(dat_type=dat_type, item_id=item_id, item=item, **kwargs)
+    s_location = kwargs.get('slocation')
+    s_item = kwargs.get('sitem')
+    tempo_antes_xxf = tempo_depois_xxf = tempo_antes_filtros = 0
+    if not s_item:
+        s_location, s_item = get_item_from_base(dat_type=dat_type, item_id=item_id, item=item, **kwargs)
+    #print('sitem: {}'.format(s_item))
+    #print('location: {}'.format(s_location))
     if not s_item:
         print_msg(__name__, "o item informado n„o existe na base", **kwargs)
         return {}
@@ -1946,8 +1957,9 @@ def get_aconf_from_base(dat_type, item_id="", item={}, **kwargs):
     if s_tac_id is None:
         print_msg(__name__, "o item n„o possui TAC configurada", **kwargs)
         return {}
+    tempo_antes_tac= time.time()
     tac_location, tac_item = get_tac(item_id=s_tac_id, **kwargs)
-
+    tempo_depois_tac = time.time()
     #print(tac_item)
     output["tac"] = {"location": tac_location, "item": tac_item}
 
@@ -1963,14 +1975,18 @@ def get_aconf_from_base(dat_type, item_id="", item={}, **kwargs):
         print(item_id)
         print(tac_item.get('ID'))
         return {}
+    tempo_antes_lsc = time.time()
     lsc_location, lsc_item = get_lsc(item_id=s_lsc_id, **kwargs)
+    tempo_depois_lsc = time.time()
 
     #print(lsc_item)
     output["lsc"] = {"location": lsc_location, "item": lsc_item}
 
     # lˆ a cnf
-
+    tempo_antes_cnf = time.time()
     cnf_location, cnf_item = get_cnf(where={"LSC": "== "+s_lsc_id}, **kwargs)
+    #print('primeira :{}'.format(cnf_item))
+    tempo_depois_cnf = time.time()
 
     output["cnf"] = {"location": cnf_location, "item": cnf_item}
 
@@ -1983,17 +1999,26 @@ def get_aconf_from_base(dat_type, item_id="", item={}, **kwargs):
 
     #print(s_tcv)
     #print(s_ttp)
-
     # caso seja um ponto de aquisi‡„o e controle, pegar pdf/paf/ptf
     if tpaqs == TPAQS_ASAC:
+        xxf_dict = kwargs.get('xxf')
         if dat_type == "cgs":
-            where = {"CGS": "== "+s_item.get("ID")}
+            xxf_item = xxf_dict.get(s_item.get("ID"), {})
+            xxf_location = s_location.replace('cgs', 'cgf')
         else:
-            where = {"PNT": "== "+s_item.get("ID"),
-                    "TPPNT": "== "+dat_type.upper()}
-        #print('dtf: ' + str(dtf))
-        xxf_location, xxf_item = get_item_from_base(dat_type=dtf, where=where, **kwargs)
-        xxf_conf = get_physical_conf(dtf, item=xxf_item, **kwargs)
+            xxf_item = xxf_dict.get(s_item.get("ID") + "_" + dat_type.upper(), {})
+            if xxf_item == {}:
+                xxf_item = xxf_dict.get(s_item.get("ID"), {})
+            if 'pds' in s_location:
+                xxf_location = s_location.replace('pds', 'pdf')
+            elif 'pas' in s_location:
+                xxf_location = s_location.replace('pas', 'paf')
+            elif 'pts' in s_location:
+                xxf_location = s_location.replace('pts','ptf')
+        #tempo_antes_xxf = time.time()
+        xxf_conf = get_physical_conf(dtf, item=xxf_item, xxfitem=xxf_item, xxflocation=xxf_location, **kwargs)
+
+        tempo_depois_xxf = time.time()
         #xxf_item = xxf_conf.get(dtf).get('item')
         #xxf_location = xxf_conf.get(dtf).get('location')
         #print('xxf item: '+ str(xxf_item) + '\n' + 'xxf_conf: '+ str(xxf_conf))
@@ -2007,9 +2032,9 @@ def get_aconf_from_base(dat_type, item_id="", item={}, **kwargs):
         output[dtf] = {"locations": xxf_locations, "items": xxf_items}
         output["nv1"] = {"locations": nv1_locations, "items": nv1_items}
         output["nv2"] = {"locations": nv2_locations, "items": nv2_items}
-
     # caso seja um c lculo, pegar as parcelas de rca
     elif tpaqs == TPAQS_ACSC:
+        tempo_antes_filtros = time.time()
         if base_item != {}:
             rca_dat = base_item.get('rca',[])
         else:
@@ -2027,9 +2052,9 @@ def get_aconf_from_base(dat_type, item_id="", item={}, **kwargs):
             "items": rca_items,
             "parcs_ids": rca_parcs_ids
         }
-
     # caso seja um filtro composto, pegar as parcelas
     elif tpaqs in [TPAQS_AFID, TPAQS_AFIL]:
+        tempo_antes_filtros = time.time()
         if base_item != {}:
             rfc_dat = base_item['rfc']
         else:
@@ -2082,7 +2107,19 @@ def get_aconf_from_base(dat_type, item_id="", item={}, **kwargs):
             output[dtf] = {"items": xxf_rfi_items, "locations": xxf_rfi_locations}
             output["nv1"] = {"items": nv1_items, "locations": nv1_locations}
             output["nv2"] = {"items": nv2_items, "locations": nv2_locations}
-
+    tempo_depois_filtros = time.time()
+    tempotac = tempo_depois_tac - tempo_antes_tac
+    tempoxxf = tempo_depois_xxf - tempo_antes_xxf
+    tempolsc = tempo_depois_lsc - tempo_antes_lsc
+    tempocnf = tempo_depois_cnf - tempo_antes_cnf
+    tempofiltros = tempo_depois_filtros - tempo_antes_filtros
+    if tempofiltros == tempo_depois_filtros:
+        tempofiltros =0
+    tempo_total = tempo_depois_filtros - tempo_antes_tac
+    #if tempo_total>0:
+    #    print('xxf: {} valor: {} \n filtros: {} valor :{}'.format((tempoxxf*100/tempo_total),tempoxxf,
+    #                                                         (tempofiltros*100/tempo_total),tempofiltros
+    #                                                        ))
     return output
 
 
@@ -2269,6 +2306,7 @@ def get_logical_dist(dat_type, item_id="", item={}, **kwargs):
     # um ponto pode ter v rias distribui‡”es configuradas
 
     xxd_items = get_dataset_from_base(dat_type=dtd, where=where, **kwargs)
+
     print('xxd_items: ' + str(xxd_items))
     for xxd_item in xxd_items:
         xxd_location = find_item_in_base(dat_type, item=xxd_item, **kwargs)
@@ -2316,23 +2354,129 @@ def get_endN3_dist(dat_type, item_id="", item={}, **kwargs):
     dtd = dat_type.replace("s", "d")
     if dat_type == 'cgs':
         dtd = 'pdd'
-    where = {
-        dat_type.upper(): "== " + item_id
-    }
+
+
     # um ponto pode ter v rias distribui‡”es configuradas
-    xxd_items = get_dataset(dat_type=dtd.lower(), generic_set=dat, id_set=[], item_set=[],
-                            **kwargs)
-    xxd_item = xxd_items[len(xxd_items)-1]
-    xxd_location, xxd_dic = get_item_from_base(dat_type=dtd, where={"PDS": "== " + item_id}, base_item = dat, **kwargs)
-    if xxd_dic != {}:
-        #tdd_location, tdd_item = get_tdd(item_id = xxd_dic.get('TDD'), base_item = dat, **kwargs)
-        xxf_location, xxf_item = get_item_from_base(dtf,
-                                                    where={
-                                                        "PNT": "== " + xxd_dic.get("ID"),
-                                                        "TPPNT": "== " + dtd.upper()
-                                                    },base_item = dat, **kwargs)
-        output = xxf_item.get('ORDEM')
+    #xxd_items = get_dataset(dat_type=dtd.lower(), generic_set=dat, id_set=[], item_set=[],
+                            #**kwargs)
+    #xxd_item = xxd_items[len(xxd_items)-1]
+    xxd_dic = kwargs.get('xxd')
+    idpdd = xxd_dic.get(item_id)
+    xxf_dic = kwargs.get('xxf')
+    #xxd_location, xxd_dic = get_item_from_base(dat_type=dtd, where={"PDS": "== " + item_id}, base_item = dat, **kwargs)
+    if idpdd != None:
+        if dat_type == "cgs":
+            xxf_item = xxf_dic.get(idpdd)
+            if xxf_item:
+                i = 2
+                #print(idpdd)
+                while xxf_item.get('ORDEM', False) == False or i < 4:
+                    xxf_item = xxf_dic.get(idpdd+'_'+str(i))
+                    if xxf_item:
+                        if xxf_item.get('ORDEM',False):
+                            break
+                    else:
+                        break
+                    i+=1
+                if xxf_item:
+                    output = xxf_item.get('ORDEM','')
+        else:
+            xxf_item = xxf_dic.get(idpdd + '_' + dtd.upper())
+            if xxf_item:
+                output = xxf_item.get('ORDEM','')
     return output
+
+def create_dict_pdd(dat={},**kwargs):
+    dict={}
+    for key in dt.list_keys(dat):
+        for dat_item in dat[key]:
+            if (not dt.is_comment(dat_item)):
+                if dat_item.get('ID', '') == '':
+                    # ponto mal formado (sem id)
+                    continue
+                PDS = dat_item.get('PDS')
+                ID = dat_item.get('ID')
+                if PDS in list_keys(dict):
+                    i = 2
+                    while PDS in list_keys(dict):
+                        PDS = PDS + '_' + str(i)
+                        i+=1
+                dict[PDS] = ID
+    return dict
+
+def create_dict_pad(dat={},**kwargs):
+    dict = {}
+    for key in dt.list_keys(dat):
+        for dat_item in dat[key]:
+            if (not dt.is_comment(dat_item)):
+                if dat_item.get('ID', '') == '':
+                    # ponto mal formado (sem id)
+                    continue
+                PAS = dat_item.get('PAS')
+                ID = dat_item.get('ID')
+                if PAS in list_keys(dict):
+                    i = 2
+                    while PAS in list_keys(dict):
+                        PAS = PAS + '_' + str(i)
+                        i += 1
+                dict[PAS] = ID
+    return dict
+
+def create_dict_ptd(dat={}, **kwargs):
+    dict = {}
+    for key in dt.list_keys(dat):
+        for dat_item in dat[key]:
+            if (not dt.is_comment(dat_item)):
+                if dat_item.get('ID', '') == '':
+                    # ponto mal formado (sem id)
+                    continue
+                PTS = dat_item.get('PTS')
+                ID = dat_item.get('ID')
+                if PAS in list_keys(dict):
+                    i = 2
+                    while PAS in list_keys(dict):
+                        PAS = PAS + '_' + str(i)
+                        i += 1
+                dict[PTS] = ID
+    return dict
+
+
+def create_dict_xxf(dat={}, **kwargs):
+    dict = {}
+    for key in dt.list_keys(dat):
+        for dat_item in dat[key]:
+            if (not dt.is_comment(dat_item)):
+                if dat_item.get('ID', '') == '':
+                    # ponto mal formado (sem id)
+                    continue
+                PNT = dat_item.get('PNT')
+                TPPNT = dat_item.get('TPPNT')
+                if TPPNT:
+                    dict[PNT+'_'+TPPNT] = dat_item
+                else:
+                    dict[PNT] = dat_item
+    return dict
+
+def create_dict_cgf(dat={}, **kwargs):
+    dict = {}
+    for key in dt.list_keys(dat):
+        for dat_item in dat[key]:
+            if (not dt.is_comment(dat_item)):
+                if dat_item.get('ID', '') == '':
+                    # ponto mal formado (sem id)
+                    continue
+                if 'CGS' in dat_item.get('KCONV',''):
+                    CGS = dat_item.get('KCONV').split('=')[1].strip()
+                else:
+                    CGS = dat_item.get('CGS')
+
+                if CGS in list_keys(dict):
+                    i = 2
+                    while CGS in list_keys(dict):
+                        CGS = CGS + '_' + str(i)
+                        i += 1
+                dict[CGS] = dat_item
+    return dict
 
 def get_control_dist(item_id="", item={}, **kwargs):
     '''

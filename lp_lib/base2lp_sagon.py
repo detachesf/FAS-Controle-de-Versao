@@ -50,7 +50,19 @@ def base2xls(base_path='', Diretorio_Padrao = '', **kwargs):
     #dt.print_msg(__name__, 'tudo OK',dt.MSG_INFO, **kwargs)
     med_dic = {'FR': 'Hz', 'KV': 'kV', 'AM': 'A', 'DI': 'km', 'MV': 'MVAR', 'MW': 'MW', 'TM': 'ø C'}
     include_cmts = False
+    label_progressbar.set_text('Carregando Base')
     base = sg.load_base(source_path=base_path, **kwargs)
+    label_progressbar.set_text('Carregando dicion rios')
+    ids_pdd = sg.create_dict_pdd(base['pdd'])
+    ids_pad = sg.create_dict_pad(base['pad'])
+    ids_ptd = sg.create_dict_ptd(base['ptd'])
+    ids_pdf = sg.create_dict_xxf(base['pdf'])
+    ids_cgf = sg.create_dict_cgf(base['cgf'])
+    ids_paf = sg.create_dict_xxf(base['paf'])
+    arquivos_fisicos ={'pdf':ids_pdf,'cgf':ids_cgf,'paf':ids_paf}
+    if base.get('ptf'):
+        idf_ptf = sg.create_dict_xxf(base['ptf'])
+        arquivos_fisicos['ptf'] = idf_ptf
     saida_array = []
     def grava_ponto(CONTEMPLADO ='', TIPO_RELE='', ID_PROTOCOLO='',ID_SAGE='',
                     OCR_SAGE='',DESCRICAO ='',TIPO='',COMANDO='',MEDICAO='',TELA='',LISTA_DE_ALARMES='',
@@ -60,21 +72,26 @@ def base2xls(base_path='', Diretorio_Padrao = '', **kwargs):
                     SOE, OBSERVACAO, ENDERECO, LIU, LIE, LIA, LSA, LSE,LSU,BNDMO])
 
     #Loop principal
-    for dat_type in ['pds','pas', 'pts', 'cgs']:
+    for dat_type in ['pds','pas','pts','cgs']:
+        if dat_type == 'pds' or dat_type == 'cgs':
+            xxd = ids_pdd
+        elif dat_type == 'pas':
+            xxd = ids_pad
+        elif dat_type == 'pts':
+            xxd = ids_ptd
         dat = base[dat_type]
-        janela_carregando.set_title('Lendo {0}...'.format(dat_type.upper()))
+        GObject.idle_add(janela_carregando.set_title, 'Lendo {0}...'.format(dat_type.upper()))
         key_number = 1
         total_keys = len(dat.keys())
         for key in dt.list_keys(dat):
-            label_progressbar.set_text('Processando arquivo ({0} de {1}): {2}'.format(key_number, total_keys, key))
+            GObject.idle_add(label_progressbar.set_text,'Processando arquivo ({0} de {1}): {2}'.format(key_number, total_keys, key))
             interation = 0
             total = len(dat[key])
             if total == 0:
                 total = 1
             GObject.idle_add(atualiza_progresso, progress_bar, interation, total) #Esse m‚todo direciona a execu‡„o da fun‡„o para a thread encarregada da interface gr fica
+            #print(base['pdd'])
             for dat_item in dat[key]:
-                tempo_inicio = time.time()
-                tempo_antes_datconf = tempo_depois_datconf = tempo_depois_confisica = tempo_antes_confisica =0
 
                 CONTEMPLADO = TIPO_RELE = ID_PROTOCOLO = ID_SAGE = OCR_SAGE = DESCRICAO = TIPO = COMANDO = MEDICAO = TELA = LISTA_DE_ALARMES = SOE = OBSERVACAO = ENDERECO = LIU = LIE = LIA = LSA = LSE = LSU = BNDMO = ''
                 # loop de itera‡„o sobre os itens
@@ -86,12 +103,11 @@ def base2xls(base_path='', Diretorio_Padrao = '', **kwargs):
                         interation += 1
                         GObject.idle_add(atualiza_progresso, progress_bar, interation, total)
                         continue
-                    tempo_antes_datconf = time.time()
-                    #print(dat_item.get('ID',''))
-                    dat_conf = sg.get_aconf_from_base(dat_type, item_id=dat_item.get('ID', ''), base_item=base,
-                                                      **kwargs)
-                    #print(dat_conf)
-                    tempo_depois_datconf = time.time()
+
+                    dat_typef = dat_type[:2] + 'f'
+                    dat_conf = sg.get_aconf_from_base(dat_type, item_id=dat_item.get('ID', ''), base_item=base, sitem = dat_item,
+                                                      slocation = key,xxf=arquivos_fisicos[dat_typef], **kwargs)
+
 
                     # checa se ‚ roteamento de controle e pula se for o caso
                     if (dat_type == 'cgs') and dat_conf.get('cgf'):
@@ -105,30 +121,25 @@ def base2xls(base_path='', Diretorio_Padrao = '', **kwargs):
                     TELA = ('X' if 'WHERE id = ' + ID_SAGE in texto_telas else '')
                     DESCRICAO = dat_item.get('NOME')
                     CONTEMPLADO = dat_item.get('TAC')
-                    ENDERECO = sg.get_endN3_dist(dat_type, ID_SAGE, base=base, **kwargs)
+                    tempo_antes_endn3 = time.time()
+                    ENDERECO = sg.get_endN3_dist(dat_type, ID_SAGE, base=base, xxd=xxd, xxf =arquivos_fisicos[dat_typef], **kwargs)
+                    tempo_depois_endn3 = time.time()
+                    OBSERVACAO = dat_item.get('OBSRV')
 
                     # extrai metacampos de cmt
                     if '|' in dat_item.get('CMT', ''):
                         try:
                             testado, vao, ied, origem = str(dat_item.get('CMT')).split('|')
-                            # ws['D' + str(row)].value = ied  # escreve na coluna "IED"
                             TIPO_RELE = ied
                         except:
                             pass
 
                     if TIPO_RELE == '' and dat_conf.get('lsc'):
                         try:
-                            # ws['D' + str(row)].value = dat_conf.get('lsc').get('item').get('ID') #Escreve na coluna tipo do rel‚
                             TIPO_RELE = dat_conf.get('lsc').get('item').get('ID')
                         except:
                             pass
-                    # campos extras comuns a todos pds, pas, pts, cgs
-                    # ws[COLS[xs.cIDICCP]+str(row)].value = dat_item.get('IDICCP')
-                    # ws['S'+ str(row)].value = dat_item.get('OBSRV') #escreve na coluna Observa‡„o
 
-                    OBSERVACAO = dat_item.get('OBSRV')
-
-                    # demais campos gerais de pas, pds, pts
                     if dat_type != 'cgs':
                         OCR_SAGE = dat_item.get('OCR')
                         # ws['K' + str(row)].value = dat_item.get('OCR')
@@ -183,8 +194,8 @@ def base2xls(base_path='', Diretorio_Padrao = '', **kwargs):
                             COMANDO = 'CD'
                         else:
                             COMANDO = 'CD'
-
                     # se for um filtro composto
+                    tempo_antes_filtros = time.time()
                     if 'rfc' in list(dat_conf.keys()):
                         OBSERVACAO = 'RFC Parcelas: '
                         DESCRICAO = dat_item.get('NOME')
@@ -243,12 +254,14 @@ def base2xls(base_path='', Diretorio_Padrao = '', **kwargs):
                         interation += 1
                         GObject.idle_add(atualiza_progresso, progress_bar, interation, total)
                         continue
+                    tempo_depois_filtros = time.time()
                     # caso seja um ponto f¡sico aquisitado, preencher conf f¡sica
                     dat_typef = dat_type[:2] + 'f'
                     tempo_antes_confisica = time.time()
                     if dat_typef in list(dat_conf.keys()):
                         # n„o for um filtro
                         if len(dat_conf[dat_typef]['items']) == 1:
+                            #print('dat_type- {} dat_item- {} aconf- {}'.format(dat_type,dat_item['ID'],dat_conf))
                             if sg.is_61850(dat_type, item_id=dat_item['ID'], aconf=dat_conf):
                                 ID_PROTOCOLO = xs.expand_address(dat_type=dat_typef, aconf=dat_conf)
                             else:
@@ -276,20 +289,14 @@ def base2xls(base_path='', Diretorio_Padrao = '', **kwargs):
                         GObject.idle_add(atualiza_progresso, progress_bar, interation, total)
                         continue
                         # row-=1
-
                     grava_ponto(CONTEMPLADO, TIPO_RELE, ID_PROTOCOLO, ID_SAGE, OCR_SAGE, DESCRICAO, TIPO,
                                 COMANDO, MEDICAO, TELA, LISTA_DE_ALARMES,
                                 SOE, OBSERVACAO, ENDERECO, LIU, LIE, LIA, LSA, LSE, LSU, BNDMO)
                     # row+=1
                 interation += 1
                 GObject.idle_add(atualiza_progresso, progress_bar, interation, total)
-                tempo_final_loop = time.time()
-                tempodatconf = tempo_depois_datconf - tempo_antes_datconf
-                tempototal = tempo_final_loop - tempo_inicio
-                tempo_confisica = tempo_depois_confisica - tempo_antes_confisica
-                if tempototal>0:
-                    print('tempo datconf: {} , porcentagem: {}'.format(tempodatconf,100*(tempodatconf/tempototal)))
-                    print('tempo na conf fisica: {} , porcentagem: {}'.format(tempo_confisica, 100*(tempo_confisica/tempototal)))
+
+
                 # fim do loop de itera‡„o sobre os itens
             key_number += 1
     # FIM DA LEITURA DA PLANILHA
