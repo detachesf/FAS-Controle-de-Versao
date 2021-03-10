@@ -1288,9 +1288,9 @@ class Manipulador(object):
     def on_button_base2lp_confirmar_clicked(self, button):
         self.janela_config_base2lp.hide()
         parcela_rfc = self.checkbutton_rfc.get_active()
-        parcela_rca = self.checkbutton_rfc.get_active()
+        parcela_rca = self.checkbutton_rca.get_active()
         self.checkbutton_rfc.set_active(False)
-        self.checkbutton_rfc.set_active(False)
+        self.checkbutton_rca.set_active(False)
         self.Base2Lp(parcela_rca, parcela_rfc)
 
     def on_button_base2lp_cancelar_clicked(self, button):

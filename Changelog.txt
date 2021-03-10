@@ -4,6 +4,13 @@ Todas as mudanças serão documentadas neste arquivo.
 
 ###### Mantido pelo DETA.
 
+## [2.1.2](https://github.com/detachesf/FAS-Controle-de-Versao/commit/cedf557fb480ee5f67f542ff324dee1cadb347cc)- 10-03-2021
+
+### Modificado
+
+- Função base para lp excel
+  - Identificação das configurações físicas e de distribuição dos pontos através de dicionários, trazendo mais rapidez na leitura da base.
+
 ## [2.1.1](https://github.com/detachesf/FAS-Controle-de-Versao/commit/cedf557fb480ee5f67f542ff324dee1cadb347cc)- 03-03-2021
 
 ### Adicionado

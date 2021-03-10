@@ -54,10 +54,12 @@ def base2xls(base_path='', Diretorio_Padrao = '', **kwargs):
     base = sg.load_base(source_path=base_path, **kwargs)
     label_progressbar.set_text('Carregando dicion rios')
     ids_pdd = sg.create_dict_pdd(base['pdd'])
+
     ids_pad = sg.create_dict_pad(base['pad'])
     ids_ptd = sg.create_dict_ptd(base['ptd'])
     ids_pdf = sg.create_dict_xxf(base['pdf'])
     ids_cgf = sg.create_dict_cgf(base['cgf'])
+
     ids_paf = sg.create_dict_xxf(base['paf'])
     arquivos_fisicos ={'pdf':ids_pdf,'cgf':ids_cgf,'paf':ids_paf}
     if base.get('ptf'):
@@ -264,6 +266,25 @@ def base2xls(base_path='', Diretorio_Padrao = '', **kwargs):
                             #print('dat_type- {} dat_item- {} aconf- {}'.format(dat_type,dat_item['ID'],dat_conf))
                             if sg.is_61850(dat_type, item_id=dat_item['ID'], aconf=dat_conf):
                                 ID_PROTOCOLO = xs.expand_address(dat_type=dat_typef, aconf=dat_conf)
+                                if ID_PROTOCOLO == False:
+                                    i=2
+                                    while ID_PROTOCOLO == False or i<10:
+                                        ID_alterado = dat_item.get('ID') + '_' + str(i)
+                                        dat_conf = sg.get_aconf_from_base(dat_type, item_id=dat_item.get('ID', ''),
+                                                                      base_item=base, sitem=dat_item,
+                                                                      slocation=key, xxf=arquivos_fisicos[dat_typef],
+                                                                    item_id_alterado=ID_alterado,
+                                                                      **kwargs)
+                                        ID_PROTOCOLO = xs.expand_address(dat_type=dat_typef, aconf=dat_conf)
+                                        if ID_PROTOCOLO != False:
+                                            break
+                                        print(ID_alterado)
+                                        print(dat_conf)
+                                        i+=1
+                                    if ID_PROTOCOLO == False:
+                                        ID_PROTOCOLO=''
+                                        print('nao achou')
+
                             else:
                                 # ws['H' + str(row)].value = dat_conf[dat_typef]['items'][0].get('ID')  # escreve na coluna "ID PROTOCOLO"
                                 ID_PROTOCOLO = dat_conf[dat_typef]['items'][0].get('ID')
@@ -337,6 +358,8 @@ def base2xls(base_path='', Diretorio_Padrao = '', **kwargs):
         linha += 1  # incrementa a linha
     arq_lp.close()
     janela_carregando.hide()
+    GObject.idle_add(atualiza_progresso, progress_bar, 0, total)
+    GObject.idle_add(janela_carregando.set_title, 'Processando...')
     GObject.idle_add(dialogo_abrir_arquivo_gerado,nome_arq_saida.rsplit('\\', 1)[1],Diretorio_Padrao)
 
     #abrirarquivo = pergunta_sim_nao('Aviso', 'Arquivo \"' + nome_arq_saida.rsplit('\\', 1)[

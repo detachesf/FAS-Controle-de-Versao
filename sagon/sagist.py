@@ -2003,7 +2003,11 @@ def get_aconf_from_base(dat_type, item_id="", item={}, **kwargs):
     if tpaqs == TPAQS_ASAC:
         xxf_dict = kwargs.get('xxf')
         if dat_type == "cgs":
-            xxf_item = xxf_dict.get(s_item.get("ID"), {})
+            id_alterado = kwargs.get('item_id_alterado', False)
+            if id_alterado:
+                xxf_item = xxf_dict.get(id_alterado, {})
+            else:
+                xxf_item = xxf_dict.get(s_item.get('ID'), {})
             xxf_location = s_location.replace('cgs', 'cgf')
         else:
             xxf_item = xxf_dict.get(s_item.get("ID") + "_" + dat_type.upper(), {})
@@ -2017,7 +2021,6 @@ def get_aconf_from_base(dat_type, item_id="", item={}, **kwargs):
                 xxf_location = s_location.replace('pts','ptf')
         #tempo_antes_xxf = time.time()
         xxf_conf = get_physical_conf(dtf, item=xxf_item, xxfitem=xxf_item, xxflocation=xxf_location, **kwargs)
-
         tempo_depois_xxf = time.time()
         #xxf_item = xxf_conf.get(dtf).get('item')
         #xxf_location = xxf_conf.get(dtf).get('location')
@@ -2361,23 +2364,32 @@ def get_endN3_dist(dat_type, item_id="", item={}, **kwargs):
                             #**kwargs)
     #xxd_item = xxd_items[len(xxd_items)-1]
     xxd_dic = kwargs.get('xxd')
-    idpdd = xxd_dic.get(item_id)
     xxf_dic = kwargs.get('xxf')
+
+    idpdd = xxd_dic.get(item_id)
+
     #xxd_location, xxd_dic = get_item_from_base(dat_type=dtd, where={"PDS": "== " + item_id}, base_item = dat, **kwargs)
     if idpdd != None:
         if dat_type == "cgs":
+            if idpdd not in xxf_dic.keys():
+                i = 2
+                while idpdd not in xxf_dic.keys() and i < 10:
+                    chave = item_id + '_' + str(i)
+                    idpdd = xxd_dic.get(chave)
+                    i += 1
             xxf_item = xxf_dic.get(idpdd)
             if xxf_item:
                 i = 2
-                #print(idpdd)
-                while xxf_item.get('ORDEM', False) == False or i < 4:
-                    xxf_item = xxf_dic.get(idpdd+'_'+str(i))
-                    if xxf_item:
-                        if xxf_item.get('ORDEM',False):
+                if not 'ORDEM' in xxf_item.keys():
+                    #print(idpdd)
+                    while xxf_item.get('ORDEM', False) == False and i < 4:
+                        xxf_item = xxf_dic.get(idpdd+'_'+str(i))
+                        if xxf_item:
+                            if xxf_item.get('ORDEM',False):
+                                break
+                        else:
                             break
-                    else:
-                        break
-                    i+=1
+                        i+=1
                 if xxf_item:
                     output = xxf_item.get('ORDEM','')
         else:
@@ -2394,12 +2406,13 @@ def create_dict_pdd(dat={},**kwargs):
                 if dat_item.get('ID', '') == '':
                     # ponto mal formado (sem id)
                     continue
-                PDS = dat_item.get('PDS')
+                PDS_1 = dat_item.get('PDS')
                 ID = dat_item.get('ID')
+                PDS = PDS_1
                 if PDS in list_keys(dict):
                     i = 2
                     while PDS in list_keys(dict):
-                        PDS = PDS + '_' + str(i)
+                        PDS = PDS_1 + '_' + str(i)
                         i+=1
                 dict[PDS] = ID
     return dict
@@ -2412,12 +2425,13 @@ def create_dict_pad(dat={},**kwargs):
                 if dat_item.get('ID', '') == '':
                     # ponto mal formado (sem id)
                     continue
-                PAS = dat_item.get('PAS')
+                PAS_1 = dat_item.get('PAS')
                 ID = dat_item.get('ID')
+                PAS = PAS_1
                 if PAS in list_keys(dict):
                     i = 2
                     while PAS in list_keys(dict):
-                        PAS = PAS + '_' + str(i)
+                        PAS = PAS_1 + '_' + str(i)
                         i += 1
                 dict[PAS] = ID
     return dict
@@ -2430,12 +2444,13 @@ def create_dict_ptd(dat={}, **kwargs):
                 if dat_item.get('ID', '') == '':
                     # ponto mal formado (sem id)
                     continue
-                PTS = dat_item.get('PTS')
+                PTS_1 = dat_item.get('PTS')
                 ID = dat_item.get('ID')
-                if PAS in list_keys(dict):
+                PTS = PTS_1
+                if PTS in list_keys(dict):
                     i = 2
-                    while PAS in list_keys(dict):
-                        PAS = PAS + '_' + str(i)
+                    while PTS in list_keys(dict):
+                        PTS = PTS_1 + '_' + str(i)
                         i += 1
                 dict[PTS] = ID
     return dict
@@ -2466,14 +2481,18 @@ def create_dict_cgf(dat={}, **kwargs):
                     # ponto mal formado (sem id)
                     continue
                 if 'CGS' in dat_item.get('KCONV',''):
-                    CGS = dat_item.get('KCONV').split('=')[1].strip()
+                    CGS_1 = dat_item.get('KCONV').split('=')[1].strip()
                 else:
-                    CGS = dat_item.get('CGS')
+                    CGS_1 = dat_item.get('CGS','')
+                    if CGS_1 == '':
+                        #Ponto sem KCONV = CGS e sem CGS =, mal formatado
+                        continue
 
-                if CGS in list_keys(dict):
+                CGS = CGS_1
+                if CGS_1 in list_keys(dict):
                     i = 2
                     while CGS in list_keys(dict):
-                        CGS = CGS + '_' + str(i)
+                        CGS = CGS_1 + '_' + str(i)
                         i += 1
                 dict[CGS] = dat_item
     return dict

@@ -482,7 +482,10 @@ def expand_address(dat_type, aconf):
     if address == None:
         return ''
     else:
-        prefix, address = str(address).split('-',maxsplit=1)
+        try:
+            prefix, address = str(address).split('-',maxsplit=1)
+        except:
+            return False
         address = aconf.get('nv1',{}).get('items',[{}])[0].get('CONFIG',prefix)+'/'+address
         return address
 
