@@ -91,8 +91,8 @@ class Manipulador(object):
         # Vairáveis Gerais
         self.arqconf_novo = True
         self.pathchecar = getcwd()
-        self.versao = '2.1.1'
-        self.data = '03/03/2020'
+        self.versao = '2.1.2'
+        self.data = '10/03/2020'
         self.window: Gtk.Window = builder.get_object('janela_principal')  # Pega o Objeto da janela princial
         self.window.show_all()  # Mostra a janela principal
         self.lp_de_saida = ''
@@ -1114,7 +1114,7 @@ class Manipulador(object):
         try:
             vers = arq_conf.arqconf['versão'].split('.')
             vers = list(map(int, vers))  # Transformar array de string em array de inteiro
-            if vers < [2, 1, 1]:
+            if vers < [2, 1, 0]:
                 mensagem_erro('Erro', 'Deve ser usado arquivo de configuração com versão igual ou maior a 2.1.0')
             else:
                 try:
@@ -1158,7 +1158,7 @@ class Manipulador(object):
         try:
             vers = arq_conf.arqconf['versão'].split('.')
             vers = list(map(int, vers))  # Transformar array de string em array de inteiro
-            if vers < [2, 1, 1]:
+            if vers < [2, 1, 0]:
                 mensagem_erro('Erro', 'Deve ser usado arquivo de configuração com versão igual ou maior a 2.1.0')
             else:
                 try:
